@@ -2,9 +2,8 @@ import { React, useEffect } from "react";
 import { StyleSheet, Text, View, TextInput, Dimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import * as SQLite from 'expo-sqlite';
+import * as SQLite from "expo-sqlite";
 
-//Scenes
 import PaginaPrincipal from "./Scenes/Principal";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
 
@@ -20,12 +19,40 @@ const TabNatigation = () => {
   );
 };
 
+const Registro = () => {
+  const [Usuario, DefUsuario] = useEffect("");
+  const [Contraseña, DefContraseña] = useEffect("");
+
+  return (
+    <View style={styles.background}>
+      <Text style = {styles.text}>Registro</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => {
+          DefUsuario(text);
+        }}
+        value={Usuario}
+        placeholder="Usuario"
+      />
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => {
+          DefContraseña(text);
+        }}
+        value={Contraseña}
+        placeholder="Contraseña"
+      />
+    </View>
+  );
+};
+
 const Ingreso = () => {
   const [Usuario, DefUsuario] = useEffect("");
   const [Contraseña, DefContraseña] = useEffect("");
 
   return (
     <View style={styles.background}>
+      <Text style = {styles.text}>Inicio de sesión</Text>
       <TextInput
         style={styles.input}
         onChangeText={(text) => {
