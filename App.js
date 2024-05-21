@@ -2,6 +2,7 @@ import { React, useEffect } from "react";
 import { StyleSheet, Text, View, TextInput, Dimensions } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import * as SQLite from 'expo-sqlite';
 
 //Scenes
 import PaginaPrincipal from "./Scenes/Principal";
