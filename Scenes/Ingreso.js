@@ -1,19 +1,67 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { React, useState } from "react";
+import { StyleSheet, Text, View, TextInput, Dimensions,Button } from "react-native";
 
-export default function PaginaIngreso() {
+const Scale = Dimensions.get("window").width;
+
+export default function PaginaIngreso({ navigation }) {
+  const [Usuario, DefUsuario] = useState("");
+  const [Contraseña, DefContraseña] = useState("");
+
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <View style={styles.background}>
+      <Text style={styles.text}>Inicio de sesión</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => {
+          DefUsuario(text);
+        }}
+        value={Usuario}
+        placeholder="Usuario"
+      />
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => {
+          DefContraseña(text);
+        }}
+        value={Contraseña}
+        placeholder="Contraseña"
+        secureTextEntry={true}
+      />
+      <Text style={styles.text}>
+        {"No tienes cuenta "}
+        <Text
+          style={{ color: "blue", textDecorationLine: "underline" }}
+          onPress={() => navigation.navigate("Registro")}
+        >
+          Registrate
+        </Text>
+      </Text>
+      <Button title="Ingresar" onPress={() => navigation.navigate("Tab")}/>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    resizeMode: "cover",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  input: {
+    height: Scale > 400 ? 60 : 40,
+    borderWidth: 1,
+    backgroundColor: "white",
+    borderRadius: Scale > 400 ? 20 : 15,
+    padding: 10,
+    margin: 10,
+    width: "80%",
+    fontSize: Scale > 400 ? 30 : 15,
+  },
+  text: {
+    fontSize: Scale > 400 ? 50 : 15,
+    fontWeight: "bold",
+    marginRight: 10,
+    color: "black",
   },
 });
