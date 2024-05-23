@@ -4,8 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import PaginaPrincipal from "./Scenes/Principal";
-import PaginaIngreso from "./Scenes/Ingreso";
-import PaginaRegistro from "./Scenes/Registro";
+import PaginaInicio from "./Scenes/Inicio";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
 
 const Tab = createBottomTabNavigator();
@@ -24,8 +23,7 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Ingreso" component={PaginaIngreso}/>
-        <Stack.Screen name="Registro" component={PaginaRegistro}/>
+        <Stack.Screen name="Inicio" component={PaginaInicio}/>
         <Stack.Screen name="Tab" component={TabNavigation}/>
       </Stack.Navigator>
     </NavigationContainer>
