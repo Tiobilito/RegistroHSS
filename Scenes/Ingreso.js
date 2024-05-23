@@ -12,12 +12,12 @@ import * as SQLite from "expo-sqlite";
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
-  //const db = await SQLite.openDatabaseAsync("Horario");
+  const db = SQLite.openDatabaseAsync("Horario");
   const [Usuario, DefUsuario] = useState("");
   const [Contraseña, DefContraseña] = useState("");
 
   useEffect(() => {
-    //await db.execAsync('');
+    db.execAsync('');
   }, []);
 
   return (
