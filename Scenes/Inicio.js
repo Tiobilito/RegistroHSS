@@ -1,4 +1,4 @@
-import { React, useState, useEffect, useRef } from "react";
+import { React, useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -9,13 +9,13 @@ import {
 } from "react-native";
 import * as SQLite from "expo-sqlite/legacy";
 import PagerView from "react-native-pager-view";
+import { Picker } from "@react-native-picker/picker";
 
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
-  const [Usuario, DefUsuario] = useState("");
-  const [Contraseña, DefContraseña] = useState("");
-  const refIni = useRef();
+  const [Nombre, DefNombre] = useState("");
+  const [tipoUsuario, DeftipoUsuario] = useState();
 
   const db = SQLite.openDatabase("Horario.db");
 
@@ -39,9 +39,9 @@ export default function PaginaIngreso({ navigation }) {
         `    
           CREATE TABLE IF NOT EXISTS Usuarios (
             ID INTEGER NOT NULL UNIQUE,
-            Usuario TEXT NOT NULL,
+            Nombre TEXT NOT NULL,
+            Tipo TEXT NOT NULL,
             Inicio TEXT,
-            Contraseña TEXT NOT NULL,
             PRIMARY KEY(ID AUTOINCREMENT)
           );
         `
@@ -51,28 +51,37 @@ export default function PaginaIngreso({ navigation }) {
 
   return (
     <View style={styles.background}>
-      <PagerView style={styles.pager} initialPage={0} orientation="horizontal">
-        <View key="1">
-          <Text style={styles.text}>Nombre</Text>
+      <PagerView style={styles.pager} initialPage={0}>
+        <View key="1" style={styles.container}>
+          <Text style={styles.text}>Escribe tu nombre</Text>
           <TextInput
             style={styles.input}
             onChangeText={(text) => {
-              DefUsuario(text);
+              DefNombre(text);
             }}
-            value={Usuario}
+            value={Nombre}
             placeholder="Nombre"
           />
         </View>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => {
-            DefContraseña(text);
-          }}
-          value={Contraseña}
-          placeholder="Contraseña"
-          secureTextEntry={true}
-        />
-        <Button title="Ingresar" onPress={() => navigation.navigate("Tab")} />
+        <View key="2" style={styles.container}>
+          <Text style={styles.text}>Selecciona un rol </Text>
+          <View style={{ width: 240, height: 150 }}>
+            <Picker
+              selectedValue={tipoUsuario}
+              itemStyle={styles.text}
+              onValueChange={(itemValue, itemIndex) => DeftipoUsuario(itemValue)}
+            >
+              <Picker.Item
+                label="Prestador de servicio"
+                value="Prestador de servicio"
+              />
+              <Picker.Item label="Practicante" value="Practicante" />
+            </Picker>
+          </View>
+        </View>
+        <View key="3" style={styles.container}>
+          <Button title="Listo" onPress={() => navigation.navigate("Tab")} />
+        </View>
       </PagerView>
     </View>
   );
@@ -104,5 +113,11 @@ const styles = StyleSheet.create({
   pager: {
     flex: 1,
     alignSelf: "stretch",
+  },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
