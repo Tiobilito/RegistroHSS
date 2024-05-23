@@ -1,11 +1,24 @@
-import { React, useState } from "react";
-import { StyleSheet, Text, View, TextInput, Dimensions,Button } from "react-native";
+import { React, useState, useEffect } from "react";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Dimensions,
+  Button,
+} from "react-native";
+import * as SQLite from "expo-sqlite";
 
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
+  //const db = await SQLite.openDatabaseAsync("Horario");
   const [Usuario, DefUsuario] = useState("");
   const [Contraseña, DefContraseña] = useState("");
+
+  useEffect(() => {
+    //await db.execAsync('');
+  }, []);
 
   return (
     <View style={styles.background}>
@@ -36,7 +49,7 @@ export default function PaginaIngreso({ navigation }) {
           Registrate
         </Text>
       </Text>
-      <Button title="Ingresar" onPress={() => navigation.navigate("Tab")}/>
+      <Button title="Ingresar" onPress={() => navigation.navigate("Tab")} />
     </View>
   );
 }
