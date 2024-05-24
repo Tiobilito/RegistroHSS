@@ -16,7 +16,7 @@ const initializeDatabase = () => {
         );
       `,
       [],
-      () => { console.log('Tabla Horas creada o ya existe'); },
+      () => { console.log('Tabla Horas ya existe'); },
       (_, error) => { console.log('Error al crear la tabla Horas:', error); return true; }
     );
   });
@@ -33,7 +33,7 @@ const initializeDatabase = () => {
         );
       `,
       [],
-      () => { console.log('Tabla Usuarios creada o ya existe'); },
+      () => { console.log('Tabla ya existe'); },
       (_, error) => { console.log('Error al crear la tabla Usuarios:', error); return true; }
     );
   });
