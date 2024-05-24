@@ -1,4 +1,4 @@
-import { React } from "react";
+import { React, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
@@ -20,12 +20,18 @@ const TabNavigation = () => {
 };
 
 export default function App() {
+  const IrInicio = false;
+
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="Inicio" component={PaginaInicio}/>
-        <Stack.Screen name="Tab" component={TabNavigation}/>
-      </Stack.Navigator>
+      {IrInicio ? (
+        <TabNavigation />
+      ) : (
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="Inicio" component={PaginaInicio} />
+          <Stack.Screen name="Tab" component={TabNavigation} />
+        </Stack.Navigator>
+      )}
     </NavigationContainer>
   );
 }
