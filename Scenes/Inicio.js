@@ -7,7 +7,7 @@ import {
   Dimensions,
   Button,
 } from "react-native";
-import * as SQLite from "expo-sqlite/legacy";
+import db from "../DB";
 import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 
@@ -16,38 +16,6 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState();
-
-  const db = SQLite.openDatabase("Horario.db");
-
-  useEffect(() => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `    
-          CREATE TABLE IF NOT EXISTS Horas (
-            ID INTEGER NOT NULL UNIQUE,
-            Inicio TEXT,
-            Final TEXT,
-            Total REAL,
-            PRIMARY KEY(ID AUTOINCREMENT)
-          );
-        `
-      );
-    });
-
-    db.transaction((tx) => {
-      tx.executeSql(
-        `    
-          CREATE TABLE IF NOT EXISTS Usuarios (
-            ID INTEGER NOT NULL UNIQUE,
-            Nombre TEXT NOT NULL,
-            Tipo TEXT NOT NULL,
-            Inicio TEXT,
-            PRIMARY KEY(ID AUTOINCREMENT)
-          );
-        `
-      );
-    });
-  }, []);
 
   return (
     <View style={styles.background}>
