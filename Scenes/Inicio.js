@@ -1,4 +1,4 @@
-import { React, useState, useEffect } from "react";
+import { React, useState, useRef } from "react";
 import {
   StyleSheet,
   Text,
@@ -8,7 +8,7 @@ import {
   Button,
   Alert,
 } from "react-native";
-import db from "../db";
+import db, { AñadeUsuario } from "../db";
 import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 
@@ -17,27 +17,6 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
-
-  const AñadeUsuario = () => {
-    if (Nombre != "" && tipoUsuario != "") {
-      db.transaction((tx) => {
-        tx.executeSql(
-          `INSERT INTO Usuarios (Nombre, Tipo) VALUES (?, ?);`,
-          [Nombre, tipoUsuario],
-          (_, result) => {
-            console.log("Usuario insertado con ID:", result.insertId);
-          },
-          (_, error) => {
-            console.log("Error al insertar usuario:", error);
-            return true;
-          }
-        );
-      });
-      navigation.navigate("Tab");
-    } else {
-      Alert.alert("Por favor rellene todos los datos");
-    }
-  };
 
   return (
     <View style={styles.background}>
@@ -72,7 +51,7 @@ export default function PaginaIngreso({ navigation }) {
           </View>
         </View>
         <View key="3" style={styles.container}>
-          <Button title="Listo" onPress={() => AñadeUsuario()} />
+          <Button title="Listo" onPress={() => AñadeUsuario(Nombre, tipoUsuario)} />
         </View>
       </PagerView>
     </View>
