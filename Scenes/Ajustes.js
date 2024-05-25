@@ -6,7 +6,7 @@ export default function PaginaAjustes() {
   return (
     <View style={styles.container}>
       <Text>Ventana de ajustes</Text>
-      <Button title="Borrar Usuarios" onPress={() => borrarUsuarios()} />
+      <Button title="Borrar El Usuario" onPress={() => borrarUsuarios()} />
     </View>
   );
 }
