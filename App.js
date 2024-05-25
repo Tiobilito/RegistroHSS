@@ -16,6 +16,7 @@ const Stack = createNativeStackNavigator();
 const TabNavigation = () => {
   return (
     <Tab.Navigator
+      initialRouteName="Principal"
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ focused, color, size }) => {
@@ -34,8 +35,8 @@ const TabNavigation = () => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
+      <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
     </Tab.Navigator>
   );
