@@ -1,4 +1,5 @@
 import * as SQLite from "expo-sqlite/legacy";
+import { Alert } from "react-native";
 
 const db = SQLite.openDatabase("Horario.db");
 
@@ -47,24 +48,19 @@ export const initializeDatabase = () => {
 
 //Añade el usuario principal
 export const AñadeUsuario = (Nombre, tipoUsuario) => {
-  if (Nombre != "" && tipoUsuario != "") {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `INSERT INTO Usuarios (Nombre, Tipo) VALUES (?, ?);`,
-        [Nombre, tipoUsuario],
-        (_, result) => {
-          console.log("Usuario insertado con ID:", result.insertId);
-        },
-        (_, error) => {
-          console.log("Error al insertar usuario:", error);
-          return true;
-        }
-      );
-    });
-    navigation.navigate("Tab");
-  } else {
-    Alert.alert("Por favor rellene todos los datos");
-  }
+  db.transaction((tx) => {
+    tx.executeSql(
+      `INSERT INTO Usuarios (Nombre, Tipo) VALUES (?, ?);`,
+      [Nombre, tipoUsuario],
+      (_, result) => {
+        console.log("Usuario insertado con ID:", result.insertId);
+      },
+      (_, error) => {
+        console.log("Error al insertar usuario:", error);
+        return true;
+      }
+    );
+  });
 };
 
 //Borra todos los usuarios

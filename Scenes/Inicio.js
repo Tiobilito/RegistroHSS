@@ -17,11 +17,17 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
+  const ref = useRef();
 
   return (
     <View style={styles.background}>
-      <PagerView style={styles.pager} initialPage={0}>
+      <PagerView style={styles.pager} ref={ref} initialPage={0}>
         <View key="1" style={styles.container}>
+          <Text style={styles.text}>
+            {
+              "Hola aspirante, registra tu usuario y desliza para procegir con el registro\n"
+            }
+          </Text>
           <Text style={styles.text}>Escribe tu nombre</Text>
           <TextInput
             style={styles.input}
@@ -38,10 +44,12 @@ export default function PaginaIngreso({ navigation }) {
             <Picker
               selectedValue={tipoUsuario}
               itemStyle={styles.text}
-              onValueChange={(itemValue, itemIndex) =>
-                DeftipoUsuario(itemValue)
-              }
+              onValueChange={(itemValue) => DeftipoUsuario(itemValue)}
             >
+              <Picker.Item
+                label="Selecciona una opción"
+                value="Selecciona una opción"
+              />
               <Picker.Item
                 label="Prestador de servicio"
                 value="Prestador de servicio"
@@ -51,7 +59,17 @@ export default function PaginaIngreso({ navigation }) {
           </View>
         </View>
         <View key="3" style={styles.container}>
-          <Button title="Listo" onPress={() => AñadeUsuario(Nombre, tipoUsuario)} />
+          <Button
+            title="Listo"
+            onPress={() => {
+              if (Nombre != "" && tipoUsuario != "") {
+                AñadeUsuario(Nombre, tipoUsuario);
+                navigation.navigate("Tab");
+              } else {
+                Alert.alert("Por favor rellene todos los datos");
+              }
+            }}
+          />
         </View>
       </PagerView>
     </View>
@@ -78,7 +96,7 @@ const styles = StyleSheet.create({
   text: {
     fontSize: Scale > 400 ? 50 : 15,
     fontWeight: "bold",
-    marginRight: 10,
+    marginRight: 20,
     color: "black",
   },
   pager: {
