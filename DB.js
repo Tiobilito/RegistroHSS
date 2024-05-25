@@ -85,4 +85,24 @@ export const borrarUsuarios = () => {
   });
 };
 
+//Inicia el tiempo
+export const IniciarTiempoUsuario = (TiempoInicio) => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      `UPDATE Usuarios SET Inicio = ? WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
+      [TiempoInicio],
+      (_, result) => {
+        console.log("El tiempo de inicio ha sido registrado.");
+      },
+      (_, error) => {
+        console.log(
+          "Error al iniciar el tiempo de inicio.",
+          error
+        );
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+};
+
 export default db;

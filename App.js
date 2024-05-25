@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import Ionicons from "@expo/vector-icons/Ionicons";
 import db, { initializeDatabase } from "./db";
 
 import PaginaPrincipal from "./Scenes/Principal";
@@ -13,7 +14,23 @@ const Stack = createNativeStackNavigator();
 
 const TabNavigation = () => {
   return (
-    <Tab.Navigator screenOptions={{ headerShown: false }}>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName;
+          if (route.name === "Principal") {
+            iconName = focused ? "home" : "home-outline";
+          } else if (route.name === "TablaHoras") {
+            iconName = focused ? "list" : "list-outline";
+          }
+          // You can return any component that you like here!
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "black",
+        tabBarInactiveTintColor: "gray",
+      })}
+    >
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
     </Tab.Navigator>
@@ -25,7 +42,7 @@ export default function App() {
 
   useEffect(() => {
     initializeDatabase();
-    console.log('Base de datos inicializada');
+    console.log("Base de datos inicializada");
     VerificarUsuario();
   }, []);
 
