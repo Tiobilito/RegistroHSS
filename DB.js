@@ -1,5 +1,4 @@
 import * as SQLite from "expo-sqlite/legacy";
-import { Alert } from "react-native";
 
 const db = SQLite.openDatabase("Horario.db");
 
