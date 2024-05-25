@@ -1,11 +1,13 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, Alert } from "react-native";
+import { StyleSheet, Text, View, Button, Alert,Dimensions } from "react-native";
 import db, { borrarUsuarios } from "../db";
+
+const Scale = Dimensions.get("window").width;
 
 export default function PaginaAjustes() {
   return (
     <View style={styles.container}>
-      <Text>Ventana de ajustes</Text>
+      <Text style={styles.text}>Ventana de ajustes</Text>
       <Button
         title="Borrar El Usuario"
         onPress={() => {
@@ -37,5 +39,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  text: {
+    fontSize: Scale > 400 ? 50 : 15,
+    fontWeight: "bold",
+    margin: 20,
+    color: "black",
   },
 });
