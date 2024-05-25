@@ -6,8 +6,9 @@ import {
   TextInput,
   Dimensions,
   Button,
+  Alert,
 } from "react-native";
-import db from "../DB";
+import db from "../db";
 import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 
@@ -15,7 +16,28 @@ const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
   const [Nombre, DefNombre] = useState("");
-  const [tipoUsuario, DeftipoUsuario] = useState();
+  const [tipoUsuario, DeftipoUsuario] = useState("");
+
+  const AñadeUsuario = () => {
+    if (Nombre != "" && tipoUsuario != "") {
+      db.transaction((tx) => {
+        tx.executeSql(
+          `INSERT INTO Usuarios (Nombre, Tipo) VALUES (?, ?);`,
+          [Nombre, tipoUsuario],
+          (_, result) => {
+            console.log("Usuario insertado con ID:", result.insertId);
+          },
+          (_, error) => {
+            console.log("Error al insertar usuario:", error);
+            return true;
+          }
+        );
+      });
+      navigation.navigate("Tab");
+    } else {
+      Alert.alert("Por favor rellene todos los datos");
+    }
+  };
 
   return (
     <View style={styles.background}>
@@ -37,7 +59,9 @@ export default function PaginaIngreso({ navigation }) {
             <Picker
               selectedValue={tipoUsuario}
               itemStyle={styles.text}
-              onValueChange={(itemValue, itemIndex) => DeftipoUsuario(itemValue)}
+              onValueChange={(itemValue, itemIndex) =>
+                DeftipoUsuario(itemValue)
+              }
             >
               <Picker.Item
                 label="Prestador de servicio"
@@ -48,7 +72,7 @@ export default function PaginaIngreso({ navigation }) {
           </View>
         </View>
         <View key="3" style={styles.container}>
-          <Button title="Listo" onPress={() => navigation.navigate("Tab")} />
+          <Button title="Listo" onPress={() => AñadeUsuario()} />
         </View>
       </PagerView>
     </View>

@@ -1,7 +1,8 @@
-import { React, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import db, { initializeDatabase } from "./db";
 
 import PaginaPrincipal from "./Scenes/Principal";
 import PaginaInicio from "./Scenes/Inicio";
@@ -20,11 +21,43 @@ const TabNavigation = () => {
 };
 
 export default function App() {
-  const IrInicio = false;
+  const [irInicio, setIrInicio] = useState(null);
+
+  useEffect(() => {
+    initializeDatabase();
+    console.log('Base de datos inicializada');
+    VerificarUsuario();
+  }, []);
+
+  const VerificarUsuario = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM Usuarios;`,
+        [],
+        (_, { rows }) => {
+          if (rows.length > 0) {
+            console.log("Si hay un usuario: ", rows._array);
+            setIrInicio(true);
+          } else {
+            console.log("No hay registros en la tabla Usuarios");
+            setIrInicio(false);
+          }
+        },
+        (_, error) => {
+          console.log("Error al verificar usuarios:", error);
+          setIrInicio(false);
+        }
+      );
+    });
+  };
+
+  if (irInicio === null) {
+    return null;
+  }
 
   return (
     <NavigationContainer>
-      {IrInicio ? (
+      {irInicio ? (
         <TabNavigation />
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
