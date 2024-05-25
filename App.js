@@ -8,6 +8,7 @@ import db, { initializeDatabase } from "./db";
 import PaginaPrincipal from "./Scenes/Principal";
 import PaginaInicio from "./Scenes/Inicio";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
+import PaginaAjustes from "./Scenes/Ajustes";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -23,6 +24,8 @@ const TabNavigation = () => {
             iconName = focused ? "home" : "home-outline";
           } else if (route.name === "TablaHoras") {
             iconName = focused ? "list" : "list-outline";
+          } else if (route.name === "Ajustes") {
+            iconName = focused ? "cog" : "cog-outline";
           }
           // You can return any component that you like here!
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -33,6 +36,7 @@ const TabNavigation = () => {
     >
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
+      <Tab.Screen name="Ajustes" component={PaginaAjustes} />
     </Tab.Navigator>
   );
 };
