@@ -25,7 +25,7 @@ export default function PaginaIngreso({ navigation }) {
         <View key="1" style={styles.container}>
           <Text style={styles.text}>
             {
-              "Hola aspirante, registra tu usuario y desliza para procegir con el registro\n"
+              "Hola aspirante, registra tu usuario y desliza para procegir con el registro\n Solo tienes que hacer este proceso 1 vez \n\n"
             }
           </Text>
           <Text style={styles.text}>Escribe tu nombre</Text>
