@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
-import db from "../db";
+import db from "../Modulos/db";
 
 export default function PaginaTablaHoras() {
   const [Horas, DefHoras] = useState([]);

@@ -8,7 +8,7 @@ import {
   Button,
   Alert,
 } from "react-native";
-import db, { AñadeUsuario } from "../db";
+import db, { AñadeUsuario } from "../Modulos/db";
 import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 import { CommonActions } from "@react-navigation/native";

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
-import db from "../db";
+import db from "../Modulos/db";
+import { Cronometro } from "../Modulos/Cronometro";
 
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso() {
   const [usuario, setUsuario] = useState(null);
+  const startDate = new Date(); 
 
   const tomarUsuario = () => {
     db.transaction((tx) => {
@@ -33,7 +35,7 @@ export default function PaginaIngreso() {
   return (
     <View style={styles.container}>
       {usuario ? (
-        <>
+        <View>
           <Text style={styles.text}>
             Hola {usuario.Nombre} a la app de registro de horas para{" "}
             {usuario.Tipo}
@@ -44,7 +46,8 @@ export default function PaginaIngreso() {
               console.log("espere funcionalidad");
             }}
           />
-        </>
+          <Cronometro startDate={startDate} />
+        </View>
       ) : (
         <Text>Cargando...</Text>
       )}
@@ -58,6 +61,9 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  Content: {
+    margin: 50
   },
   text: {
     fontSize: Scale > 400 ? 50 : 15,

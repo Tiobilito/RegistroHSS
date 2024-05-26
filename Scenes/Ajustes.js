@@ -7,7 +7,7 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
-import db, { borrarUsuarios } from "../db";
+import db, { borrarUsuarios } from "../Modulos/db"
 
 const Scale = Dimensions.get("window").width;
 
