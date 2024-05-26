@@ -1,5 +1,12 @@
 import React from "react";
-import { StyleSheet, Text, View, Button, Alert,Dimensions } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Button,
+  Alert,
+  Dimensions,
+} from "react-native";
 import db, { borrarUsuarios } from "../db";
 
 const Scale = Dimensions.get("window").width;

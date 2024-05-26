@@ -1,11 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  Button,
-} from "react-native";
+import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import db from "../db";
 
 const Scale = Dimensions.get("window").width;
@@ -40,11 +34,16 @@ export default function PaginaIngreso() {
     <View style={styles.container}>
       {usuario ? (
         <>
-        <Text style={styles.text}>
-          Hola {usuario.Nombre} a la app de registro de horas para{" "}
-          {usuario.Tipo}
-        </Text>
-        <Button title="Iniciar tiempo" onPress={() => {console.log("espere funcionalidad")}}/>
+          <Text style={styles.text}>
+            Hola {usuario.Nombre} a la app de registro de horas para{" "}
+            {usuario.Tipo}
+          </Text>
+          <Button
+            title="Iniciar tiempo"
+            onPress={() => {
+              console.log("espere funcionalidad");
+            }}
+          />
         </>
       ) : (
         <Text>Cargando...</Text>
