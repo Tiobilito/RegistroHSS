@@ -35,8 +35,8 @@ const TabNavigation = () => {
         tabBarInactiveTintColor: "gray",
       })}
     >
-      <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
+      <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
     </Tab.Navigator>
   );

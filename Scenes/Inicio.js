@@ -11,6 +11,7 @@ import {
 import db, { AñadeUsuario } from "../db";
 import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
+import { CommonActions } from "@react-navigation/native";
 
 const Scale = Dimensions.get("window").width;
 
@@ -64,7 +65,12 @@ export default function PaginaIngreso({ navigation }) {
             onPress={() => {
               if (Nombre != "" && tipoUsuario != "") {
                 AñadeUsuario(Nombre, tipoUsuario);
-                navigation.navigate("Tab");
+                navigation.dispatch(
+                  CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: "Tab" }],
+                  })
+                );
               } else {
                 Alert.alert("Por favor rellene todos los datos");
               }
