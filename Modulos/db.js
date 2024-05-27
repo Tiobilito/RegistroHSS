@@ -104,4 +104,49 @@ export const IniciarTiempoUsuario = (TiempoInicio) => {
   });
 };
 
+//Añade Horas
+export const añadirHoras = () => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      `SELECT ID, Inicio FROM Usuarios WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
+      [],
+      (_, { rows }) => {
+        if (rows.length > 0) {
+          const usuario = rows._array[0];
+          const inicio = new Date(usuario.Inicio);
+          const fin = new Date();
+          const total = (fin - inicio) / (1000 * 60 * 60); // Diferencia en horas
+
+          tx.executeSql(
+            `INSERT INTO Horas (Inicio, Final, Total) VALUES (?, ?, ?);`,
+            [inicio.toISOString(), fin.toISOString(), total],
+            (_, result) => {
+              console.log("Registro de horas añadido con ID:", result.insertId);
+              tx.executeSql(
+                `UPDATE Usuarios SET Inicio = NULL WHERE ID = ?;`,
+                [usuario.ID],
+                (_, result) => {
+                  console.log("Campo Inicio del usuario actualizado a NULL.");
+                },
+                (_, error) => {
+                  console.log("Error al actualizar el campo Inicio del usuario:", error);
+                  return true; // Indica que el error fue manejado
+                }
+              );
+            },
+            (_, error) => {
+              console.log("Error al añadir el registro de horas:", error);
+              return true; // Indica que el error fue manejado
+            }
+          );
+        }
+      },
+      (_, error) => {
+        console.log("Error al obtener la fecha de inicio del usuario:", error);
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+};
+
 export default db;

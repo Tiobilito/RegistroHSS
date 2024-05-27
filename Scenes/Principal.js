@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
-import db from "../Modulos/db";
+import db, { IniciarTiempoUsuario, añadirHoras } from "../Modulos/db";
 import { Cronometro } from "../Modulos/Cronometro";
 
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso() {
-  const [usuario, setUsuario] = useState(null);
-  const startDate = new Date(); 
+  const [usuario, DefUsuario] = useState(null);
+  const [MostrarCr, DefMostrarCr] = useState(false);
+  const [FechaInicio, DefFechaInicio] = useState(new Date());
 
   const tomarUsuario = () => {
     db.transaction((tx) => {
@@ -16,7 +17,12 @@ export default function PaginaIngreso() {
         [],
         (_, { rows }) => {
           if (rows.length > 0) {
-            setUsuario(rows._array[0]);
+            const usuario = rows._array[0];
+            DefUsuario(usuario);
+            if (usuario.Inicio) {
+              DefMostrarCr(true);
+              DefFechaInicio(new Date(usuario.Inicio));
+            }
           } else {
             console.log("No hay Usuario");
           }
@@ -40,13 +46,32 @@ export default function PaginaIngreso() {
             Hola {usuario.Nombre} a la app de registro de horas para{" "}
             {usuario.Tipo}
           </Text>
-          <Button
-            title="Iniciar tiempo"
-            onPress={() => {
-              console.log("espere funcionalidad");
-            }}
-          />
-          <Cronometro startDate={startDate} />
+          {MostrarCr ? (
+            <View>
+              <Button
+                color="red"
+                title="Detener tiempo"
+                onPress={() => {
+                  añadirHoras();
+                  DefMostrarCr(false);
+                }}
+              />
+              <Cronometro startDate={FechaInicio} />
+            </View>
+          ) : (
+            <View>
+              <Button
+                color="blue"
+                title="Iniciar tiempo"
+                onPress={() => {
+                  const now = new Date();
+                  DefFechaInicio(now);
+                  IniciarTiempoUsuario(now.toISOString());
+                  DefMostrarCr(true);
+                }}
+              />
+            </View>
+          )}
         </View>
       ) : (
         <Text>Cargando...</Text>
@@ -63,7 +88,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   Content: {
-    margin: 50
+    margin: 50,
+  },
+  Boton: {
+    color: "red",
   },
   text: {
     fontSize: Scale > 400 ? 50 : 15,

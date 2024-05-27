@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 import db from "../Modulos/db";
 
 export default function PaginaTablaHoras() {
@@ -23,9 +24,11 @@ export default function PaginaTablaHoras() {
     });
   };
 
-  useEffect(() => {
-    obtenerHoras();
-  }, []);
+  useFocusEffect(
+    React.useCallback(() => {
+      obtenerHoras();
+    }, [])
+  );
 
   return (
     <View style={styles.container}>
