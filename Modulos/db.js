@@ -2,7 +2,7 @@ import * as SQLite from "expo-sqlite/legacy";
 
 const db = SQLite.openDatabase("Horario.db");
 
-//Inicializa la base de datos
+// Inicializa la base de datos
 export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -11,7 +11,7 @@ export const initializeDatabase = () => {
           ID INTEGER NOT NULL UNIQUE,
           Inicio TEXT,
           Final TEXT,
-          Total REAL,
+          Total TEXT,
           PRIMARY KEY(ID AUTOINCREMENT)
         );
       `,
@@ -45,7 +45,7 @@ export const initializeDatabase = () => {
   });
 };
 
-//Añade el usuario principal
+// Añade el usuario principal
 export const AñadeUsuario = (Nombre, tipoUsuario) => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -62,7 +62,7 @@ export const AñadeUsuario = (Nombre, tipoUsuario) => {
   });
 };
 
-//Borra todos los usuarios
+// Borra todos los usuarios
 export const borrarUsuarios = () => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -84,7 +84,7 @@ export const borrarUsuarios = () => {
   });
 };
 
-//Inicia el tiempo
+// Inicia el tiempo
 export const IniciarTiempoUsuario = (TiempoInicio) => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -94,17 +94,37 @@ export const IniciarTiempoUsuario = (TiempoInicio) => {
         console.log("El tiempo de inicio ha sido registrado.");
       },
       (_, error) => {
-        console.log(
-          "Error al iniciar el tiempo de inicio.",
-          error
-        );
+        console.log("Error al iniciar el tiempo de inicio.", error);
         return true; // Indica que el error fue manejado
       }
     );
   });
 };
 
-//Añade Horas
+// Función para formatear la fecha y hora
+const formatearFechaHora = (fecha) => {
+  const opciones = {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  };
+  return fecha.toLocaleString("es-ES", opciones).replace(",", " a las");
+};
+
+// Función para calcular la diferencia en formato HH:MM
+const calcularDiferenciaHoras = (inicio, fin) => {
+  const diffMs = fin - inicio;
+  const diffHrs = Math.floor(diffMs / 3600000);
+  const diffMins = Math.floor((diffMs % 3600000) / 60000);
+  return `${diffHrs.toString().padStart(2, "0")}:${diffMins
+    .toString()
+    .padStart(2, "0")}`;
+};
+
+// Añade horas
 export const añadirHoras = () => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -115,11 +135,13 @@ export const añadirHoras = () => {
           const usuario = rows._array[0];
           const inicio = new Date(usuario.Inicio);
           const fin = new Date();
-          const total = (fin - inicio) / (1000 * 60 * 60); // Diferencia en horas
+          const inicioFormateado = formatearFechaHora(inicio);
+          const finFormateado = formatearFechaHora(fin);
+          const total = calcularDiferenciaHoras(inicio, fin);
 
           tx.executeSql(
             `INSERT INTO Horas (Inicio, Final, Total) VALUES (?, ?, ?);`,
-            [inicio.toISOString(), fin.toISOString(), total],
+            [inicioFormateado, finFormateado, total],
             (_, result) => {
               console.log("Registro de horas añadido con ID:", result.insertId);
               tx.executeSql(
@@ -129,7 +151,10 @@ export const añadirHoras = () => {
                   console.log("Campo Inicio del usuario actualizado a NULL.");
                 },
                 (_, error) => {
-                  console.log("Error al actualizar el campo Inicio del usuario:", error);
+                  console.log(
+                    "Error al actualizar el campo Inicio del usuario:",
+                    error
+                  );
                   return true; // Indica que el error fue manejado
                 }
               );
