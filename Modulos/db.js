@@ -109,19 +109,21 @@ const formatearFechaHora = (fecha) => {
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
     hour12: true,
   };
   return fecha.toLocaleString("es-ES", opciones).replace(",", " a las");
 };
 
-// Función para calcular la diferencia en formato HH:MM
+// Función para calcular la diferencia en formato HH:MM:SS
 const calcularDiferenciaHoras = (inicio, fin) => {
   const diffMs = fin - inicio;
   const diffHrs = Math.floor(diffMs / 3600000);
   const diffMins = Math.floor((diffMs % 3600000) / 60000);
+  const diffSecs = Math.floor((diffMs % 60000) / 1000);
   return `${diffHrs.toString().padStart(2, "0")}:${diffMins
     .toString()
-    .padStart(2, "0")}`;
+    .padStart(2, "0")}:${diffSecs.toString().padStart(2, "0")}`;
 };
 
 // Añade horas
