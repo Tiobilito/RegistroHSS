@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Ionicons from "@expo/vector-icons/Ionicons";
 import db, { initializeDatabase } from "./Modulos/db";
 
@@ -54,26 +55,16 @@ export default function App() {
     VerificarUsuario();
   }, []);
 
-  const VerificarUsuario = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Usuarios;`,
-        [],
-        (_, { rows }) => {
-          if (rows.length > 0) {
-            console.log("Si hay un usuario: ", rows._array);
-            setIrInicio(true);
-          } else {
-            console.log("No hay registros en la tabla Usuarios");
-            setIrInicio(false);
-          }
-        },
-        (_, error) => {
-          console.log("Error al verificar usuarios:", error);
-          setIrInicio(false);
-        }
-      );
-    });
+  const VerificarUsuario = async () => {
+    try {
+      const codigo = await AsyncStorage.getItem('Codigo-Usuario');
+      if (codigo !== null) {
+        console.log("Codigo: ", codigo);
+        setIrInicio(true);
+      }
+    } catch (e) {
+      console.log("no hay codigo");
+    }
   };
 
   if (irInicio === null) {

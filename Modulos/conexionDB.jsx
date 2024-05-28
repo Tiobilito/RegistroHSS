@@ -9,7 +9,7 @@ async function conexion() {
     console.log('Algo salió mal:', error);
     return
   } 
-    console.log('Data:', data[0]);
+    console.log('Data:', data);
    
   }
 
