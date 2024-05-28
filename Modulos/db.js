@@ -98,7 +98,7 @@ export const IniciarTiempoUsuario = (TiempoInicio) => {
         return true; // Indica que el error fue manejado
       }
     );
-  });
+  }); 
 };
 
 // Función para formatear la fecha y hora
