@@ -7,12 +7,15 @@ export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
       `
-        CREATE TABLE IF NOT EXISTS Horas (
-          ID INTEGER NOT NULL UNIQUE,
-          Inicio TEXT,
-          Final TEXT,
-          Total TEXT,
-          PRIMARY KEY(ID AUTOINCREMENT)
+        CREATE TABLE "Horas" (
+          "ID"	INTEGER NOT NULL UNIQUE,
+          "Inicio"	TEXT,
+          "Final"	TEXT,
+          "Total"	TEXT,
+          "Impreso"	INTEGER DEFAULT 0,
+          "CodigoUsuario"	INTEGER,
+          FOREIGN KEY("CodigoUsuario") REFERENCES "Usuarios"("Codigo"),
+          PRIMARY KEY("ID" AUTOINCREMENT)
         );
       `,
       [],
@@ -23,16 +26,15 @@ export const initializeDatabase = () => {
       }
     );
   });
-
   db.transaction((tx) => {
     tx.executeSql(
       `
-        CREATE TABLE IF NOT EXISTS Usuarios (
-          ID INTEGER NOT NULL UNIQUE,
-          Nombre TEXT NOT NULL,
-          Tipo TEXT NOT NULL,
-          Inicio TEXT,
-          PRIMARY KEY(ID AUTOINCREMENT)
+        CREATE TABLE "Usuarios" (
+          "Codigo"	INTEGER NOT NULL UNIQUE,
+          "Usuario"	TEXT NOT NULL,
+          "Inicio"	TEXT,
+          "Contraseña"	TEXT NOT NULL,
+          PRIMARY KEY("Codigo")
         );
       `,
       [],
@@ -46,13 +48,13 @@ export const initializeDatabase = () => {
 };
 
 // Añade el usuario principal
-export const AñadeUsuario = (Nombre, tipoUsuario) => {
+export const AñadeUsuario = (Codigo ,Nombre, tipoUsuario) => {
   db.transaction((tx) => {
     tx.executeSql(
-      `INSERT INTO Usuarios (Nombre, Tipo) VALUES (?, ?);`,
-      [Nombre, tipoUsuario],
+      `INSERT INTO Usuarios (Codigo, Nombre, Tipo) VALUES (?, ?, ?);`,
+      [Codigo, Nombre, tipoUsuario],
       (_, result) => {
-        console.log("Usuario insertado con ID:", result.insertId);
+        console.log("Usuario insertado con el codigo:", result.insertId);
       },
       (_, error) => {
         console.log("Error al insertar usuario:", error);
@@ -76,6 +78,24 @@ export const borrarUsuarios = () => {
       (_, error) => {
         console.log(
           "Error al borrar los registros de la tabla Usuarios:",
+          error
+        );
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+  db.transaction((tx) => {
+    tx.executeSql(
+      `DELETE FROM Horas;`,
+      [],
+      (_, result) => {
+        console.log(
+          "Todos los registros de la tabla Horas han sido borrados."
+        );
+      },
+      (_, error) => {
+        console.log(
+          "Error al borrar los registros de la tabla Horas:",
           error
         );
         return true; // Indica que el error fue manejado
@@ -114,21 +134,22 @@ const formatearFechaHora = (fecha) => {
   return fecha.toLocaleString("es-ES", opciones).replace(",", " a las");
 };
 
-// Función para calcular la diferencia en formato HH:MM
+// Función para calcular la diferencia en formato HH:MM:SS
 const calcularDiferenciaHoras = (inicio, fin) => {
   const diffMs = fin - inicio;
   const diffHrs = Math.floor(diffMs / 3600000);
   const diffMins = Math.floor((diffMs % 3600000) / 60000);
+  const diffSecs = Math.floor((diffMs % 60000) / 1000);
   return `${diffHrs.toString().padStart(2, "0")}:${diffMins
     .toString()
-    .padStart(2, "0")}`;
+    .padStart(2, "0")}:${diffSecs.toString().padStart(2, "0")}`;
 };
 
 // Añade horas
 export const añadirHoras = () => {
   db.transaction((tx) => {
     tx.executeSql(
-      `SELECT ID, Inicio FROM Usuarios WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
+      `SELECT Codigo, Inicio FROM Usuarios WHERE Codigo = (SELECT Codigo FROM Usuarios ORDER BY Codigo ASC LIMIT 1);`,
       [],
       (_, { rows }) => {
         if (rows.length > 0) {
@@ -140,13 +161,13 @@ export const añadirHoras = () => {
           const total = calcularDiferenciaHoras(inicio, fin);
 
           tx.executeSql(
-            `INSERT INTO Horas (Inicio, Final, Total) VALUES (?, ?, ?);`,
-            [inicioFormateado, finFormateado, total],
+            `INSERT INTO Horas (Inicio, Final, Total, CodigoUsuario) VALUES (?, ?, ?, ?);`,
+            [inicioFormateado, finFormateado, total, usuario.Codigo],
             (_, result) => {
               console.log("Registro de horas añadido con ID:", result.insertId);
               tx.executeSql(
-                `UPDATE Usuarios SET Inicio = NULL WHERE ID = ?;`,
-                [usuario.ID],
+                `UPDATE Usuarios SET Inicio = NULL WHERE Codigo = ?;`,
+                [usuario.Codigo],
                 (_, result) => {
                   console.log("Campo Inicio del usuario actualizado a NULL.");
                 },

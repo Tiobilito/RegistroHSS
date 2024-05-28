@@ -18,6 +18,7 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
+  const [Codigo, DefCodigo] = useState(0);
   const ref = useRef();
 
   return (
@@ -40,6 +41,18 @@ export default function PaginaIngreso({ navigation }) {
           />
         </View>
         <View key="2" style={styles.container}>
+          <Text style={styles.text}>Escribe tu codigo</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => {
+              if (/^\d+$/.test(text) || text === "") DefCodigo(text);
+            }}
+            keyboardType="numeric"
+            value={Codigo}
+            placeholder="Codigo"
+          />
+        </View>
+        <View key="3" style={styles.container}>
           <Text style={styles.text}>Selecciona un rol </Text>
           <View style={{ width: 240, height: 150 }}>
             <Picker
@@ -59,7 +72,7 @@ export default function PaginaIngreso({ navigation }) {
             </Picker>
           </View>
         </View>
-        <View key="3" style={styles.container}>
+        <View key="4" style={styles.container}>
           <Button
             title="Listo"
             onPress={() => {
