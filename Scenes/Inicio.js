@@ -13,14 +13,22 @@ import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 import { CommonActions } from "@react-navigation/native";
 
-import { conexion} from "../Modulos/conexionDB"
-
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
+  const [codigo, DefCodigo] = useState(null);
   const ref = useRef();
+
+  const GuardarCodigo = async () => {
+    try {
+      await AsyncStorage.setItem("Codigo-Usuario", codigo);
+      console.log("Codigo: ", codigo);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <View style={styles.background}>
@@ -41,7 +49,22 @@ export default function PaginaIngreso({ navigation }) {
             placeholder="Nombre"
           />
         </View>
-        <View key="2" style={styles.container}>
+        <View key="2">
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            onChangeText={(text) => {
+              const ValorEnt = parseInt(text, 10);
+              if (!isNaN(ValorEnt)) {
+                DefCodigo(ValorEnt);
+              } else if (text === "") {
+                DefCodigo(null);
+              }
+            }}
+            value={codigo !== null ? codigo.toString() : ""}
+          />
+        </View>
+        <View key="3" style={styles.container}>
           <Text style={styles.text}>Selecciona un rol </Text>
           <View style={{ width: 240, height: 150 }}>
             <Picker
@@ -61,14 +84,13 @@ export default function PaginaIngreso({ navigation }) {
             </Picker>
           </View>
         </View>
-        <View key="3" style={styles.container}>
+        <View key="4" style={styles.container}>
           <Button
             title="Listo"
             onPress={() => {
               if (Nombre != "" && tipoUsuario != "") {
-                AñadeUsuario(Nombre, tipoUsuario);
-              
-
+                GuardarCodigo(codigo);
+                //AñadeUsuario(Nombre, tipoUsuario);
                 navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
