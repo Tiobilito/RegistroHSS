@@ -13,6 +13,8 @@ import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 import { CommonActions } from "@react-navigation/native";
 
+import { conexion} from "../Modulos/conexionDB"
+
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
@@ -65,6 +67,8 @@ export default function PaginaIngreso({ navigation }) {
             onPress={() => {
               if (Nombre != "" && tipoUsuario != "") {
                 AñadeUsuario(Nombre, tipoUsuario);
+              
+
                 navigation.dispatch(
                   CommonActions.reset({
                     index: 0,

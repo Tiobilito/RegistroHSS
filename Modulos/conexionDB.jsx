@@ -2,20 +2,20 @@ import {React,useEffect} from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import {supabase} from "./supabase"
 
-async function conexion() {
-    console.log("enter")
-  const { data, error } = await supabase.from('usuarios').select('*');
+export async function conexion(nombre,tipo) {
+    
+  const { data, error } = await supabase.from('usuarios2').select('*');
   if (error) {
     console.log('Algo salió mal:', error);
     return
   } 
-    console.log('Data:', data[0]);
+    console.log('Data:', data);
    
   }
 
   
 export default function DB() {
-    console.log("hola")
+
   useEffect(() => {
    conexion();
   }, []);
