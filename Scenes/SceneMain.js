@@ -19,7 +19,7 @@ export default function Main({ navigation }) {
     console.log(user)
     console.log(password)
     findDB()
-    // Puedes agregar aquí más lógica si lo necesitas
+    
   }
   async function findDB(){
 

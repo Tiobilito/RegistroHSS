@@ -1,8 +1,66 @@
 import * as SQLite from "expo-sqlite/legacy";
+import React, { useState, useEffect } from "react";
+import { saveDateDBHours, conexion } from "./conexionDB";
 
 const db = SQLite.openDatabase("Horario.db");
 
-// Inicializa la base de datos
+const MyComponent = () => {
+  const [dates, setDates] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const user = await conexion();
+      if (user) {
+        setDates(user);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  
+
+  // Resto de las funciones y lógica aquí...
+
+  return (
+    <div>
+      {/* Tu componente JSX aquí... */}
+    </div>
+  );
+};
+
+export const añadirHora = async() => {
+  const usuario = "rauf";
+  //const esperar= await conexion()
+  console.log(usuario);
+  const inicio = new Date(usuario);
+  const fin = new Date();
+  const inicioFormateado = formatearFechaHora(inicio);
+  const finFormateado = formatearFechaHora(fin);
+  const total = calcularDiferenciaHoras(inicio, fin);
+  console.log({ inicioFormateado, finFormateado, total });
+  conexion()
+
+};
+
+export async function añadirHoras (){
+  console.log("entrad a la funcion horas ")
+ 
+  try {
+    console.log("antes del wait")
+    const data = await conexion();
+    if (data) {
+      console.log("Datos recibidos:", data[0].inicio);
+      saveDateDBHours(data[0].inicio,data[0].inicio)
+      
+    } else {
+      console.log("No se recibieron datos.");
+    }
+  } catch (error) {
+    console.error("Error al obtener los datos:", error);
+  }
+
+}
 export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -45,7 +103,6 @@ export const initializeDatabase = () => {
   });
 };
 
-// Añade el usuario principal
 export const AñadeUsuario = (Nombre, tipoUsuario) => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -62,7 +119,6 @@ export const AñadeUsuario = (Nombre, tipoUsuario) => {
   });
 };
 
-// Borra todos los usuarios
 export const borrarUsuarios = () => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -84,7 +140,6 @@ export const borrarUsuarios = () => {
   });
 };
 
-// Inicia el tiempo
 export const IniciarTiempoUsuario = (TiempoInicio) => {
   db.transaction((tx) => {
     tx.executeSql(
@@ -98,10 +153,9 @@ export const IniciarTiempoUsuario = (TiempoInicio) => {
         return true; // Indica que el error fue manejado
       }
     );
-  }); 
+  });
 };
 
-// Función para formatear la fecha y hora
 const formatearFechaHora = (fecha) => {
   const opciones = {
     year: "numeric",
@@ -115,7 +169,6 @@ const formatearFechaHora = (fecha) => {
   return fecha.toLocaleString("es-ES", opciones).replace(",", " a las");
 };
 
-// Función para calcular la diferencia en formato HH:MM:SS
 const calcularDiferenciaHoras = (inicio, fin) => {
   const diffMs = fin - inicio;
   const diffHrs = Math.floor(diffMs / 3600000);
@@ -124,56 +177,6 @@ const calcularDiferenciaHoras = (inicio, fin) => {
   return `${diffHrs.toString().padStart(2, "0")}:${diffMins
     .toString()
     .padStart(2, "0")}:${diffSecs.toString().padStart(2, "0")}`;
-};
-
-// Añade horas
-export const añadirHoras = () => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `SELECT ID, Inicio FROM Usuarios WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
-      [],
-      (_, { rows }) => {
-        if (rows.length > 0) {
-          const usuario = rows._array[0];
-          const inicio = new Date(usuario.Inicio);
-          const fin = new Date();
-          const inicioFormateado = formatearFechaHora(inicio);
-          const finFormateado = formatearFechaHora(fin);
-          const total = calcularDiferenciaHoras(inicio, fin);
-
-          tx.executeSql(
-            `INSERT INTO Horas (Inicio, Final, Total) VALUES (?, ?, ?);`,
-            [inicioFormateado, finFormateado, total],
-            (_, result) => {
-              console.log("Registro de horas añadido con ID:", result.insertId);
-              tx.executeSql(
-                `UPDATE Usuarios SET Inicio = NULL WHERE ID = ?;`,
-                [usuario.ID],
-                (_, result) => {
-                  console.log("Campo Inicio del usuario actualizado a NULL.");
-                },
-                (_, error) => {
-                  console.log(
-                    "Error al actualizar el campo Inicio del usuario:",
-                    error
-                  );
-                  return true; // Indica que el error fue manejado
-                }
-              );
-            },
-            (_, error) => {
-              console.log("Error al añadir el registro de horas:", error);
-              return true; // Indica que el error fue manejado
-            }
-          );
-        }
-      },
-      (_, error) => {
-        console.log("Error al obtener la fecha de inicio del usuario:", error);
-        return true; // Indica que el error fue manejado
-      }
-    );
-  });
 };
 
 export default db;

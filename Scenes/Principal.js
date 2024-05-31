@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
-import db, { IniciarTiempoUsuario, añadirHoras } from "../Modulos/db";
+import db, { IniciarTiempoUsuario, añadirHoras,MyComponent } from "../Modulos/db";
 import { Cronometro } from "../Modulos/Cronometro";
 import { getGlobalData } from "../Modulos/getUser";
 import { supabase } from "../Modulos/supabase";
@@ -59,7 +59,7 @@ export default function PaginaIngreso() {
     tomarUsuario();
   }, []);
 
-  console.log("Estado de la base de datos:", database.inicio);
+  //console.log("Estado de la base de datos:", database.inicio);
 
   return (
     <View style={styles.container}>
@@ -76,6 +76,8 @@ export default function PaginaIngreso() {
                 title="Detener tiempo"
                 onPress={() => {
                   añadirHoras();
+                  //MyComponent();
+                  
                   DefMostrarCr(false);
                 }}
               />
