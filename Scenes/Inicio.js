@@ -12,6 +12,9 @@ import db, { AñadeUsuario } from "../Modulos/db";
 import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 import { CommonActions } from "@react-navigation/native";
+import { setGlobalData,getGlobalData } from "../Modulos/getUser";
+import { supabase } from "../Modulos/supabase";
+import { saveDateDB } from "../Modulos/conexionDB";
 
 const Scale = Dimensions.get("window").width;
 
@@ -29,6 +32,8 @@ export default function PaginaIngreso({ navigation }) {
       console.log(error);
     }
   };
+  
+  
 
   return (
     <View style={styles.background}>
@@ -49,21 +54,23 @@ export default function PaginaIngreso({ navigation }) {
             placeholder="Nombre"
           />
         </View>
-        <View key="2">
+        <View key="2" style={styles.container}>
+          <Text style={styles.text}>
+            {
+              "Hola aspirante, registra tu usuario y desliza para procegir con el registro\n Solo tienes que hacer este proceso 1 vez \n\n"
+            }
+          </Text>
+          <Text style={styles.text}>Escribe tu Codigo</Text>
           <TextInput
             style={styles.input}
-            keyboardType="numeric"
             onChangeText={(text) => {
-              const ValorEnt = parseInt(text, 10);
-              if (!isNaN(ValorEnt)) {
-                DefCodigo(ValorEnt);
-              } else if (text === "") {
-                DefCodigo(null);
-              }
+              DefCodigo(text);
             }}
-            value={codigo !== null ? codigo.toString() : ""}
+            value={codigo}
+            placeholder="Codigo"
           />
         </View>
+      
         <View key="3" style={styles.container}>
           <Text style={styles.text}>Selecciona un rol </Text>
           <View style={{ width: 240, height: 150 }}>
@@ -88,13 +95,18 @@ export default function PaginaIngreso({ navigation }) {
           <Button
             title="Listo"
             onPress={() => {
-              if (Nombre != "" && tipoUsuario != "") {
-                GuardarCodigo(codigo);
-                //AñadeUsuario(Nombre, tipoUsuario);
+              if (Nombre != "" && tipoUsuario != "" && codigo != "") {
+                //GuardarCodigo(codigo);
+                saveDateDB(Nombre,tipoUsuario,codigo)
+                Alert.alert("USUario ingresado correctamente")
+                console.log(Nombre)
+            
+        
+               
                 navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
-                    routes: [{ name: "Tab" }],
+                    routes: [{ name: "Inicio" }],
                   })
                 );
               } else {

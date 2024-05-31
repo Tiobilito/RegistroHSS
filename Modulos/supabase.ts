@@ -18,8 +18,8 @@ const ExpoSecureStoreAdapter = {
 //const supabaseUrl = Constants?.expoConfig?.extra?.supabaseUrl;
 
 //const supabaseAnonKey = Constants?.expoConfig?.extra?.supabaseAnonKey;
-const supabaseUrl="https://lpxsgoriiklrtkyfoxtk.supabase.co"
-const supabaseAnonKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweHNnb3JpaWtscnRreWZveHRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY5MzkyNDUsImV4cCI6MjAzMjUxNTI0NX0.HSSUL1zoy944xHop9X36WGHDvdE4zUe9Y7Fb0GNVUj0"
+const supabaseUrl="https://abgspujwyujtccknqenr.supabase.co"
+const supabaseAnonKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiZ3NwdWp3eXVqdGNja25xZW5yIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTA0MzU5NzgsImV4cCI6MjAyNjAxMTk3OH0.NOjPxUVPBYztUlLCl6CBYg9vIrl9I58zD6bolUzqYfs"
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       storage: ExpoSecureStoreAdapter as any,

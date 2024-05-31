@@ -6,9 +6,11 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import db, { initializeDatabase } from "./Modulos/db";
 
 import PaginaPrincipal from "./Scenes/Principal";
-import PaginaInicio from "./Scenes/Inicio";
+import PaginaIngreso from "./Scenes/Inicio";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaAjustes from "./Scenes/Ajustes";
+import { conexion } from "./Modulos/conexionDB";
+import  Main  from "./Scenes/SceneMain";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -38,6 +40,7 @@ const TabNavigation = () => {
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
+      <Tab.Screen name="conexion" component={conexion}/>
     </Tab.Navigator>
   );
 };
@@ -83,8 +86,9 @@ export default function App() {
         <TabNavigation />
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Inicio" component={PaginaInicio} />
+          <Stack.Screen name="Inicio" component={Main} />
           <Stack.Screen name="Tab" component={TabNavigation} />
+          <Stack.Screen name="Registro" component={PaginaIngreso}/>
         </Stack.Navigator>
       )}
     </NavigationContainer>

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import db, { IniciarTiempoUsuario, añadirHoras } from "../Modulos/db";
 import { Cronometro } from "../Modulos/Cronometro";
+import { getGlobalData } from "../Modulos/getUser";
+import { supabase } from "../Modulos/supabase";
 
 const Scale = Dimensions.get("window").width;
 
@@ -9,16 +11,20 @@ export default function PaginaIngreso() {
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
+  const [database, setDatabase] = useState([]);
 
-  const tomarUsuario = () => {
+  const tomarUsuario = async () => {
+    const User = getGlobalData("user");
+    await getDates();
     db.transaction((tx) => {
       tx.executeSql(
         `SELECT * FROM Usuarios;`,
         [],
         (_, { rows }) => {
-          if (rows.length > 0) {
-            const usuario = rows._array[0];
-            DefUsuario(usuario);
+          console.log("Datos de usuario:", User);
+          if (User.length > 0) {
+            console.log("Usuario encontrado:", User);
+            DefUsuario(User);
             if (usuario.Inicio) {
               DefMostrarCr(true);
               DefFechaInicio(new Date(usuario.Inicio));
@@ -34,17 +40,34 @@ export default function PaginaIngreso() {
     });
   };
 
+  async function getDates() {
+    console.log("Obteniendo datos de la base de datos...");
+    const { data, error } = await supabase
+      .from("usuarios2")
+      .select("*")
+      .eq("nombre", "rauf")
+      .eq("codigo", "221350567");
+    if (error) {
+      console.log("Error al buscar el usuario:", error);
+    } else {
+      console.log("Datos obtenidos de la base de datos:", data);
+      setDatabase(data);
+    }
+  }
+
   useEffect(() => {
     tomarUsuario();
   }, []);
+
+  console.log("Estado de la base de datos:", database.inicio);
 
   return (
     <View style={styles.container}>
       {usuario ? (
         <View>
           <Text style={styles.text}>
-            Hola {usuario.Nombre} a la app de registro de horas para{" "}
-            {usuario.Tipo}
+            Hola {usuario} a la app de registro de horas para{" "}
+            {database.length > 0 && database[0].nombre}
           </Text>
           {MostrarCr ? (
             <View>

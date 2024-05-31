@@ -1,32 +1,33 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { supabase } from "../Modulos/supabase";
 import db from "../Modulos/db";
 
 export default function PaginaTablaHoras() {
   const [Horas, DefHoras] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
-  const obtenerHoras = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Horas;`,
-        [],
-        (_, { rows }) => {
-          DefHoras(rows._array);
-          DefMostrarHoras(rows._array.length > 0);
-        },
-        (_, error) => {
-          console.log("Error al obtener las horas:", error);
-          return true; // Indica que el error fue manejado
-        }
-      );
-    });
-  };
+  async function getHours(){
+  const {data,error} = await supabase.from("horas").select("*")
+  if(error){
+
+    console.log("error")
+  }
+  console.log(data)
+  DefHoras(data)
+  DefMostrarHoras(data.length > 0);
+  console.log("lo que le paso a horas es=",Horas)
+  console.log(Horas[0].inicio)
+
+  }
+
+  
 
   useFocusEffect(
     React.useCallback(() => {
-      obtenerHoras();
+      //obtenerHoras();
+      getHours()
     }, [])
   );
 
@@ -35,13 +36,13 @@ export default function PaginaTablaHoras() {
       {MostrarHoras ? (
         <FlatList
           data={Horas}
-          keyExtractor={(item) => item.ID.toString()}
+          keyExtractor={(item) => item.id.toString()}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text>ID: {item.ID}</Text>
-              <Text>Inicio: {item.Inicio}</Text>
-              <Text>Final: {item.Final}</Text>
-              <Text>Total: {item.Total}</Text>
+              <Text>ID: {item.id}</Text>
+              <Text>Inicio: {item.inicio}</Text>
+              <Text>Final: {item.fin}</Text>
+              
             </View>
           )}
         />
