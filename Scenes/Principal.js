@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import db, { IniciarTiempoUsuario, añadirHoras } from "../Modulos/db";
 import { Cronometro } from "../Modulos/Cronometro";
-import { getGlobalData } from "../Modulos/getUser";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import { supabase } from "../Modulos/supabase";
 
 const Scale = Dimensions.get("window").width;
@@ -14,8 +14,18 @@ export default function PaginaIngreso() {
   const [database, setDatabase] = useState([]);
 
   const tomarUsuario = async () => {
-    const User = getGlobalData("user");
-    await getDates();
+    let CodigoUsuario = ObtenerDatosUsuario();
+    const { data, error } = await supabase
+      .from("usuarios2")
+      .select("*")
+      .eq("codigo", CodigoUsuario);
+    if (error) {
+      console.log("Error al buscar el usuario:", error);
+    } else {
+      console.log("Datos obtenidos de la base de datos:", data);
+      setDatabase(data);
+    }
+
     db.transaction((tx) => {
       tx.executeSql(
         `SELECT * FROM Usuarios;`,
@@ -40,20 +50,7 @@ export default function PaginaIngreso() {
     });
   };
 
-  async function getDates() {
-    console.log("Obteniendo datos de la base de datos...");
-    const { data, error } = await supabase
-      .from("usuarios2")
-      .select("*")
-      .eq("nombre", "rauf")
-      .eq("codigo", "221350567");
-    if (error) {
-      console.log("Error al buscar el usuario:", error);
-    } else {
-      console.log("Datos obtenidos de la base de datos:", data);
-      setDatabase(data);
-    }
-  }
+  async function O() {}
 
   useEffect(() => {
     tomarUsuario();

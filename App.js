@@ -3,14 +3,13 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import db, { initializeDatabase } from "./Modulos/db";
+import { ObtenerDatosUsuario } from "./Modulos/InfoUsuario";
 
 import PaginaPrincipal from "./Scenes/Principal";
-import PaginaIngreso from "./Scenes/Inicio";
+import PaginaRegistro from "./Scenes/Registro";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaAjustes from "./Scenes/Ajustes";
-import { conexion } from "./Modulos/conexionDB";
-import  Main  from "./Scenes/SceneMain";
+import PaginaIngreso  from "./Scenes/Ingreso";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -40,7 +39,6 @@ const TabNavigation = () => {
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
-      <Tab.Screen name="conexion" component={conexion}/>
     </Tab.Navigator>
   );
 };
@@ -49,31 +47,17 @@ export default function App() {
   const [irInicio, setIrInicio] = useState(null);
 
   useEffect(() => {
-    initializeDatabase();
-    console.log("Base de datos inicializada");
     VerificarUsuario();
   }, []);
 
   const VerificarUsuario = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Usuarios;`,
-        [],
-        (_, { rows }) => {
-          if (rows.length > 0) {
-            console.log("Si hay un usuario: ", rows._array);
-            setIrInicio(true);
-          } else {
-            console.log("No hay registros en la tabla Usuarios");
-            setIrInicio(false);
-          }
-        },
-        (_, error) => {
-          console.log("Error al verificar usuarios:", error);
-          setIrInicio(false);
-        }
-      );
-    });
+    const [codigo, defcodigo] = useState(0);
+    defcodigo(ObtenerDatosUsuario());
+    if(codigo != 0) {
+      setIrInicio(true);
+    } else {
+      setIrInicio(false);
+    }
   };
 
   if (irInicio === null) {
@@ -86,9 +70,9 @@ export default function App() {
         <TabNavigation />
       ) : (
         <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="Inicio" component={Main} />
+          <Stack.Screen name="Ingreso" component={PaginaIngreso} />
+          <Stack.Screen name="Registro" component={PaginaRegistro}/>
           <Stack.Screen name="Tab" component={TabNavigation} />
-          <Stack.Screen name="Registro" component={PaginaIngreso}/>
         </Stack.Navigator>
       )}
     </NavigationContainer>

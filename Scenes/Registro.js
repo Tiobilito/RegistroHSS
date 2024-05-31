@@ -8,32 +8,18 @@ import {
   Button,
   Alert,
 } from "react-native";
-import db, { AñadeUsuario } from "../Modulos/db";
 import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
-import { CommonActions } from "@react-navigation/native";
-import { setGlobalData,getGlobalData } from "../Modulos/getUser";
-import { supabase } from "../Modulos/supabase";
-import { saveDateDB } from "../Modulos/conexionDB";
+import { AñadeUsuario } from "../Modulos/OperacionesBD";
+import { GuardarDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
 
-export default function PaginaIngreso({ navigation }) {
+export default function PaginaRegistro({ navigation }) {
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
   const [codigo, DefCodigo] = useState(null);
   const ref = useRef();
-
-  const GuardarCodigo = async () => {
-    try {
-      await AsyncStorage.setItem("Codigo-Usuario", codigo);
-      console.log("Codigo: ", codigo);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  
-  
 
   return (
     <View style={styles.background}>
@@ -70,7 +56,7 @@ export default function PaginaIngreso({ navigation }) {
             placeholder="Codigo"
           />
         </View>
-      
+
         <View key="3" style={styles.container}>
           <Text style={styles.text}>Selecciona un rol </Text>
           <View style={{ width: 240, height: 150 }}>
@@ -96,19 +82,15 @@ export default function PaginaIngreso({ navigation }) {
             title="Listo"
             onPress={() => {
               if (Nombre != "" && tipoUsuario != "" && codigo != "") {
-                //GuardarCodigo(codigo);
-                saveDateDB(Nombre,tipoUsuario,codigo)
-                Alert.alert("USUario ingresado correctamente")
-                console.log(Nombre)
-            
-        
-               
-                navigation.dispatch(
+                AñadeUsuario(Nombre, tipoUsuario, codigo);
+                GuardarDatosUsuario(codigo);
+                console.log("El susuario: ", Nombre, " De tipo: ", tipoUsuario, " Con el codigo: ", codigo);
+                /*navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
                     routes: [{ name: "Inicio" }],
                   })
-                );
+                );*/
               } else {
                 Alert.alert("Por favor rellene todos los datos");
               }
