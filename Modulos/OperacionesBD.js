@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { getGlobalData } from "./InfoUsuario";
+import { GuardarDatosUsuario, getGlobalData } from "./InfoUsuario";
 import { CommonActions } from "@react-navigation/native";
 
 export async function conexion() {
@@ -21,13 +21,13 @@ export async function conexion() {
 
 export async function AñadeUsuario(Nombre, tipoUsuario, codigo) {
   const { data, error } = await supabase
-    .from("usuarios2")
-    .insert([{ codigo: codigo, nombre: Nombre, tipo: tipoUsuario }]);
+    .from("Usuarios")
+    .insert([{ Codigo: codigo, Nombre: Nombre, TipoServidor: tipoUsuario }]);
   if (error) {
     console.log("Hubo un error", error);
     return;
   }
-  console.log("Los datos a la base de datos se actualizaron", data);
+  console.log("El usuario se inserto en la tabla exitosamente: ", data);
 }
 
 export async function EncontrarUsuario(Nombre, Codigo) {
@@ -41,7 +41,7 @@ export async function EncontrarUsuario(Nombre, Codigo) {
   }
   if (data.length > 0) {
     console.log("hay datos=", data);
-    setGlobalData("user", user);
+    GuardarDatosUsuario(Codigo);
     //navigation.navigate("Inicio");
     /*navigation.dispatch(
       CommonActions.reset({

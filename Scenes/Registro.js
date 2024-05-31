@@ -52,6 +52,7 @@ export default function PaginaRegistro({ navigation }) {
             onChangeText={(text) => {
               DefCodigo(text);
             }}
+            keyboardType="numeric"
             value={codigo}
             placeholder="Codigo"
           />
@@ -82,9 +83,16 @@ export default function PaginaRegistro({ navigation }) {
             title="Listo"
             onPress={() => {
               if (Nombre != "" && tipoUsuario != "" && codigo != "") {
-                AñadeUsuario(Nombre, tipoUsuario, codigo);
+                AñadeUsuario(Nombre, tipoUsuario, parseInt(codigo, 10));
                 GuardarDatosUsuario(codigo);
-                console.log("El susuario: ", Nombre, " De tipo: ", tipoUsuario, " Con el codigo: ", codigo);
+                console.log(
+                  "El susuario: ",
+                  Nombre,
+                  " De tipo: ",
+                  tipoUsuario,
+                  " Con el codigo: ",
+                  codigo
+                );
                 /*navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
