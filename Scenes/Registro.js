@@ -7,8 +7,9 @@ import {
   Dimensions,
   Button,
   Alert,
+  TouchableOpacity,
+  ScrollView,
 } from "react-native";
-import PagerView from "react-native-pager-view";
 import { Picker } from "@react-native-picker/picker";
 import { AñadeUsuario } from "../Modulos/OperacionesBD";
 import { GuardarDatosUsuario } from "../Modulos/InfoUsuario";
@@ -18,94 +19,91 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaRegistro({ navigation }) {
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
+  const [Contraseña, DefContraseña] = useState("");
   const [codigo, DefCodigo] = useState(null);
-  const ref = useRef();
 
   return (
     <View style={styles.background}>
-      <PagerView style={styles.pager} ref={ref} initialPage={0}>
-        <View key="1" style={styles.container}>
-          <Text style={styles.text}>
-            {
-              "Hola aspirante, registra tu usuario y desliza para procegir con el registro\n Solo tienes que hacer este proceso 1 vez \n\n"
-            }
-          </Text>
-          <Text style={styles.text}>Escribe tu nombre</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={(text) => {
-              DefNombre(text);
-            }}
-            value={Nombre}
-            placeholder="Nombre"
-          />
+      <ScrollView>
+        <Text style={styles.text}>Hola aspirante, registra tu usuario</Text>
+        <Text style={styles.text}>Escribe tu nombre</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => {
+            DefNombre(text);
+          }}
+          value={Nombre}
+          placeholder="Nombre"
+        />
+        <Text style={styles.text}>Escribe tu Codigo</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={(text) => {
+            DefCodigo(text);
+          }}
+          keyboardType="numeric"
+          value={codigo}
+          placeholder="Codigo"
+        />
+        <Text style={styles.text}>Selecciona un rol </Text>
+        <View style={{ width: 240, height: 150 }}>
+          <Picker
+            selectedValue={tipoUsuario}
+            itemStyle={styles.text}
+            onValueChange={(itemValue) => DeftipoUsuario(itemValue)}
+          >
+            <Picker.Item
+              label="Selecciona una opción"
+              value="Selecciona una opción"
+            />
+            <Picker.Item
+              label="Prestador de servicio"
+              value="Prestador de servicio"
+            />
+            <Picker.Item label="Practicante" value="Practicante" />
+          </Picker>
         </View>
-        <View key="2" style={styles.container}>
-          <Text style={styles.text}>
-            {
-              "Hola aspirante, registra tu usuario y desliza para procegir con el registro\n Solo tienes que hacer este proceso 1 vez \n\n"
-            }
-          </Text>
-          <Text style={styles.text}>Escribe tu Codigo</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={(text) => {
-              DefCodigo(text);
-            }}
-            keyboardType="numeric"
-            value={codigo}
-            placeholder="Codigo"
-          />
-        </View>
-
-        <View key="3" style={styles.container}>
-          <Text style={styles.text}>Selecciona un rol </Text>
-          <View style={{ width: 240, height: 150 }}>
-            <Picker
-              selectedValue={tipoUsuario}
-              itemStyle={styles.text}
-              onValueChange={(itemValue) => DeftipoUsuario(itemValue)}
-            >
-              <Picker.Item
-                label="Selecciona una opción"
-                value="Selecciona una opción"
-              />
-              <Picker.Item
-                label="Prestador de servicio"
-                value="Prestador de servicio"
-              />
-              <Picker.Item label="Practicante" value="Practicante" />
-            </Picker>
-          </View>
-        </View>
-        <View key="4" style={styles.container}>
-          <Button
-            title="Listo"
-            onPress={() => {
-              if (Nombre != "" && tipoUsuario != "" && codigo != "") {
-                AñadeUsuario(Nombre, tipoUsuario, parseInt(codigo, 10));
-                GuardarDatosUsuario(codigo);
-                console.log(
-                  "El susuario: ",
-                  Nombre,
-                  " De tipo: ",
-                  tipoUsuario,
-                  " Con el codigo: ",
-                  codigo
-                );
-                /*navigation.dispatch(
+        <Text style={styles.text}>Escribe tu contraseña </Text>
+        <TextInput
+          style={styles.input}
+          secureTextEntry={true}
+          onChangeText={(text) => {
+            DefContraseña(text);
+          }}
+          value={Contraseña}
+          placeholder="Contraseña"
+        />
+        <Button
+          title="Listo"
+          onPress={() => {
+            if (Nombre != "" && tipoUsuario != "" && codigo != "") {
+              AñadeUsuario(
+                Nombre.toUpperCase(),
+                tipoUsuario,
+                parseInt(codigo, 10),
+                Contraseña
+              );
+              GuardarDatosUsuario(parseInt(codigo, 10), Contraseña);
+              console.log(
+                "El susuario: ",
+                Nombre,
+                " De tipo: ",
+                tipoUsuario,
+                " Con el codigo: ",
+                codigo
+              );
+              /*navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
                     routes: [{ name: "Inicio" }],
                   })
                 );*/
-              } else {
-                Alert.alert("Por favor rellene todos los datos");
-              }
-            }}
-          />
-        </View>
-      </PagerView>
+            } else {
+              Alert.alert("Por favor rellene todos los datos");
+            }
+          }}
+        />
+      </ScrollView>
     </View>
   );
 }
@@ -130,12 +128,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: Scale > 400 ? 50 : 15,
     fontWeight: "bold",
-    marginRight: 20,
+    margin: 10,
     color: "black",
-  },
-  pager: {
-    flex: 1,
-    alignSelf: "stretch",
   },
   container: {
     flex: 1,

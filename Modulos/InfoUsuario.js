@@ -1,24 +1,38 @@
-import { useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export const ObtenerDatosUsuario = async () => {
-  const [Codigo, DefCodigo] = useState(0);
   try {
-    const value = await AsyncStorage.getItem("Cod-Usuario");
-    if (value !== null) {
-      DefCodigo(parseInt(value, 10));
-      console.log("Codigo: ", Codigo);
-      return Codigo;
+    const jsonData = await AsyncStorage.getItem("@UserData");
+    if (jsonData != null) {
+      return JSON.parse(jsonData);
+    } else {
+      return null;
     }
   } catch (error) {
-    console.log("Error: ", error);
+    console.error("Error al obtener los datos: ", error);
+    return null;
   }
 };
 
-export const GuardarDatosUsuario = async (Codigo) => {
+export const GuardarDatosUsuario = async (codigo, contraseña) => {
   try {
-    await AsyncStorage.setItem("Cod-Usuario", Codigo.toString());
+    const data = {
+      codigo: codigo.toString(),
+      contraseña: contraseña,
+    };
+    const jsonData = JSON.stringify(data);
+    await AsyncStorage.setItem("@UserData", jsonData);
+    console.log("Datos guardados correctamente: ", jsonData);
   } catch (error) {
-    console.log("Error: ", error);
+    console.error("Error al guardar los datos: ", error);
+  }
+};
+
+export const BorrarDatosUsuario = async () => {
+  try {
+    await AsyncStorage.removeItem("@UserData");
+    console.log("Datos borrados correctamente");
+  } catch (error) {
+    console.error("Error al borrar los datos: ", error);
   }
 };

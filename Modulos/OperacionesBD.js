@@ -19,36 +19,40 @@ export async function conexion() {
   }
 }
 
-export async function AñadeUsuario(Nombre, tipoUsuario, codigo) {
+export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña) {
   const { data, error } = await supabase
     .from("Usuarios")
-    .insert([{ Codigo: codigo, Nombre: Nombre, TipoServidor: tipoUsuario }]);
+    .insert([
+      {
+        Codigo: codigo,
+        Nombre: Nombre,
+        TipoServidor: tipoUsuario,
+        Contraseña: contraseña,
+      },
+    ]);
   if (error) {
     console.log("Hubo un error", error);
     return;
   }
-  console.log("El usuario se inserto en la tabla exitosamente: ", data);
 }
 
-export async function EncontrarUsuario(Nombre, Codigo) {
+export async function EncontrarUsuario(Codigo, Contraseña) {
   const { data, error } = await supabase
-    .from("usuarios2")
+    .from("Usuarios")
     .select("*")
-    .eq("nombre", Nombre)
-    .eq("codigo", Codigo);
+    .eq("Codigo", Codigo)
+    .eq("Contraseña", Contraseña);
   if (error) {
     console.log("hubo un error: " + error);
   }
   if (data.length > 0) {
-    console.log("hay datos=", data);
-    GuardarDatosUsuario(Codigo);
-    //navigation.navigate("Inicio");
-    /*navigation.dispatch(
+    GuardarDatosUsuario(Codigo, Contraseña);
+    navigation.dispatch(
       CommonActions.reset({
         index: 0,
         routes: [{ name: "Tab" }],
       })
-    );*/
+    );
   } else {
     console.log("El usuario no existe");
   }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
@@ -6,63 +6,66 @@ import {
   Button,
   Dimensions,
   TextInput,
-  SafeAreaView,
+  Alert,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/OperacionesBD";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
 
-export default function Main({ navigation }) {
-  const [user, SetUser] = useState("");
-  const [password, SetPassword] = useState("");
+export default function PaginaIngreso({ navigation }) {
+  const [Codigo, DefCodigo] = useState("");
+  const [Contraseña, DefContraseña] = useState("");
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.text2}>
-        <Text style={styles.text}>Logeate</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={SetUser}
-          value={user}
-          placeholder="Usuario"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={SetPassword}
-          placeholder="Contraseña"
-          secureTextEntry
-        />
-        <Button
-          color="blue"
-          title="Iniciar tiempo"
-          onPress={() => {
-            EncontrarUsuario(user, password);
-          }}
-        />
-        <Button
-          color="red"
-          title="Registro"
-          onPress={() => {
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 0,
-                routes: [{ name: "Registro" }],
-              })
-            );
-          }}
-        />
-      </View>
-    </SafeAreaView>
+    <View style={styles.container}>
+      <Text style={styles.text}>Ingresa</Text>
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => {
+          DefCodigo(text);
+        }}
+        value={Codigo}
+        placeholder="Codigo"
+      />
+      <TextInput
+        style={styles.input}
+        onChangeText={(text) => {
+          DefContraseña(text);
+        }}
+        value={Contraseña}
+        placeholder="Contraseña"
+        secureTextEntry={true}
+      />
+      <Button
+        color="blue"
+        title="Ingresar"
+        onPress={() => {
+          if (Codigo != "" && Contraseña != "") {
+            EncontrarUsuario(parseInt(Codigo, 10), Contraseña);
+          } else {
+            Alert.alert("Por favor completa los 2 campos");
+          }
+        }}
+      />
+      <Button
+        color="red"
+        title="Registro"
+        onPress={() => {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "Registro" }],
+            })
+          );
+        }}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  text2: {
-    flex: 5,
-    justifyContent: "center",
-    alignItems: "center",
-  },
   text: {
     fontSize: Scale > 400 ? 50 : 15,
     fontWeight: "bold",

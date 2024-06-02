@@ -7,7 +7,6 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
-import db, { borrarUsuarios } from "../Modulos/db"
 
 const Scale = Dimensions.get("window").width;
 
@@ -29,7 +28,7 @@ export default function PaginaAjustes() {
               },
               {
                 text: "Borrar",
-                onPress: () => borrarUsuarios(),
+                onPress: () => console.log("Espere funcionalidad"),
               },
             ],
             { cancelable: false }

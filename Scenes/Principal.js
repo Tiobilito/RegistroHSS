@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
-import db, { IniciarTiempoUsuario, añadirHoras } from "../Modulos/db";
 import { Cronometro } from "../Modulos/Cronometro";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import { supabase } from "../Modulos/supabase";
@@ -25,29 +24,6 @@ export default function PaginaIngreso() {
       console.log("Datos obtenidos de la base de datos:", data);
       setDatabase(data);
     }
-
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Usuarios;`,
-        [],
-        (_, { rows }) => {
-          console.log("Datos de usuario:", User);
-          if (User.length > 0) {
-            console.log("Usuario encontrado:", User);
-            DefUsuario(User);
-            if (usuario.Inicio) {
-              DefMostrarCr(true);
-              DefFechaInicio(new Date(usuario.Inicio));
-            }
-          } else {
-            console.log("No hay Usuario");
-          }
-        },
-        (_, error) => {
-          console.log("Error al buscar el usuario:", error);
-        }
-      );
-    });
   };
 
   async function O() {}
