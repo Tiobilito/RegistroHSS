@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -17,6 +17,22 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
+
+  const checarUsuario = async () => {
+    try {
+      const data = await ObtenerDatosUsuario();
+      if (data) {
+        DefCodigo(data.codigo);
+        DefContraseña(data.contraseña);
+      }
+    } catch (error) {
+      console.error("Error al obtener los datos del usuario: ", error);
+    }
+  };
+
+  useEffect(() => {
+    checarUsuario();
+  }, []);
 
   return (
     <View style={styles.container}>
