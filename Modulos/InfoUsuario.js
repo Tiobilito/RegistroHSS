@@ -17,8 +17,8 @@ export const ObtenerDatosUsuario = async () => {
 export const GuardarDatosUsuario = async (codigo, contraseña) => {
   try {
     const data = {
-      codigo: codigo.toString(),
-      contraseña: contraseña,
+      Codigo: codigo.toString(),
+      Contraseña: contraseña,
     };
     const jsonData = JSON.stringify(data);
     await AsyncStorage.setItem("@UserData", jsonData);

@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import { Cronometro } from "../Modulos/Cronometro";
-import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
-import { supabase } from "../Modulos/supabase";
+import { ObtenerDatosUSB, IniciarTiempoUsuario, añadirHoras } from "../Modulos/OperacionesBD";
 
 const Scale = Dimensions.get("window").width;
 
@@ -10,37 +9,30 @@ export default function PaginaIngreso() {
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
-  const [database, setDatabase] = useState([]);
 
   const tomarUsuario = async () => {
-    let CodigoUsuario = ObtenerDatosUsuario();
-    const { data, error } = await supabase
-      .from("usuarios2")
-      .select("*")
-      .eq("codigo", CodigoUsuario);
-    if (error) {
-      console.log("Error al buscar el usuario:", error);
-    } else {
-      console.log("Datos obtenidos de la base de datos:", data);
-      setDatabase(data);
+    const DatosUsuario = await ObtenerDatosUSB();
+    if (DatosUsuario && DatosUsuario.length > 0) {
+      const usuarioDatos = DatosUsuario[0]; 
+      DefUsuario(usuarioDatos);
+      if (usuarioDatos.Inicio) {
+        DefFechaInicio(new Date(usuarioDatos.Inicio));
+        DefMostrarCr(true);
+      }
     }
   };
-
-  async function O() {}
 
   useEffect(() => {
     tomarUsuario();
   }, []);
-
-  console.log("Estado de la base de datos:", database.inicio);
 
   return (
     <View style={styles.container}>
       {usuario ? (
         <View>
           <Text style={styles.text}>
-            Hola {usuario} a la app de registro de horas para{" "}
-            {database.length > 0 && database[0].nombre}
+            Hola {usuario.Nombre} a la app de registro de horas para{" "}
+            {usuario.TipoServidor}
           </Text>
           {MostrarCr ? (
             <View>
@@ -48,7 +40,7 @@ export default function PaginaIngreso() {
                 color="red"
                 title="Detener tiempo"
                 onPress={() => {
-                  añadirHoras();
+                  añadirHoras(usuario.Codigo);
                   DefMostrarCr(false);
                 }}
               />
@@ -62,7 +54,7 @@ export default function PaginaIngreso() {
                 onPress={() => {
                   const now = new Date();
                   DefFechaInicio(now);
-                  IniciarTiempoUsuario(now.toISOString());
+                  IniciarTiempoUsuario(now.toISOString(), usuario.Codigo);
                   DefMostrarCr(true);
                 }}
               />

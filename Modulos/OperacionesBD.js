@@ -1,6 +1,5 @@
 import { supabase } from "./supabase";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
-import { CommonActions } from "@react-navigation/native";
 
 // Función para formatear la fecha y hora
 const formatearFechaHora = (fecha) => {
@@ -63,22 +62,37 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
 // Inicia el tiempo
 export async function IniciarTiempoUsuario(TiempoInicio, codigo) {
   const { data, error } = await supabase
-    .from("Horas")
+    .from("Usuarios")
     .update({ Inicio: TiempoInicio })
     .eq("Codigo", parseInt(codigo, 10));
   if (error) {
     console.error("Error al actualizar el registro:", error);
-    return null;
   } else {
     console.log("Registro actualizado:", data);
+  }
+}
+
+//Obtiene los datos de la base de datos (supabase) retorna toda la informacion del usuario
+export async function ObtenerDatosUSB() {
+  const usuario = await ObtenerDatosUsuario();
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .select("*")
+    .eq("Codigo", parseInt(usuario.Codigo, 10));
+  if (error) {
+    console.error("Error al obtener los datos del usuario:", error);
+    return null;
+  } else {
+    console.log("Datos del usuario:", data);
     return data;
   }
 }
 
 // Añade horas
-export async function añadirHoras() {
-  const usuario = await ObtenerDatosUsuario();
-  const inicio = new Date(usuario.Inicio);
+export async function añadirHoras(codigoUsuario) {
+  const DatosUsuario = await ObtenerDatosUSB();
+  const usuarioDatos = DatosUsuario[0]; 
+  const inicio = new Date(usuarioDatos.Inicio);
   const fin = new Date();
   const inicioFormateado = formatearFechaHora(inicio);
   const finFormateado = formatearFechaHora(fin);
@@ -88,32 +102,41 @@ export async function añadirHoras() {
       Inicio: inicioFormateado,
       Final: finFormateado,
       Total: total,
-      CodigoUsuario: parseInt(usuario.Codigo, 10),
+      CodigoUsuario: parseInt(codigoUsuario, 10),
     },
   ]);
   if (error) {
     console.log("Hubo un error", error);
     return;
   }
+  const { data: DUsuario, error: EUsuario } = await supabase
+    .from("Usuarios")
+    .update({ Inicio: null })
+    .eq("Codigo", parseInt(codigoUsuario, 10));
+  if (EUsuario) {
+    console.error("Error al actualizar el registro:", EUsuario);
+  } else {
+    console.log("Registro actualizado:", DUsuario);
+  }
 }
 
 export async function EliminarUsuarioHoras() {
-  const usuario = await ObtenerDatosUsuario();
+  const usuarioDatos = await ObtenerDatosUsuario();
+  const usuario = usuarioDatos[0];
   const { data: hoursData, error: hoursError } = await supabase
-    .from("horas")
+    .from("Horas")
     .delete()
     .eq("CodigoUsuario", parseInt(usuario.Codigo, 10));
-  if (error) {
+  if (hoursError) {
     console.error("Error al borrar las horas asociadas:", hoursError);
     return null;
   } else {
     console.log("Horas asociadas borradas:", hoursData);
   }
-
   const { data: userData, error: userError } = await supabase
-    .from("usuarios")
+    .from("Usuarios")
     .delete()
-    .eq("id", parseInt(usuario.Codigo, 10));
+    .eq("Codigo", parseInt(usuario.Codigo, 10));
 
   if (userError) {
     console.error("Error al borrar el usuario:", userError);

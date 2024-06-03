@@ -2,18 +2,33 @@ import React, { useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { supabase } from "../Modulos/supabase";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";  // Asegúrate de que la ruta es correcta
 
 export default function PaginaTablaHoras() {
   const [Horas, DefHoras] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
   async function obtenerHoras() {
-    const { data, error } = await supabase.from("horas").select("*");
-    if (error) {
-      console.log("error");
+    try {
+      const usuario = await ObtenerDatosUsuario();
+      if (usuario && usuario.Codigo) {
+        const codigoUsuario = parseInt(usuario.Codigo, 10);
+        const { data, error } = await supabase
+          .from("Horas")
+          .select("*")
+          .eq("CodigoUsuario", codigoUsuario);
+        if (error) {
+          console.log("Error al obtener horas:", error);
+        } else {
+          DefHoras(data);
+          DefMostrarHoras(data.length > 0);
+        }
+      } else {
+        console.log("No se encontraron datos del usuario.");
+      }
+    } catch (error) {
+      console.log("Error al obtener datos del usuario:", error);
     }
-    DefHoras(data);
-    DefMostrarHoras(data.length > 0);
   }
 
   useFocusEffect(
@@ -31,8 +46,9 @@ export default function PaginaTablaHoras() {
           renderItem={({ item }) => (
             <View style={styles.item}>
               <Text>ID: {item.id}</Text>
-              <Text>Inicio: {item.inicio}</Text>
-              <Text>Final: {item.fin}</Text>
+              <Text>Inicio: {item.Inicio}</Text>
+              <Text>Final: {item.Final}</Text>
+              <Text>Total: {item.Total}</Text>
             </View>
           )}
         />

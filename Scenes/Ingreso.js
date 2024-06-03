@@ -27,6 +27,8 @@ export default function PaginaIngreso({ navigation }) {
           routes: [{ name: "Tab" }],
         })
       );
+    } else {
+      console.log("No existe el usuario");
     }
   };
 
@@ -34,8 +36,8 @@ export default function PaginaIngreso({ navigation }) {
     try {
       const data = await ObtenerDatosUsuario();
       if (data) {
-        DefCodigo(data.codigo);
-        DefContraseña(data.contraseña);
+        DefCodigo(data.Codigo);
+        DefContraseña(data.Contraseña);
       }
     } catch (error) {
       console.error("Error al obtener los datos del usuario: ", error);
