@@ -18,6 +18,18 @@ export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
 
+  const IngresoUsuario = async () => {
+    const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
+    if (BUsuario === true) {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Tab" }],
+        })
+      );
+    }
+  };
+
   const checarUsuario = async () => {
     try {
       const data = await ObtenerDatosUsuario();
@@ -59,7 +71,7 @@ export default function PaginaIngreso({ navigation }) {
         title="Ingresar"
         onPress={() => {
           if (Codigo != "" && Contraseña != "") {
-            EncontrarUsuario(Codigo, Contraseña);
+            IngresoUsuario();
           } else {
             Alert.alert("Por favor completa los 2 campos");
           }

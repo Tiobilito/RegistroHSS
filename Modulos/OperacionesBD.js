@@ -53,14 +53,10 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   }
   if (data.length > 0) {
     GuardarDatosUsuario(Codigo, Contraseña);
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: "Tab" }],
-      })
-    );
+    return true;
   } else {
     console.log("El usuario no existe");
+    return false;
   }
 }
 
