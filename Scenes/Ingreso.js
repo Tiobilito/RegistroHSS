@@ -59,7 +59,7 @@ export default function PaginaIngreso({ navigation }) {
         title="Ingresar"
         onPress={() => {
           if (Codigo != "" && Contraseña != "") {
-            EncontrarUsuario(parseInt(Codigo, 10), Contraseña);
+            EncontrarUsuario(Codigo, Contraseña);
           } else {
             Alert.alert("Por favor completa los 2 campos");
           }
