@@ -10,6 +10,8 @@ import {
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/OperacionesBD";
+
+import { Gps,obtenerUbicacion } from "./gps";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
@@ -20,8 +22,13 @@ export default function PaginaIngreso({ navigation }) {
 
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
-    if (BUsuario === true) {
-      navigation.dispatch(
+   
+    if (BUsuario === true) 
+      {
+        console.log("hola")
+       const getLocation1=await obtenerUbicacion()
+       console.log("Lo que agarra es ",getLocation1)
+      navigation.dispatch( 
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Tab" }],
@@ -83,12 +90,7 @@ export default function PaginaIngreso({ navigation }) {
         color="red"
         title="Registro"
         onPress={() => {
-          navigation.dispatch(
-            CommonActions.reset({
-              index: 0,
-              routes: [{ name: "Registro" }],
-            })
-          );
+         navigation.navigate("Registro")
         }}
       />
     </View>

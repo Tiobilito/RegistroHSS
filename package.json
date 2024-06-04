@@ -17,6 +17,8 @@
     "@supabase/supabase-js": "^2.43.4",
     "@types/react": "~18.2.79",
     "expo": "~51.0.9",
+    "expo-device": "^6.0.2",
+    "expo-location": "^17.0.1",
     "expo-secure-store": "^13.0.1",
     "expo-sqlite": "~14.0.3",
     "expo-status-bar": "~1.12.1",

@@ -13,6 +13,7 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { AñadeUsuario } from "../Modulos/OperacionesBD";
 import { GuardarDatosUsuario } from "../Modulos/InfoUsuario";
+import { CommonActions } from "@react-navigation/native";
 
 const Scale = Dimensions.get("window").width;
 
@@ -92,12 +93,12 @@ export default function PaginaRegistro({ navigation }) {
                 " Con el codigo: ",
                 codigo
               );
-              /*navigation.dispatch(
+              navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
-                    routes: [{ name: "Inicio" }],
+                    routes: [{ name: "Ingreso" }],
                   })
-                );*/
+                );
             } else {
               Alert.alert("Por favor rellene todos los datos");
             }
