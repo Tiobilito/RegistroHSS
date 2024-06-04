@@ -5,8 +5,6 @@ import { StatusBar } from 'expo-status-bar';
 
 export const obtenerUbicacion = async () => {
 
-
-
     try {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -23,7 +21,7 @@ export const obtenerUbicacion = async () => {
       console.log("Reverse Geocoded:");
       console.log(reverseGeocodedAddress);
 
-      return reverseGeocodedAddress;
+      //return reverseGeocodedAddress;
     } catch (error) {
       console.error('Error obteniendo la localización:', error);
       return null;
