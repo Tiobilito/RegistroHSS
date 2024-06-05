@@ -39,8 +39,6 @@ export const obtenerUbicacion = async () => {
     const [location, setLocation] = useState();
     const [address, setAddress] = useState();
   
-    //Location.setGoogleApiKey("AIzaSyD5GUOMMrDY5Ml8JOQ5j7z7p9f8GaGCDBg");
-  
     useEffect(() => {
       const getPermissions = async () => {
         let { status } = await Location.requestForegroundPermissionsAsync();
@@ -72,15 +70,6 @@ export const obtenerUbicacion = async () => {
       console.log("Reverse Geocoded:");
       console.log(reverseGeocodedAddress);
     };
-  
-    return (
-      <View style={styles.container}>
-        <TextInput placeholder='Address' value={address} onChangeText={setAddress} />
-        <Button title="Geocode Address" onPress={geocode} />
-        <Button title="Reverse Geocode Current Location" onPress={reverseGeocode} />
-        <StatusBar style="auto" />
-      </View>
-    );
   }
   
   const styles = StyleSheet.create({

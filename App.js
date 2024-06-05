@@ -9,7 +9,7 @@ import PaginaRegistro from "./Scenes/Registro";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
-import { Gps } from "./Scenes/gps";
+import { Gps } from "./Modulos/gps";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

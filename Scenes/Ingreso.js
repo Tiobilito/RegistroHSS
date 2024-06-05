@@ -9,9 +9,10 @@ import {
   Alert,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
+import * as LocalAuthentication from "expo-local-authentication";
 import { EncontrarUsuario } from "../Modulos/OperacionesBD";
 
-import { Gps,obtenerUbicacion } from "./gps";
+import { Gps, obtenerUbicacion } from "../Modulos/gps";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
@@ -20,15 +21,31 @@ export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
 
+  const authenticate = async () => {
+    const result = await LocalAuthentication.authenticateAsync();
+    return result.success;
+  };
+
+  const IngresoBiometrico = async () => {
+    const Auth = await authenticate();
+    const data = await ObtenerDatosUsuario();
+    if (Auth != false) {
+      console.log("Aprobado acceso por biometrico");
+      DefContraseña(data.Contraseña);
+      await IngresoUsuario();
+    } else {
+      console.log("Denegado acceso por biometrico");
+    }
+  };
+
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
-   
-    if (BUsuario === true) 
-      {
-        console.log("hola")
-       const getLocation1=await obtenerUbicacion()
-       console.log("Lo que agarra es ",getLocation1)
-      navigation.dispatch( 
+
+    if (BUsuario === true) {
+      console.log("hola");
+      const getLocation1 = await obtenerUbicacion();
+      console.log("Lo que agarra es ", getLocation1);
+      navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Tab" }],
@@ -44,7 +61,7 @@ export default function PaginaIngreso({ navigation }) {
       const data = await ObtenerDatosUsuario();
       if (data) {
         DefCodigo(data.Codigo);
-        DefContraseña(data.Contraseña);
+        //DefContraseña(data.Contraseña);
       }
     } catch (error) {
       console.error("Error al obtener los datos del usuario: ", error);
@@ -75,12 +92,13 @@ export default function PaginaIngreso({ navigation }) {
         placeholder="Contraseña"
         secureTextEntry={true}
       />
+      <Button color="black" title="Biometrico" onPress={async () => {await IngresoBiometrico()}} />
       <Button
         color="blue"
         title="Ingresar"
-        onPress={() => {
+        onPress={ async () => {
           if (Codigo != "" && Contraseña != "") {
-            IngresoUsuario();
+            await IngresoUsuario();
           } else {
             Alert.alert("Por favor completa los 2 campos");
           }
@@ -90,7 +108,7 @@ export default function PaginaIngreso({ navigation }) {
         color="red"
         title="Registro"
         onPress={() => {
-         navigation.navigate("Registro")
+          navigation.navigate("Registro");
         }}
       />
     </View>

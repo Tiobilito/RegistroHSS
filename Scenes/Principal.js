@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import { Cronometro } from "../Modulos/Cronometro";
-import { ObtenerDatosUSB, IniciarTiempoUsuario, añadirHoras } from "../Modulos/OperacionesBD";
+import {
+  ObtenerDatosUSB,
+  IniciarTiempoUsuario,
+  añadirHoras,
+} from "../Modulos/OperacionesBD";
 
 const Scale = Dimensions.get("window").width;
 
@@ -13,9 +17,8 @@ export default function PaginaIngreso() {
   const tomarUsuario = async () => {
     const DatosUsuario = await ObtenerDatosUSB();
     if (DatosUsuario && DatosUsuario.length > 0) {
-      const usuarioDatos = DatosUsuario[0]; 
-      DefUsuario(usuarioDatos);
-      if (usuarioDatos.Inicio) {
+      DefUsuario(DatosUsuario[0]);
+      if (DatosUsuario[0].Inicio) {
         DefFechaInicio(new Date(usuarioDatos.Inicio));
         DefMostrarCr(true);
       }
@@ -39,8 +42,8 @@ export default function PaginaIngreso() {
               <Button
                 color="red"
                 title="Detener tiempo"
-                onPress={() => {
-                  añadirHoras(usuario.Codigo);
+                onPress={async () => {
+                  await añadirHoras();
                   DefMostrarCr(false);
                 }}
               />
@@ -51,10 +54,10 @@ export default function PaginaIngreso() {
               <Button
                 color="blue"
                 title="Iniciar tiempo"
-                onPress={() => {
+                onPress={async () => {
                   const now = new Date();
                   DefFechaInicio(now);
-                  IniciarTiempoUsuario(now.toISOString(), usuario.Codigo);
+                  await IniciarTiempoUsuario(now.toISOString());
                   DefMostrarCr(true);
                 }}
               />

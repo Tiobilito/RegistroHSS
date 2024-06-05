@@ -60,11 +60,12 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
 }
 
 // Inicia el tiempo
-export async function IniciarTiempoUsuario(TiempoInicio, codigo) {
+export async function IniciarTiempoUsuario(TiempoInicio) {
+  const usuario = await ObtenerDatosUSB();
   const { data, error } = await supabase
     .from("Usuarios")
     .update({ Inicio: TiempoInicio })
-    .eq("Codigo", parseInt(codigo, 10));
+    .eq("Codigo", parseInt(usuario[0].Codigo, 10));
   if (error) {
     console.error("Error al actualizar el registro:", error);
   } else {
@@ -89,9 +90,8 @@ export async function ObtenerDatosUSB() {
 }
 
 // Añade horas
-export async function añadirHoras(codigoUsuario) {
+export async function añadirHoras() {
   const DatosUsuario = await ObtenerDatosUSB();
-  const usuarioDatos = DatosUsuario[0]; 
   const inicio = new Date(usuarioDatos.Inicio);
   const fin = new Date();
   const inicioFormateado = formatearFechaHora(inicio);
@@ -102,7 +102,7 @@ export async function añadirHoras(codigoUsuario) {
       Inicio: inicioFormateado,
       Final: finFormateado,
       Total: total,
-      CodigoUsuario: parseInt(codigoUsuario, 10),
+      CodigoUsuario: parseInt(DatosUsuario[0].Codigo, 10),
     },
   ]);
   if (error) {
@@ -121,12 +121,11 @@ export async function añadirHoras(codigoUsuario) {
 }
 
 export async function EliminarUsuarioHoras() {
-  const usuarioDatos = await ObtenerDatosUsuario();
-  const usuario = usuarioDatos[0];
+  const usuarioDatos = await ObtenerDatosUSB();
   const { data: hoursData, error: hoursError } = await supabase
     .from("Horas")
     .delete()
-    .eq("CodigoUsuario", parseInt(usuario.Codigo, 10));
+    .eq("CodigoUsuario", parseInt(usuarioDatos[0].Codigo, 10));
   if (hoursError) {
     console.error("Error al borrar las horas asociadas:", hoursError);
     return null;
@@ -136,7 +135,7 @@ export async function EliminarUsuarioHoras() {
   const { data: userData, error: userError } = await supabase
     .from("Usuarios")
     .delete()
-    .eq("Codigo", parseInt(usuario.Codigo, 10));
+    .eq("Codigo", parseInt(usuarioDatos[0].Codigo, 10));
 
   if (userError) {
     console.error("Error al borrar el usuario:", userError);
