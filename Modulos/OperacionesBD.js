@@ -1,5 +1,8 @@
 import { supabase } from "./supabase";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
+import { Alert } from "react-native";
+import { useState } from "react";
+import { setUser,getUser } from "./getUser";
 
 // Función para formatear la fecha y hora
 const formatearFechaHora = (fecha) => {
@@ -52,6 +55,8 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   }
   if (data.length > 0) {
     GuardarDatosUsuario(Codigo, Contraseña);
+    setUser("codigo",codigo)
+
     return true;
   } else {
     console.log("El usuario no existe");
@@ -72,6 +77,43 @@ export async function IniciarTiempoUsuario(TiempoInicio, codigo) {
   }
 }
 
+
+export async function checkUser(user){
+  console.log(user)
+
+
+    const {data,error}=await supabase.from("Usuarios").select("*").eq("Codigo",user)
+     console.log("el tamano es=",data.length)
+    if(error){
+      console.log("hubo un error",error)
+
+
+    }
+    if(data.length > 0 ){
+
+      console.log("si existe")
+      return true
+    }else{
+      console.log("no existe")
+      return false
+    }
+   
+}
+//cambiar las contrasenas 
+export async function changePassword(password,code){
+
+  const {data,error} = await supabase.from("Usuarios").update({"Contraseña":password}).eq("Codigo",code);
+  if(error){
+
+    console.log("Error al cambia a contrasena")
+  }else{
+    console.log("Contrasena cambiada")
+     Alert.alert("contrasena cmabiada :)")
+
+ 
+  }
+
+}
 //Obtiene los datos de la base de datos (supabase) retorna toda la informacion del usuario
 export async function ObtenerDatosUSB() {
   const usuario = await ObtenerDatosUsuario();

@@ -106,6 +106,13 @@ export default function PaginaIngreso({ navigation }) {
          navigation.navigate("Registro")
         }}
       />
+
+      <Button
+      color="orange"
+      title="change password"
+      onPress={()=>{
+        navigation.navigate("changepassword")
+       } }/>
     </View>
   );
 }

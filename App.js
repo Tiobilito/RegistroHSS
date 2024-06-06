@@ -9,8 +9,10 @@ import PaginaRegistro from "./Scenes/Registro";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
-import { Gps } from "./Scenes/gps";
-import { PermissionsButton } from "./Scenes/example";
+import BackgroundFetchScreen from "./Scenes/example";
+import changepassword from "./Scenes/changePassword";
+
+
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -39,7 +41,8 @@ const TabNavigation = () => {
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
-      <Tab.Screen name="Example" component={PermissionsButton} />
+      <Tab.Screen name="example" component={BackgroundFetchScreen}/>
+   
      
     </Tab.Navigator>
   );
@@ -51,6 +54,7 @@ export default function App() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Ingreso" component={PaginaIngreso} />
         <Stack.Screen name="Registro" component={PaginaRegistro} />
+        <Stack.Screen name="changepassword" component={changepassword}/>
         <Stack.Screen name="Tab" component={TabNavigation} />
       </Stack.Navigator>
     </NavigationContainer>
