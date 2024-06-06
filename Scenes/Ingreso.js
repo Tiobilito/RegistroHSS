@@ -19,21 +19,33 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
+  const [location , setLocation] = useState(null);
+  const [locationIphone, setLocationIphone] = useState(null)
+  const localizacion="Blvd. Gral. Marcelino García Barragán 1421, Olímpica, 44840 Guadalajara, Jal., Mexico"
 
+  
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
    
     if (BUsuario === true) 
       {
-        console.log("hola")
        const getLocation1=await obtenerUbicacion()
-       console.log("Lo que agarra es ",getLocation1)
-      navigation.dispatch( 
+       //console.log("Lo que agarra es ",getLocation1)
+       setLocation(getLocation1)
+
+       if(getLocation1){
+        navigation.dispatch( 
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Tab" }],
         })
       );
+       }else{
+
+        console.log("no puedo tener tu ubicacion :(")
+       }
+       
+      
     } else {
       console.log("No existe el usuario");
     }
@@ -51,9 +63,10 @@ export default function PaginaIngreso({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    checarUsuario();
-  }, []);
+  useEffect(()=>{
+
+    checarUsuario()
+  })
 
   return (
     <View style={styles.container}>

@@ -1,7 +1,8 @@
 import {useState,useEffect} from "react"
-import { StyleSheet,View,TextInput,Button } from "react-native"
+import { StyleSheet,View,TextInput,Button,Alert } from "react-native"
 import * as Location from "expo-location"
 import { StatusBar } from 'expo-status-bar';
+
 
 export const obtenerUbicacion = async () => {
 
@@ -13,17 +14,25 @@ export const obtenerUbicacion = async () => {
       }
   
       let location = await Location.getCurrentPositionAsync({});
-      console.log('La localización es=', location);
+    //  console.log('La localización es=', location);
       const reverseGeocodedAddress = await Location.reverseGeocodeAsync({
         longitude: location.coords.longitude,
         latitude: location.coords.latitude
       });
-      console.log("Reverse Geocoded:");
-      console.log(reverseGeocodedAddress);
+      //console.log("Reverse Geocoded:");
+      //console.log(reverseGeocodedAddress);
 
-      //return reverseGeocodedAddress;
+      return reverseGeocodedAddress;
     } catch (error) {
       console.error('Error obteniendo la localización:', error);
+      Alert.alert(
+        'Permiso denegado',
+        'Para usar la aplicacion necesuitas darme tu ubicacion. ¿Quieres intentarlo de nuevo?',
+        [
+          
+          { text: 'Reintentar', onPress: () => obtenerUbicacion() }
+        ]
+      );
       return null;
     }
      
@@ -38,8 +47,7 @@ export const obtenerUbicacion = async () => {
   export function Gps() {
     const [location, setLocation] = useState();
     const [address, setAddress] = useState();
-  
-    //Location.setGoogleApiKey("AIzaSyD5GUOMMrDY5Ml8JOQ5j7z7p9f8GaGCDBg");
+
   
     useEffect(() => {
       const getPermissions = async () => {

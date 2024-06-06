@@ -10,6 +10,7 @@ import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
 import { Gps } from "./Scenes/gps";
+import { PermissionsButton } from "./Scenes/example";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -38,6 +39,7 @@ const TabNavigation = () => {
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
+      <Tab.Screen name="Example" component={PermissionsButton} />
      
     </Tab.Navigator>
   );
