@@ -29,21 +29,21 @@ export default function PaginaIngreso({ navigation }) {
    
     if (BUsuario === true) 
       {
-       const getLocation1=await obtenerUbicacion()
-       //console.log("Lo que agarra es ",getLocation1)
-       setLocation(getLocation1)
+       //const getLocation1=await obtenerUbicacion()
+       
+       //setLocation(getLocation1)
 
-       if(getLocation1){
+       //if(getLocation1){
         navigation.dispatch( 
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Tab" }],
         })
       );
-       }else{
+      // }else{
 
         console.log("no puedo tener tu ubicacion :(")
-       }
+     //  }
        
       
     } else {

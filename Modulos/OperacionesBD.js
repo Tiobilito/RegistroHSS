@@ -53,10 +53,10 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   if (error) {
     console.log("hubo un error: " + error);
   }
+
   if (data.length > 0) {
     GuardarDatosUsuario(Codigo, Contraseña);
-    setUser("codigo",codigo)
-
+    
     return true;
   } else {
     console.log("El usuario no existe");
