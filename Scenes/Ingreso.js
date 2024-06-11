@@ -11,8 +11,6 @@ import {
 import { CommonActions } from "@react-navigation/native";
 import * as LocalAuthentication from "expo-local-authentication";
 import { EncontrarUsuario } from "../Modulos/OperacionesBD";
-
-import { Gps, obtenerUbicacion } from "../Modulos/gps";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
@@ -40,8 +38,6 @@ export default function PaginaIngreso({ navigation }) {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
 
     if (BUsuario === true) {
-      const getLocation1 = await obtenerUbicacion();
-      console.log("Lo que agarra es ", getLocation1);
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
