@@ -48,7 +48,7 @@ export default function PaginaIngreso({ navigation }) {
 
   useEffect(()=>{
     checarUsuario()
-  })
+  }, [])
 
   return (
     <View style={styles.container}>
