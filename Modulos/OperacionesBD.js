@@ -71,7 +71,7 @@ export async function IniciarTiempoUsuario(TiempoInicio, codigo) {
   if (error) {
     console.error("Error al actualizar el registro:", error);
   } else {
-    console.log("Registro actualizado:", data);
+    console.log("Tiempo iniciado");
   }
 }
 
