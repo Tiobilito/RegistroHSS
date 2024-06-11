@@ -54,8 +54,12 @@ export default function PaginaIngreso({ navigation }) {
   const checarUsuario = async () => {
       const data = await ObtenerDatosUsuario();
       if (data) {
-        DefCodigo(data.Codigo);
-        DefContraseña(data.Contraseña);
+        if(Codigo === "") {
+          DefCodigo(data.Codigo);
+        }
+        if(Contraseña === "") {
+          DefContraseña(data.Contraseña);
+        }
       }
    
   };
