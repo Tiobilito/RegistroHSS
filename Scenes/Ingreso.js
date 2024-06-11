@@ -28,10 +28,8 @@ export default function PaginaIngreso({ navigation }) {
 
   const IngresoBiometrico = async () => {
     const Auth = await authenticate();
-    const data = await ObtenerDatosUsuario();
     if (Auth != false) {
       console.log("Aprobado acceso por biometrico");
-      DefContraseña(data.Contraseña);
       await IngresoUsuario();
     } else {
       console.log("Denegado acceso por biometrico");
@@ -42,7 +40,6 @@ export default function PaginaIngreso({ navigation }) {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
 
     if (BUsuario === true) {
-      console.log("hola");
       const getLocation1 = await obtenerUbicacion();
       console.log("Lo que agarra es ", getLocation1);
       navigation.dispatch(
