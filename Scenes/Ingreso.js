@@ -9,8 +9,9 @@ import {
   Alert,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
-import * as LocalAuthentication from "expo-local-authentication";
 import { EncontrarUsuario } from "../Modulos/OperacionesBD";
+
+import { Gps,obtenerUbicacion } from "./gps";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
@@ -18,52 +19,55 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
+  const [location , setLocation] = useState(null);
+  const [locationIphone, setLocationIphone] = useState(null)
+  const localizacion="Blvd. Gral. Marcelino García Barragán 1421, Olímpica, 44840 Guadalajara, Jal., Mexico"
 
-  const authenticate = async () => {
-    const result = await LocalAuthentication.authenticateAsync();
-    return result.success;
-  };
-
-  const IngresoBiometrico = async () => {
-    const Auth = await authenticate();
-    if (Auth != false) {
-      console.log("Aprobado acceso por biometrico");
-      await IngresoUsuario();
-    } else {
-      console.log("Denegado acceso por biometrico");
-    }
-  };
-
+  
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
+   
+    if (BUsuario === true) 
+      {
+       //const getLocation1=await obtenerUbicacion()
+       
+       //setLocation(getLocation1)
 
-    if (BUsuario === true) {
-      navigation.dispatch(
+       //if(getLocation1){
+        navigation.dispatch( 
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Tab" }],
         })
       );
+      // }else{
+
+        console.log("no puedo tener tu ubicacion :(")
+     //  }
+       
+      
     } else {
       console.log("No existe el usuario");
     }
   };
 
   const checarUsuario = async () => {
-    try {
       const data = await ObtenerDatosUsuario();
       if (data) {
-        DefCodigo(data.Codigo);
-        //DefContraseña(data.Contraseña);
+        if(Codigo === "") {
+          DefCodigo(data.Codigo);
+        }
+        if(Contraseña === "") {
+          DefContraseña(data.Contraseña);
+        }
       }
-    } catch (error) {
-      console.error("Error al obtener los datos del usuario: ", error);
-    }
+   
   };
 
-  useEffect(() => {
-    checarUsuario();
-  }, []);
+  useEffect(()=>{
+
+    checarUsuario()
+  })
 
   return (
     <View style={styles.container}>
@@ -85,13 +89,12 @@ export default function PaginaIngreso({ navigation }) {
         placeholder="Contraseña"
         secureTextEntry={true}
       />
-      <Button color="black" title="Biometrico" onPress={async () => {await IngresoBiometrico()}} />
       <Button
         color="blue"
         title="Ingresar"
-        onPress={ async () => {
+        onPress={() => {
           if (Codigo != "" && Contraseña != "") {
-            await IngresoUsuario();
+            IngresoUsuario();
           } else {
             Alert.alert("Por favor completa los 2 campos");
           }
@@ -101,9 +104,16 @@ export default function PaginaIngreso({ navigation }) {
         color="red"
         title="Registro"
         onPress={() => {
-          navigation.navigate("Registro");
+         navigation.navigate("Registro")
         }}
       />
+
+      <Button
+      color="orange"
+      title="change password"
+      onPress={()=>{
+        navigation.navigate("changepassword")
+       } }/>
     </View>
   );
 }

@@ -2,6 +2,7 @@ import { supabase } from "./supabase";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 import { useState } from "react";
+import { setUser,getUser } from "./getUser";
 
 // Función para formatear la fecha y hora
 const formatearFechaHora = (fecha) => {

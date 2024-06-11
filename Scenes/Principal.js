@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button, Alert } from "react-native";
 import { Cronometro } from "../Modulos/Cronometro";
 import { ObtenerDatosUSB, IniciarTiempoUsuario, añadirHoras } from "../Modulos/OperacionesBD";
-import { Gps, obtenerUbicacion } from "../Modulos/gps";
+import { Gps, obtenerUbicacion } from "./gps";
 import NetInfo from '@react-native-community/netinfo';
 
 const Scale = Dimensions.get("window").width;

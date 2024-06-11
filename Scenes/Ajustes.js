@@ -7,10 +7,11 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
+import { CommonActions } from "@react-navigation/native";
 
 const Scale = Dimensions.get("window").width;
 
-export default function PaginaAjustes() {
+export default function PaginaAjustes({navigation}) {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Ventana de ajustes</Text>
@@ -32,9 +33,18 @@ export default function PaginaAjustes() {
               },
             ],
             { cancelable: false }
+           
           );
+
+
+        
         }}
       />
+        <Button title="Cerrar Sesion" onPress={()=>
+        {
+        navigation.navigate("Ingreso")
+      
+      }}/>
     </View>
   );
 }
