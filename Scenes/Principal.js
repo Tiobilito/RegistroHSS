@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
+import { StyleSheet, Text, View, Dimensions, Button, Alert } from "react-native";
 import { Cronometro } from "../Modulos/Cronometro";
-import {
-  ObtenerDatosUSB,
-  IniciarTiempoUsuario,
-  añadirHoras,
-} from "../Modulos/OperacionesBD";
+import { ObtenerDatosUSB, IniciarTiempoUsuario, añadirHoras } from "../Modulos/OperacionesBD";
+import { Gps, obtenerUbicacion } from "../Modulos/gps";
+import NetInfo from '@react-native-community/netinfo';
 
 const Scale = Dimensions.get("window").width;
 
@@ -14,24 +12,106 @@ export default function PaginaIngreso() {
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
 
+  const [location, setLocation] = useState(null);
+  const localizacion = "Blvd. Gral. Marcelino García Barragán 1421, Olímpica, 44840 Guadalajara, Jal., Mexico"
+  const localizacion2 = "Centro Universitario de Ciencias Exactas e Ingenierías"
+  let showAll = false
+  const functionGetLocation = async () => {
+
+    
+      const location = await obtenerUbicacion()
+      console.log(location)
+       if(location === null){
+
+        console.log("los datos son nulos")
+        return false
+
+       }else{
+        console.log("los datos no son nulos")
+        setLocation(location)
+        return true
+       }
+          
+  }
+
+
+  const functionGetLocation2 = async () => {
+    const location = await obtenerUbicacion();
+    console.log('Resultado de obtenerUbicacion:', location);
+    if (location === null) {
+      console.log("los datos son nulos");
+      return false;
+    } else {
+      console.log("los datos no son nulos");
+      setLocation(location);
+      return true;
+    }
+  };
+  
+  function network(){
+
+    NetInfo.fetch().then(state => {
+      console.log('Connection type', state.type);
+      console.log('Is connected?', state.isConnected);
+    });
+  }
+  function validation() {
+    if (location[0].formattedAddress) {
+      if (location[0].formattedAddress == localizacion) {
+        console.log("esytas dentro de cucei")
+        return true
+
+      } else {
+
+        console.log("no estas debtri de cucei ")
+        return false
+      }
+
+
+    } else
+      if (location[0].name) {
+
+        if (location[0].name == localizacion2) {
+          console.log("esytas dentro de cucei")
+          return true
+        }
+        else {
+
+          console.log("no estas debtri de cucei ")
+
+          return false
+        }
+      }
+  }
+
+
   const tomarUsuario = async () => {
     const DatosUsuario = await ObtenerDatosUSB();
     if (DatosUsuario && DatosUsuario.length > 0) {
-      DefUsuario(DatosUsuario[0]);
-      if (DatosUsuario[0].Inicio) {
+      const usuarioDatos = DatosUsuario[0];
+      DefUsuario(usuarioDatos);
+      if (usuarioDatos.Inicio) {
         DefFechaInicio(new Date(usuarioDatos.Inicio));
         DefMostrarCr(true);
       }
     }
   };
+    if (usuario && location) {
+        showAll = true
+      }
+
 
   useEffect(() => {
+    network()
     tomarUsuario();
+    functionGetLocation()
+  
+
   }, []);
 
   return (
     <View style={styles.container}>
-      {usuario ? (
+      {showAll ? (
         <View>
           <Text style={styles.text}>
             Hola {usuario.Nombre} a la app de registro de horas para{" "}
@@ -43,8 +123,22 @@ export default function PaginaIngreso() {
                 color="red"
                 title="Detener tiempo"
                 onPress={async () => {
-                  await añadirHoras();
-                  DefMostrarCr(false);
+                 const getLocation=await functionGetLocation()
+                 if(getLocation===true){
+                  if (validation()) {
+
+                    añadirHoras(usuario.Codigo);
+                    DefMostrarCr(false);
+                  }
+                  else {
+                    Alert.alert("no estas en CUCEI :(")
+                  }}
+                  else{
+
+                    Alert.alert("debes tener la ubicacion activada para detener el boton")
+                  }
+                  
+
                 }}
               />
               <Cronometro startDate={FechaInicio} />
@@ -54,11 +148,33 @@ export default function PaginaIngreso() {
               <Button
                 color="blue"
                 title="Iniciar tiempo"
-                onPress={async () => {
+                onPress={async() => {
                   const now = new Date();
-                  DefFechaInicio(now);
-                  await IniciarTiempoUsuario(now.toISOString());
-                  DefMostrarCr(true);
+                 const obt=await functionGetLocation()
+                console.log(obt)
+                  
+                 if(obt===true) {
+                  console.log("sise puede")
+                  if (validation()) {
+
+                    DefFechaInicio(now);
+                    IniciarTiempoUsuario(now.toISOString(), usuario.Codigo);
+                    DefMostrarCr(true);
+                  }
+                  else {
+
+                    Alert.alert("no estas dentro de CUCEI :(")
+                  }}
+
+                  else{
+
+                    console.log("no se puede")
+                  }
+                  
+
+
+
+
                 }}
               />
             </View>
