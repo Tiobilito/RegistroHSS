@@ -52,15 +52,12 @@ export default function PaginaIngreso({ navigation }) {
   };
 
   const checarUsuario = async () => {
-    try {
       const data = await ObtenerDatosUsuario();
       if (data) {
         DefCodigo(data.Codigo);
         DefContraseña(data.Contraseña);
       }
-    } catch (error) {
-      console.error("Error al obtener los datos del usuario: ", error);
-    }
+   
   };
 
   useEffect(()=>{

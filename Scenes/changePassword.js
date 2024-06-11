@@ -48,6 +48,7 @@ export default function ChangePassword({ navigation }) {
 
             Alert.alert("las contrasenas son iguales")
            const changes=await changePassword(password,code)
+           navigation.navigate("Ingreso")
          
         }
         else{

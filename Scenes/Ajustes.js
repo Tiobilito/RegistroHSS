@@ -40,7 +40,7 @@ export default function PaginaAjustes({navigation}) {
         
         }}
       />
-        <Button title="Cancelar" onPress={()=>
+        <Button title="Cerrar Sesion" onPress={()=>
         {
         navigation.navigate("Ingreso")
       
