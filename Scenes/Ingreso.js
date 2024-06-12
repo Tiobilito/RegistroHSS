@@ -11,12 +11,31 @@ import {
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/OperacionesBD";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
+import * as LocalAuthentication from "expo-local-authentication";
 
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  async function Autentificacion() {
+    const result = await LocalAuthentication.authenticateAsync();
+    const data = await ObtenerDatosUsuario();
+    if (result.success && data) {
+      DefCodigo(data.Codigo);
+      DefContraseña(data.Contraseña);
+      setIsAuthenticated(true);  // Actualizamos el estado de autenticación
+    }
+  }
+
+  useEffect(() => {
+    checarUsuario();
+    if (isAuthenticated) {
+      IngresoUsuario();  // Llamamos a la función solo después de actualizar los estados
+    }
+  }, [Codigo, Contraseña, isAuthenticated]);  // Dependencias actualizadas
 
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
@@ -40,10 +59,6 @@ export default function PaginaIngreso({ navigation }) {
     }
   };
 
-  useEffect(() => {
-    checarUsuario();
-  }, []);
-
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Ingresa</Text>
@@ -63,6 +78,13 @@ export default function PaginaIngreso({ navigation }) {
         value={Contraseña}
         placeholder="Contraseña"
         secureTextEntry={true}
+      />
+      <Button
+        color="black"
+        title="Ingreso AL"
+        onPress={() => {
+          Autentificacion();
+        }}      
       />
       <Button
         color="blue"
