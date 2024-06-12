@@ -21,14 +21,15 @@ export default function PaginaIngreso({ navigation }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
 
-  useEffect(() => {
-    checkBiometricSupport();
-  }, []);
-
   const checkBiometricSupport = async () => {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-    setBiometricAvailable(hasHardware && isEnrolled);
+    if(hasHardware && isEnrolled && Codigo != "") {
+      setBiometricAvailable(true);
+    } 
+    else {
+      setBiometricAvailable(false);
+    }
   };
 
   async function Autentificacion() {
@@ -43,6 +44,7 @@ export default function PaginaIngreso({ navigation }) {
 
   useEffect(() => {
     checarUsuario();
+    checkBiometricSupport();
     if (isAuthenticated) {
       IngresoUsuario();
     }
