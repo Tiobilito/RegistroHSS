@@ -27,7 +27,6 @@ export default function PaginaIngreso({ navigation }) {
           routes: [{ name: "Tab" }],
         })
       );
-      console.log("no puedo tener tu ubicacion :(");
     } else {
       console.log("No existe el usuario");
     }
