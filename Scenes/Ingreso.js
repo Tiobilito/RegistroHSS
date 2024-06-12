@@ -17,38 +17,33 @@ const Scale = Dimensions.get("window").width;
 export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
-  
+
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
-    if (BUsuario === true) 
-      {
-        navigation.dispatch( 
+    if (BUsuario === true) {
+      navigation.dispatch(
         CommonActions.reset({
           index: 0,
           routes: [{ name: "Tab" }],
         })
       );
-        console.log("no puedo tener tu ubicacion :(")
+      console.log("no puedo tener tu ubicacion :(");
     } else {
       console.log("No existe el usuario");
     }
   };
 
   const checarUsuario = async () => {
-      const data = await ObtenerDatosUsuario();
-      if (data) {
-        if(Codigo === "") {
-          DefCodigo(data.Codigo);
-        }
-        if(Contraseña === "") {
-          DefContraseña(data.Contraseña);
-        }
-      }
+    const data = await ObtenerDatosUsuario();
+    if (data) {
+      DefCodigo(data.Codigo);
+      //DefContraseña(data.Contraseña);
+    }
   };
 
-  useEffect(()=>{
-    checarUsuario()
-  }, [])
+  useEffect(() => {
+    checarUsuario();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -85,16 +80,17 @@ export default function PaginaIngreso({ navigation }) {
         color="red"
         title="Registro"
         onPress={() => {
-         navigation.navigate("Registro")
+          navigation.navigate("Registro");
         }}
       />
 
       <Button
-      color="orange"
-      title="change password"
-      onPress={()=>{
-        navigation.navigate("changepassword")
-       } }/>
+        color="orange"
+        title="change password"
+        onPress={() => {
+          navigation.navigate("changepassword");
+        }}
+      />
     </View>
   );
 }

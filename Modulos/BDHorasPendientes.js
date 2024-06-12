@@ -8,13 +8,10 @@ export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
       `
-        CREATE TABLE IF NOT EXISTS Usuario (
-          Codigo INTEGER NOT NULL UNIQUE,
-          Nombre TEXT,
-          TipoServidor TEXT,
+        CREATE TABLE IF NOT EXISTS Inicio (
+          ID INTENGER,
           Inicio TEXT,
-          Contraseña TEXT,
-          PRIMARY KEY(Codigo)
+          PRIMARY KEY("ID" AUTOINCREMENT),
         );
       `,
       [],
@@ -30,12 +27,10 @@ export const initializeDatabase = () => {
     tx.executeSql(
       `
         CREATE TABLE IF NOT EXISTS Horas (
-          ID INTEGER NOT NULL UNIQUE,
           Inicio TEXT,
           Final TEXT,
           Total TEXT,
           CodigoUsuario INTENGER,
-          PRIMARY KEY(ID AUTOINCREMENT)
         );
       `,
       [],
@@ -74,7 +69,7 @@ export const borrarHoras = () => {
 export const IniciarTiempoUsuario = (TiempoInicio) => {
   db.transaction((tx) => {
     tx.executeSql(
-      `UPDATE Usuarios SET Inicio = ? WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
+      `UPDATE Inicio SET Inicio = ? WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
       [TiempoInicio],
       (_, result) => {
         console.log("El tiempo de inicio ha sido registrado.");
@@ -116,12 +111,12 @@ const calcularDiferenciaHoras = (inicio, fin) => {
 export const añadirHoras = () => {
   db.transaction((tx) => {
     tx.executeSql(
-      `SELECT ID, Inicio FROM Usuarios WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
+      `SELECT ID, Inicio FROM Inicio WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
       [],
       (_, { rows }) => {
         if (rows.length > 0) {
-          const usuario = rows._array[0];
-          const inicio = new Date(usuario.Inicio);
+          const InicioR = rows._array[0];
+          const inicio = new Date(InicioR.Inicio);
           const fin = new Date();
           const inicioFormateado = formatearFechaHora(inicio);
           const finFormateado = formatearFechaHora(fin);
