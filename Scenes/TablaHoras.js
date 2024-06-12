@@ -11,7 +11,6 @@ export default function PaginaTablaHoras() {
   async function obtenerHoras() {
     try {
       const usuario = await ObtenerDatosUsuario();
-      console.log(usuario)
       if (usuario && usuario.Codigo) {
         const codigoUsuario = parseInt(usuario.Codigo, 10);
         const { data, error } = await supabase

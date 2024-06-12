@@ -51,10 +51,8 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   if (error) {
     console.log("hubo un error: " + error);
   }
-
   if (data.length > 0) {
     GuardarDatosUsuario(Codigo, Contraseña);
-    
     return true;
   } else {
     console.log("El usuario no existe");
@@ -75,43 +73,32 @@ export async function IniciarTiempoUsuario(TiempoInicio, codigo) {
   }
 }
 
-
 export async function checkUser(user){
-  console.log(user)
-
-
     const {data,error}=await supabase.from("Usuarios").select("*").eq("Codigo",user)
      console.log("el tamano es=",data.length)
     if(error){
       console.log("hubo un error",error)
-
-
     }
     if(data.length > 0 ){
-
       console.log("si existe")
       return true
     }else{
       console.log("no existe")
       return false
     }
-   
 }
+
 //cambiar las contrasenas 
 export async function changePassword(password,code){
-
   const {data,error} = await supabase.from("Usuarios").update({"Contraseña":password}).eq("Codigo",code);
   if(error){
-
     console.log("Error al cambia a contrasena")
   }else{
     console.log("Contrasena cambiada")
      Alert.alert("contrasena cmabiada :)")
-
- 
   }
-
 }
+
 //Obtiene los datos de la base de datos (supabase) retorna toda la informacion del usuario
 export async function ObtenerDatosUSB() {
   const usuario = await ObtenerDatosUsuario();
@@ -123,7 +110,6 @@ export async function ObtenerDatosUSB() {
     console.error("Error al obtener los datos del usuario:", error);
     return null;
   } else {
-    console.log("Datos del usuario:", data);
     return data;
   }
 }

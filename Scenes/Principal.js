@@ -13,7 +13,7 @@ import {
   IniciarTiempoUsuario,
   añadirHoras,
 } from "../Modulos/OperacionesBD";
-import { obtenerUbicacion } from "../Modulos/gps";
+import { functionGetLocation, validation } from "../Modulos/gps";
 import NetInfo from "@react-native-community/netinfo";
 
 const Scale = Dimensions.get("window").width;
@@ -22,69 +22,13 @@ export default function PaginaIngreso() {
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
-
   const [location, setLocation] = useState(null);
-  const localizacion =
-    "Blvd. Gral. Marcelino García Barragán 1421, Olímpica, 44840 Guadalajara, Jal., México";
-  const localizacionEng =
-    "Blvd. Gral. Marcelino García Barragán 1421, Olímpica, 44840 Guadalajara, Jal., Mexico";
-
-  const localizacion2 =
-    "Centro Universitario de Ciencias Exactas e Ingenierías";
   let showAll = false;
-  const functionGetLocation = async () => {
-    const location = await obtenerUbicacion();
-    console.log(location);
-    if (location === null) {
-      console.log("los datos son nulos");
-      return false;
-    } else {
-      console.log("los datos no son nulos");
-      setLocation(location);
-      return true;
-    }
-  };
-
-  const functionGetLocation2 = async () => {
-    const location = await obtenerUbicacion();
-    console.log("Resultado de obtenerUbicacion:", location);
-    if (location === null) {
-      console.log("los datos son nulos");
-      return false;
-    } else {
-      console.log("los datos no son nulos");
-      setLocation(location);
-      return true;
-    }
-  };
 
   function network() {
     NetInfo.fetch().then((state) => {
-      console.log("Connection type", state.type);
-      console.log("Is connected?", state.isConnected);
+      console.log("Esta connectado?: ", state.isConnected);
     });
-  }
-  function validation() {
-    if (location[0].formattedAddress) {
-      if (location[0].formattedAddress == localizacion || location[0].formattedAddress == localizacionEng) {
-        console.log("estas dentro de cucei");
-        return true;
-      } else {
-        console.log("no estas dentro de cucei ");
-        console.log(location[0].formattedAddress);
-        console.log(localizacion);
-        return false;
-      }
-    } else if (location[0].name) {
-      if (location[0].name == localizacion2) {
-        console.log("estas dentro de cucei");
-        return true;
-      } else {
-        console.log("no estas dentro de cucei ");
-
-        return false;
-      }
-    }
   }
 
   const tomarUsuario = async () => {
@@ -105,7 +49,7 @@ export default function PaginaIngreso() {
   useEffect(() => {
     network();
     tomarUsuario();
-    functionGetLocation();
+    functionGetLocation(setLocation);
   }, []);
 
   return (
@@ -122,17 +66,17 @@ export default function PaginaIngreso() {
                 color="red"
                 title="Detener tiempo"
                 onPress={async () => {
-                  const getLocation = await functionGetLocation();
-                  if (getLocation === true) {
-                    if (validation()) {
+                  const VLocation = await functionGetLocation(setLocation);
+                  if (VLocation === true) {
+                    if (validation(location)) {
                       añadirHoras(usuario.Codigo);
                       DefMostrarCr(false);
                     } else {
-                      Alert.alert("no estas en CUCEI :(");
+                      Alert.alert("No estas en CUCEI :(");
                     }
                   } else {
                     Alert.alert(
-                      "debes tener la ubicacion activada para detener el boton"
+                      "Debes tener la ubicacion activada para detener el boton"
                     );
                   }
                 }}
@@ -146,20 +90,20 @@ export default function PaginaIngreso() {
                 title="Iniciar tiempo"
                 onPress={async () => {
                   const now = new Date();
-                  const obt = await functionGetLocation();
-                  console.log(obt);
-
-                  if (obt === true) {
-                    console.log("sise puede");
-                    if (validation()) {
+                  const VLocation = await functionGetLocation(setLocation);
+                  if (VLocation === true) {
+                    console.log("Estas dentro de CUCEI");
+                    if (validation(location)) {
                       DefFechaInicio(now);
                       IniciarTiempoUsuario(now.toISOString(), usuario.Codigo);
                       DefMostrarCr(true);
                     } else {
-                      Alert.alert("no estas dentro de CUCEI :(");
+                      Alert.alert("No estas dentro de CUCEI :(");
                     }
                   } else {
-                    console.log("no se puede");
+                    Alert.alert(
+                      "Debes tener la ubicacion activada para detener el boton"
+                    );
                   }
                 }}
               />
