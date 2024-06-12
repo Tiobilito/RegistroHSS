@@ -19,6 +19,17 @@ export default function PaginaIngreso({ navigation }) {
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState(false);
+
+  useEffect(() => {
+    checkBiometricSupport();
+  }, []);
+
+  const checkBiometricSupport = async () => {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+    setBiometricAvailable(hasHardware && isEnrolled);
+  };
 
   async function Autentificacion() {
     const result = await LocalAuthentication.authenticateAsync();
@@ -26,16 +37,16 @@ export default function PaginaIngreso({ navigation }) {
     if (result.success && data) {
       DefCodigo(data.Codigo);
       DefContraseña(data.Contraseña);
-      setIsAuthenticated(true);  // Actualizamos el estado de autenticación
+      setIsAuthenticated(true);
     }
   }
 
   useEffect(() => {
     checarUsuario();
     if (isAuthenticated) {
-      IngresoUsuario();  // Llamamos a la función solo después de actualizar los estados
+      IngresoUsuario();
     }
-  }, [Codigo, Contraseña, isAuthenticated]);  // Dependencias actualizadas
+  }, [Codigo, Contraseña, isAuthenticated]);
 
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
@@ -79,18 +90,20 @@ export default function PaginaIngreso({ navigation }) {
         placeholder="Contraseña"
         secureTextEntry={true}
       />
-      <Button
-        color="black"
-        title="Ingreso AL"
-        onPress={() => {
-          Autentificacion();
-        }}      
-      />
+      {biometricAvailable && (
+        <Button
+          color="black"
+          title="Ingreso AL"
+          onPress={() => {
+            Autentificacion();
+          }}
+        />
+      )}
       <Button
         color="blue"
         title="Ingresar"
         onPress={() => {
-          if (Codigo != "" && Contraseña != "") {
+          if (Codigo !== "" && Contraseña !== "") {
             IngresoUsuario();
           } else {
             Alert.alert("Por favor completa los 2 campos");
@@ -104,7 +117,6 @@ export default function PaginaIngreso({ navigation }) {
           navigation.navigate("Registro");
         }}
       />
-
       <Button
         color="orange"
         title="change password"
