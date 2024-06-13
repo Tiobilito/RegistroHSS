@@ -9,7 +9,6 @@ import PaginaRegistro from "./Scenes/Registro";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
-import BackgroundFetchScreen from "./Scenes/example";
 import changepassword from "./Scenes/changePassword";
 
 
@@ -41,9 +40,6 @@ const TabNavigation = () => {
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
-      <Tab.Screen name="example" component={BackgroundFetchScreen}/>
-   
-     
     </Tab.Navigator>
   );
 };
