@@ -28,17 +28,22 @@ const calcularDiferenciaHoras = (inicio, fin) => {
 };
 
 export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña) {
-  const { data, error } = await supabase.from("Usuarios").insert([
-    {
-      Codigo: parseInt(codigo, 10),
-      Nombre: Nombre,
-      TipoServidor: tipoUsuario,
-      Contraseña: contraseña,
-    },
-  ]);
-  if (error) {
-    console.log("Hubo un error", error);
-    return;
+  let ChkUser = await checkUser();
+  if (ChkUser) {
+    Alert.alert("Ya existe un usuario asociado al codigo");
+  } else {
+    const { data, error } = await supabase.from("Usuarios").insert([
+      {
+        Codigo: parseInt(codigo, 10),
+        Nombre: Nombre,
+        TipoServidor: tipoUsuario,
+        Contraseña: contraseña,
+      },
+    ]);
+    if (error) {
+      console.log("Hubo un error", error);
+      return;
+    }
   }
 }
 
@@ -73,29 +78,31 @@ export async function IniciarTiempoUsuario(TiempoInicio, codigo) {
   }
 }
 
-export async function checkUser(user){
-    const {data,error}=await supabase.from("Usuarios").select("*").eq("Codigo",user)
-     console.log("el tamano es=",data.length)
-    if(error){
-      console.log("hubo un error",error)
-    }
-    if(data.length > 0 ){
-      console.log("si existe")
-      return true
-    }else{
-      console.log("no existe")
-      return false
-    }
+export async function checkUser(user) {
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .select("*")
+    .eq("Codigo", user);
+  if (error) {
+    console.log("hubo un error", error);
+  }
+  if (data.length > 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-//cambiar las contrasenas 
-export async function changePassword(password,code){
-  const {data,error} = await supabase.from("Usuarios").update({"Contraseña":password}).eq("Codigo",code);
-  if(error){
-    console.log("Error al cambia a contrasena")
-  }else{
-    console.log("Contrasena cambiada")
-     Alert.alert("contrasena cmabiada :)")
+//cambiar las contrasenas
+export async function changePassword(password, code) {
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .update({ Contraseña: password })
+    .eq("Codigo", code);
+  if (error) {
+    console.log("Error al cambia a contrasena");
+  } else {
+    Alert.alert("contrasena cmabiada");
   }
 }
 
@@ -117,7 +124,7 @@ export async function ObtenerDatosUSB() {
 // Añade horas
 export async function añadirHoras(codigoUsuario) {
   const DatosUsuario = await ObtenerDatosUSB();
-  const usuarioDatos = DatosUsuario[0]; 
+  const usuarioDatos = DatosUsuario[0];
   const inicio = new Date(usuarioDatos.Inicio);
   const fin = new Date();
   const inicioFormateado = formatearFechaHora(inicio);
