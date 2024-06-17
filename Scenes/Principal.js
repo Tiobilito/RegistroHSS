@@ -1,20 +1,7 @@
 import React, { useEffect, useState } from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  Button,
-  Alert,
-} from "react-native";
+import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
+import db, { IniciarTiempoUsuario, añadirHoras } from "../Modulos/db";
 import { Cronometro } from "../Modulos/Cronometro";
-import {
-  ObtenerDatosUSB,
-  IniciarTiempoUsuario,
-  añadirHoras,
-} from "../Modulos/OperacionesBD";
-import { functionGetLocation, validation } from "../Modulos/gps";
-import NetInfo from "@react-native-community/netinfo";
 
 const Scale = Dimensions.get("window").width;
 
@@ -22,63 +9,51 @@ export default function PaginaIngreso() {
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
-  const [location, setLocation] = useState(null);
-  let showAll = false;
 
-  function network() {
-    NetInfo.fetch().then((state) => {
-      console.log("Esta connectado?: ", state.isConnected);
+  const tomarUsuario = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM Usuarios;`,
+        [],
+        (_, { rows }) => {
+          if (rows.length > 0) {
+            const usuario = rows._array[0];
+            DefUsuario(usuario);
+            if (usuario.Inicio) {
+              DefMostrarCr(true);
+              DefFechaInicio(new Date(usuario.Inicio));
+            }
+          } else {
+            console.log("No hay Usuario");
+          }
+        },
+        (_, error) => {
+          console.log("Error al buscar el usuario:", error);
+        }
+      );
     });
-  }
-
-  const tomarUsuario = async () => {
-    const DatosUsuario = await ObtenerDatosUSB();
-    if (DatosUsuario && DatosUsuario.length > 0) {
-      const usuarioDatos = DatosUsuario[0];
-      DefUsuario(usuarioDatos);
-      if (usuarioDatos.Inicio) {
-        DefFechaInicio(new Date(usuarioDatos.Inicio));
-        DefMostrarCr(true);
-      }
-    }
   };
-  if (usuario && location) {
-    showAll = true;
-  }
 
   useEffect(() => {
-    network();
     tomarUsuario();
-    functionGetLocation(setLocation);
   }, []);
 
   return (
     <View style={styles.container}>
-      {showAll ? (
+      {usuario ? (
         <View>
           <Text style={styles.text}>
             Hola {usuario.Nombre} a la app de registro de horas para{" "}
-            {usuario.TipoServidor}
+            {usuario.Tipo}
           </Text>
           {MostrarCr ? (
             <View>
               <Button
                 color="red"
                 title="Detener tiempo"
-                onPress={async () => {
-                  const VLocation = await functionGetLocation(setLocation);
-                  if (VLocation === true) {
-                    if (validation(location)) {
-                      añadirHoras(usuario.Codigo);
-                      DefMostrarCr(false);
-                    } else {
-                      Alert.alert("No estas en CUCEI :(");
-                    }
-                  } else {
-                    Alert.alert(
-                      "Debes tener la ubicacion activada para detener el boton"
-                    );
-                  }
+                onPress={() => {
+                  añadirHoras();
+                  DefMostrarCr(false);
                 }}
               />
               <Cronometro startDate={FechaInicio} />
@@ -88,23 +63,11 @@ export default function PaginaIngreso() {
               <Button
                 color="blue"
                 title="Iniciar tiempo"
-                onPress={async () => {
+                onPress={() => {
                   const now = new Date();
-                  const VLocation = await functionGetLocation(setLocation);
-                  if (VLocation === true) {
-                    console.log("Estas dentro de CUCEI");
-                    if (validation(location)) {
-                      DefFechaInicio(now);
-                      IniciarTiempoUsuario(now.toISOString(), usuario.Codigo);
-                      DefMostrarCr(true);
-                    } else {
-                      Alert.alert("No estas dentro de CUCEI :(");
-                    }
-                  } else {
-                    Alert.alert(
-                      "Debes tener la ubicacion activada para detener el boton"
-                    );
-                  }
+                  DefFechaInicio(now);
+                  IniciarTiempoUsuario(now.toISOString());
+                  DefMostrarCr(true);
                 }}
               />
             </View>
