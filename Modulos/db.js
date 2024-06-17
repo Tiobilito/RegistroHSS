@@ -134,7 +134,7 @@ const calcularDiferenciaHoras = (inicio, fin) => {
 export const añadirHoras = () => {
   db.transaction((tx) => {
     tx.executeSql(
-      `SELECT ID, Inicio FROM Usuarios WHERE ID = (SELECT ID FROM Usuarios ORDER BY ID ASC LIMIT 1);`,
+      `SELECT id, Inicio FROM Usuarios WHERE id = (SELECT id FROM Usuarios ORDER BY id ASC LIMIT 1);`,
       [],
       (_, { rows }) => {
         if (rows.length > 0) {
@@ -149,10 +149,10 @@ export const añadirHoras = () => {
             `INSERT INTO Horas (Inicio, Final, Total) VALUES (?, ?, ?);`,
             [inicioFormateado, finFormateado, total],
             (_, result) => {
-              console.log("Registro de horas añadido con ID:", result.insertId);
+              console.log("Registro de horas añadido con id:", result.insertId);
               tx.executeSql(
-                `UPDATE Usuarios SET Inicio = NULL WHERE ID = ?;`,
-                [usuario.ID],
+                `UPDATE Usuarios SET Inicio = NULL WHERE id = ?;`,
+                [usuario.id],
                 (_, result) => {
                   console.log("Campo Inicio del usuario actualizado a NULL.");
                 },
