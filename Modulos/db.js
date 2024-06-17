@@ -34,7 +34,7 @@ export const initializeDatabase = () => {
           "Inicio"	TEXT,
           "Final"	TEXT,
           "Total"	TEXT,
-          "idUsuario"	INTEGER NOT NULL,
+          "idUsuario"	INTEGER,
           FOREIGN KEY("idUsuario") REFERENCES "Usuarios"("id"),
           PRIMARY KEY("id" AUTOINCREMENT)
         );
