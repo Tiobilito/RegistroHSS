@@ -50,11 +50,11 @@ export const initializeDatabase = () => {
 };
 
 // Añade el usuario principal
-export const AñadeUsuario = (Codigo, Nombre, tipoUsuario) => {
+export const AñadeUsuario = (Codigo, Nombre, tipoUsuario, Contraseña, Departamento) => {
   db.transaction((tx) => {
     tx.executeSql(
-      `INSERT INTO Usuarios (id, Nombre, Tipo) VALUES (?, ?, ?);`,
-      [parseInt(Codigo, 10), Nombre, tipoUsuario],
+      `INSERT INTO Usuarios (id, Nombre, Tipo, Contraseña, Departamento) VALUES (?, ?, ?);`,
+      [parseInt(Codigo, 10), Nombre, tipoUsuario, Contraseña, Departamento],
       (_, result) => {
         console.log("Usuario insertado correctamente");
       },
