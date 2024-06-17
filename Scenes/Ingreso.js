@@ -24,7 +24,8 @@ export default function PaginaIngreso({ navigation }) {
   const checkBiometricSupport = async () => {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
-    if(hasHardware && isEnrolled && Codigo != "") {
+    const data = await ObtenerDatosUsuario();
+    if(hasHardware && isEnrolled && data) {
       setBiometricAvailable(true);
     } 
     else {

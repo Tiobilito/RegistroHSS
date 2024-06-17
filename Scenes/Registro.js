@@ -78,27 +78,31 @@ export default function PaginaRegistro({ navigation }) {
           title="Listo"
           onPress={() => {
             if (Nombre != "" && tipoUsuario != "" && codigo != "") {
-              AñadeUsuario(
-                Nombre.toUpperCase(),
-                tipoUsuario,
-                parseInt(codigo, 10),
-                Contraseña
-              );
-              GuardarDatosUsuario(parseInt(codigo, 10), Contraseña);
-              console.log(
-                "El susuario: ",
-                Nombre,
-                " De tipo: ",
-                tipoUsuario,
-                " Con el codigo: ",
-                codigo
-              );
-              navigation.dispatch(
+              if (codigo.length === 9) {
+                AñadeUsuario(
+                  Nombre.toUpperCase(),
+                  tipoUsuario,
+                  parseInt(codigo, 10),
+                  Contraseña
+                );
+                GuardarDatosUsuario(parseInt(codigo, 10), Contraseña);
+                console.log(
+                  "El susuario: ",
+                  Nombre,
+                  " De tipo: ",
+                  tipoUsuario,
+                  " Con el codigo: ",
+                  codigo
+                );
+                navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
                     routes: [{ name: "Ingreso" }],
                   })
                 );
+              } else {
+                Alert.alert("Digite un codigo valido");
+              }
             } else {
               Alert.alert("Por favor rellene todos los datos");
             }
