@@ -1,4 +1,5 @@
 import * as SQLite from "expo-sqlite/legacy";
+import { ObtenerDatosUsuario } from "./InfoUsuario";
 
 const db = SQLite.openDatabase("Horario.db");
 
@@ -7,36 +8,13 @@ export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
       `
-        CREATE TABLE IF NOT EXISTS "Usuario" (
-          "Codigo"	INTEGER NOT NULL,
-          "Nombre"	TEXT NOT NULL,
-          "Tipo"	TEXT NOT NULL,
-          "Inicio"	TEXT,
-          "Contraseña"	TEXT NOT NULL,
-          "idDepartamento"	INTEGER NOT NULL,
-          PRIMARY KEY("Codigo")
-        );
-      `,
-      [],
-      null,
-      (_, error) => {
-        console.log("Error al crear la tabla Usuarios:", error);
-        return true;
-      }
-    );
-  });
-
-  db.transaction((tx) => {
-    tx.executeSql(
-      `
         CREATE TABLE IF NOT EXISTS "Horas" (
-          "id"	INTEGER NOT NULL UNIQUE,
-          "Inicio"	TEXT,
-          "Final"	TEXT,
-          "Total"	TEXT,
-          "idUsuario"	INTEGER,
+          "id"  INTEGER NOT NULL UNIQUE,
+          "Inicio"  TEXT,
+          "Final" TEXT,
+          "Total" TEXT,
+          "idUsuario" INTENGER NOT NULL,
           "IsBackedInSupabase"	INTEGER DEFAULT 0,
-          FOREIGN KEY("idUsuario") REFERENCES "Usuarios"("Codigo"),
           PRIMARY KEY("id" AUTOINCREMENT)
         );
       `,
@@ -48,62 +26,6 @@ export const initializeDatabase = () => {
       }
     );
   });
-};
-
-// Añade el usuario principal
-export const AñadeUsuario = (Codigo, Nombre, tipoUsuario, Contraseña, Departamento) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `INSERT INTO Usuarios (Codigo, Nombre, Tipo, Contraseña, idDepartamento) VALUES (?, ?, ?, ?);`,
-      [parseInt(Codigo, 10), Nombre, tipoUsuario, Contraseña, Departamento],
-      (_, result) => {
-        console.log("Usuario insertado correctamente");
-      },
-      (_, error) => {
-        console.log("Error al insertar usuario:", error);
-        return true;
-      }
-    );
-  });
-};
-
-// Borra todos los usuarios
-export const borrarUsuarios = () => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `DELETE FROM Usuarios;`,
-      [],
-      (_, result) => {
-        console.log(
-          "Todos los registros de la tabla Usuarios han sido borrados."
-        );
-      },
-      (_, error) => {
-        console.log(
-          "Error al borrar los registros de la tabla Usuarios:",
-          error
-        );
-        return true; // Indica que el error fue manejado
-      }
-    );
-  });
-};
-
-// Inicia el tiempo
-export const IniciarTiempoUsuario = (TiempoInicio) => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `UPDATE Usuarios SET Inicio = ? WHERE Codigo = (SELECT Codigo FROM Usuarios ORDER BY Codigo ASC LIMIT 1);`,
-      [TiempoInicio],
-      (_, result) => {
-        console.log("El tiempo de inicio ha sido registrado.");
-      },
-      (_, error) => {
-        console.log("Error al iniciar el tiempo de inicio.", error);
-        return true; // Indica que el error fue manejado
-      }
-    );
-  }); 
 };
 
 // Función para formatear la fecha y hora
@@ -132,53 +54,25 @@ const calcularDiferenciaHoras = (inicio, fin) => {
 };
 
 // Añade horas
-export const añadirHoras = () => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `SELECT Codigo, Inicio FROM Usuarios WHERE Codigo = (SELECT Codigo FROM Usuarios ORDER BY Codigo ASC LIMIT 1);`,
-      [],
-      (_, { rows }) => {
-        if (rows.length > 0) {
-          const usuario = rows._array[0];
-          const inicio = new Date(usuario.Inicio);
-          const fin = new Date();
-          const inicioFormateado = formatearFechaHora(inicio);
-          const finFormateado = formatearFechaHora(fin);
-          const total = calcularDiferenciaHoras(inicio, fin);
+export const añadirHoras = async () => {
+  const usuario = await ObtenerDatosUsuario();
+  const inicio = new Date(usuario.Inicio);
+  const fin = new Date();
+  const inicioFormateado = formatearFechaHora(inicio);
+  const finFormateado = formatearFechaHora(fin);
+  const total = calcularDiferenciaHoras(inicio, fin);
 
-          tx.executeSql(
-            `INSERT INTO Horas (Inicio, Final, Total) VALUES (?, ?, ?);`,
-            [inicioFormateado, finFormateado, total],
-            (_, result) => {
-              console.log("Registro de horas añadido con id:", result.insertId);
-              tx.executeSql(
-                `UPDATE Usuarios SET Inicio = NULL WHERE id = ?;`,
-                [usuario.id],
-                (_, result) => {
-                  console.log("Campo Inicio del usuario actualizado a NULL.");
-                },
-                (_, error) => {
-                  console.log(
-                    "Error al actualizar el campo Inicio del usuario:",
-                    error
-                  );
-                  return true; // Indica que el error fue manejado
-                }
-              );
-            },
-            (_, error) => {
-              console.log("Error al añadir el registro de horas:", error);
-              return true; // Indica que el error fue manejado
-            }
-          );
-        }
-      },
-      (_, error) => {
-        console.log("Error al obtener la fecha de inicio del usuario:", error);
-        return true; // Indica que el error fue manejado
-      }
-    );
-  });
+  tx.executeSql(
+    `INSERT INTO Horas (Inicio, Final, Total, idUsuario) VALUES (?, ?, ?, ?);`,
+    [inicioFormateado, finFormateado, total, parseInt(usuario.Codigo, 10)],
+    (_, result) => {
+      console.log("Registro de horas añadido con id:", result.insertId);
+    },
+    (_, error) => {
+      console.log("Error al añadir el registro de horas:", error);
+      return true; // Indica que el error fue manejado
+    }
+  );
 };
 
 export default db;
