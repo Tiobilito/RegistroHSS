@@ -13,8 +13,11 @@ const ExpoSecureStoreAdapter = {
   },
 }
 
-const supabaseUrl="https://lpxsgoriiklrtkyfoxtk.supabase.co"
-const supabaseAnonKey="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxweHNnb3JpaWtscnRreWZveHRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTY5MzkyNDUsImV4cCI6MjAzMjUxNTI0NX0.HSSUL1zoy944xHop9X36WGHDvdE4zUe9Y7Fb0GNVUj0"
+//Project URL
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASEURL;
+//API Key
+const supabaseAnonKey= process.env.EXPO_PUBLIC_EXPO_PUBLIC_SUPABASEANONKEY;
+
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       storage: ExpoSecureStoreAdapter as any,
