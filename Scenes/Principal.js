@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
-import db, { IniciarTiempoUsuario, añadirHoras } from "../Modulos/db";
+import { añadirHoras } from "../Modulos/db";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
 
 const Scale = Dimensions.get("window").width;
@@ -10,28 +11,17 @@ export default function PaginaIngreso() {
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
 
-  const tomarUsuario = () => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Usuarios;`,
-        [],
-        (_, { rows }) => {
-          if (rows.length > 0) {
-            const usuario = rows._array[0];
-            DefUsuario(usuario);
-            if (usuario.Inicio) {
-              DefMostrarCr(true);
-              DefFechaInicio(new Date(usuario.Inicio));
-            }
-          } else {
-            console.log("No hay Usuario");
-          }
-        },
-        (_, error) => {
-          console.log("Error al buscar el usuario:", error);
-        }
-      );
-    });
+  const tomarUsuario = async () => {
+    let data = await ObtenerDatosUsuario();
+    if (data) {
+      DefUsuario(data);
+      if (data.Inicio != "null") {
+        DefFechaInicio(new Date(data.Inicio));
+        DefMostrarCr(true);
+      }
+    } else {
+      console.log("No hay Usuario");
+    }
   };
 
   useEffect(() => {

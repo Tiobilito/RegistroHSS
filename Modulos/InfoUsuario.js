@@ -19,7 +19,7 @@ export const GuardarDatosUsuario = async (codigo, contraseña) => {
     const data = {
       Codigo: codigo.toString(),
       Contraseña: contraseña,
-      Inicio: null,
+      Inicio: "null",
     };
     const jsonData = JSON.stringify(data);
     await AsyncStorage.setItem("@UserData", jsonData);
