@@ -7,14 +7,14 @@ export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
       `
-        CREATE TABLE IF NOT EXISTS "Usuarios" (
-          "id"	INTEGER NOT NULL,
+        CREATE TABLE IF NOT EXISTS "Usuario" (
+          "Codigo"	INTEGER NOT NULL,
           "Nombre"	TEXT NOT NULL,
           "Tipo"	TEXT NOT NULL,
           "Inicio"	TEXT,
           "Contraseña"	TEXT NOT NULL,
           "idDepartamento"	INTEGER NOT NULL,
-          PRIMARY KEY("id")
+          PRIMARY KEY("Codigo")
         );
       `,
       [],
@@ -36,7 +36,7 @@ export const initializeDatabase = () => {
           "Total"	TEXT,
           "idUsuario"	INTEGER,
           "IsBackedInSupabase"	INTEGER DEFAULT 0,
-          FOREIGN KEY("idUsuario") REFERENCES "Usuarios"("id"),
+          FOREIGN KEY("idUsuario") REFERENCES "Usuarios"("Codigo"),
           PRIMARY KEY("id" AUTOINCREMENT)
         );
       `,
@@ -54,7 +54,7 @@ export const initializeDatabase = () => {
 export const AñadeUsuario = (Codigo, Nombre, tipoUsuario, Contraseña, Departamento) => {
   db.transaction((tx) => {
     tx.executeSql(
-      `INSERT INTO Usuarios (id, Nombre, Tipo, Contraseña, Departamento) VALUES (?, ?, ?);`,
+      `INSERT INTO Usuarios (Codigo, Nombre, Tipo, Contraseña, idDepartamento) VALUES (?, ?, ?, ?);`,
       [parseInt(Codigo, 10), Nombre, tipoUsuario, Contraseña, Departamento],
       (_, result) => {
         console.log("Usuario insertado correctamente");
@@ -93,7 +93,7 @@ export const borrarUsuarios = () => {
 export const IniciarTiempoUsuario = (TiempoInicio) => {
   db.transaction((tx) => {
     tx.executeSql(
-      `UPDATE Usuarios SET Inicio = ? WHERE id = (SELECT id FROM Usuarios ORDER BY id ASC LIMIT 1);`,
+      `UPDATE Usuarios SET Inicio = ? WHERE Codigo = (SELECT Codigo FROM Usuarios ORDER BY Codigo ASC LIMIT 1);`,
       [TiempoInicio],
       (_, result) => {
         console.log("El tiempo de inicio ha sido registrado.");
@@ -135,7 +135,7 @@ const calcularDiferenciaHoras = (inicio, fin) => {
 export const añadirHoras = () => {
   db.transaction((tx) => {
     tx.executeSql(
-      `SELECT id, Inicio FROM Usuarios WHERE id = (SELECT id FROM Usuarios ORDER BY id ASC LIMIT 1);`,
+      `SELECT Codigo, Inicio FROM Usuarios WHERE Codigo = (SELECT Codigo FROM Usuarios ORDER BY Codigo ASC LIMIT 1);`,
       [],
       (_, { rows }) => {
         if (rows.length > 0) {
