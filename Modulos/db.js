@@ -7,13 +7,13 @@ export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
       `
-        CREATE TABLE "Usuarios" (
+        CREATE TABLE IF NOT EXISTS "Usuarios" (
           "id"	INTEGER NOT NULL,
           "Nombre"	TEXT NOT NULL,
           "Tipo"	TEXT NOT NULL,
           "Inicio"	TEXT,
           "Contraseña"	TEXT NOT NULL,
-          "idDepartamento"	INTEGER NOT NULL DEFAULT 0,
+          "idDepartamento"	INTEGER NOT NULL,
           PRIMARY KEY("id")
         );
       `,
@@ -29,12 +29,13 @@ export const initializeDatabase = () => {
   db.transaction((tx) => {
     tx.executeSql(
       `
-        CREATE TABLE "Horas" (
+        CREATE TABLE IF NOT EXISTS "Horas" (
           "id"	INTEGER NOT NULL UNIQUE,
           "Inicio"	TEXT,
           "Final"	TEXT,
           "Total"	TEXT,
           "idUsuario"	INTEGER,
+          "IsBackedInSupabase"	INTEGER DEFAULT 0,
           FOREIGN KEY("idUsuario") REFERENCES "Usuarios"("id"),
           PRIMARY KEY("id" AUTOINCREMENT)
         );
