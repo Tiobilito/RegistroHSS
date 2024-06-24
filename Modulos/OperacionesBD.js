@@ -28,7 +28,7 @@ const calcularDiferenciaHoras = (inicio, fin) => {
 };
 
 export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña) {
-  let ChkUser = await checkUser();
+  let ChkUser = await checkUser(codigo);
   if (ChkUser) {
     Alert.alert("Ya existe un usuario asociado al codigo");
   } else {
@@ -93,20 +93,20 @@ export async function checkUser(user) {
   }
 }
 
-//cambiar las contrasenas
+// Cambiar las contraseñas
 export async function changePassword(password, code) {
   const { data, error } = await supabase
     .from("Usuarios")
     .update({ Contraseña: password })
     .eq("Codigo", code);
   if (error) {
-    console.log("Error al cambia a contrasena");
+    console.log("Error al cambiar la contraseña");
   } else {
-    Alert.alert("contrasena cmabiada");
+    Alert.alert("Contraseña cambiada");
   }
 }
 
-//Obtiene los datos de la base de datos (supabase) retorna toda la informacion del usuario
+// Obtiene los datos de la base de datos (supabase) retorna toda la informacion del usuario
 export async function ObtenerDatosUSB() {
   const usuario = await ObtenerDatosUsuario();
   const { data, error } = await supabase
@@ -178,4 +178,27 @@ export async function EliminarUsuarioHoras() {
     console.log("Usuario borrado:", userData);
     return userData;
   }
+}
+
+// Función para obtener centros universitarios
+export async function obtenerCentros() {
+  const { data, error } = await supabase.from("CentroUniversitario").select("*");
+  if (error) {
+    console.error("Error al obtener centros universitarios:", error);
+    return [];
+  }
+  return data;
+}
+
+// Función para obtener departamentos asociados a un centro universitario
+export async function obtenerDepartamentos(idCentroUniversitario) {
+  const { data, error } = await supabase
+    .from("Departamento")
+    .select("*")
+    .eq("idCentroUniversitario", idCentroUniversitario);
+  if (error) {
+    console.error("Error al obtener departamentos:", error);
+    return [];
+  }
+  return data;
 }
