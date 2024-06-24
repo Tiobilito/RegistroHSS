@@ -1,4 +1,4 @@
-import { React, useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -11,7 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { AñadeUsuario } from "../Modulos/OperacionesBD";
+import { AñadeUsuario, obtenerCentros, obtenerDepartamentos } from "../Modulos/OperacionesBD";
 import { GuardarDatosUsuario } from "../Modulos/InfoUsuario";
 import { CommonActions } from "@react-navigation/native";
 
@@ -22,6 +22,30 @@ export default function PaginaRegistro({ navigation }) {
   const [tipoUsuario, DeftipoUsuario] = useState("");
   const [Contraseña, DefContraseña] = useState("");
   const [codigo, DefCodigo] = useState(null);
+  const [centros, setCentros] = useState([]);
+  const [departamentos, setDepartamentos] = useState([]);
+  const [selectedCentro, setSelectedCentro] = useState(null);
+  const [selectedDepartamento, setSelectedDepartamento] = useState(null);
+
+  useEffect(() => {
+    const fetchCentros = async () => {
+      const data = await obtenerCentros();
+      setCentros(data);
+    };
+
+    fetchCentros();
+  }, []);
+
+  useEffect(() => {
+    if (selectedCentro) {
+      const fetchDepartamentos = async () => {
+        const data = await obtenerDepartamentos(selectedCentro);
+        setDepartamentos(data);
+      };
+
+      fetchDepartamentos();
+    }
+  }, [selectedCentro]);
 
   return (
     <View style={styles.background}>
@@ -53,17 +77,48 @@ export default function PaginaRegistro({ navigation }) {
             itemStyle={styles.text}
             onValueChange={(itemValue) => DeftipoUsuario(itemValue)}
           >
-            <Picker.Item
-              label="Selecciona una opción"
-              value="Selecciona una opción"
-            />
-            <Picker.Item
-              label="Prestador de servicio"
-              value="Prestador de servicio"
-            />
+            <Picker.Item label="Selecciona una opción" value="Selecciona una opción" />
+            <Picker.Item label="Prestador de servicio" value="Prestador de servicio" />
             <Picker.Item label="Practicante" value="Practicante" />
           </Picker>
         </View>
+        <Text style={styles.text}>Selecciona un Centro Universitario</Text>
+        <View style={{ width: 240, height: 150 }}>
+          <Picker
+            selectedValue={selectedCentro}
+            itemStyle={styles.text}
+            onValueChange={(itemValue) => {
+              setSelectedCentro(itemValue);
+              setSelectedDepartamento(null); // Reset the Departamento picker
+            }}
+          >
+            <Picker.Item label="Selecciona una opción" value="Selecciona una opción" />
+            {centros.map((centro) => (
+              <Picker.Item key={centro.id} label={centro.Nombre} value={centro.id} />
+            ))}
+          </Picker>
+        </View>
+        {selectedCentro && (
+          <>
+            <Text style={styles.text}>Selecciona un Departamento</Text>
+            <View style={{ width: 240, height: 150 }}>
+              <Picker
+                selectedValue={selectedDepartamento}
+                itemStyle={styles.text}
+                onValueChange={(itemValue) => setSelectedDepartamento(itemValue)}
+              >
+                <Picker.Item label="Selecciona una opción" value="Selecciona una opción" />
+                {departamentos.map((departamento) => (
+                  <Picker.Item
+                    key={departamento.id}
+                    label={departamento.NombreDepartamento}
+                    value={departamento.id}
+                  />
+                ))}
+              </Picker>
+            </View>
+          </>
+        )}
         <Text style={styles.text}>Escribe tu contraseña </Text>
         <TextInput
           style={styles.input}
@@ -77,23 +132,16 @@ export default function PaginaRegistro({ navigation }) {
         <Button
           title="Listo"
           onPress={() => {
-            if (Nombre != "" && tipoUsuario != "" && codigo != "") {
+            if (Nombre !== "" && tipoUsuario !== "" && codigo !== "" && selectedCentro !== null && selectedDepartamento !== null) {
               if (codigo.length === 9) {
                 AñadeUsuario(
                   Nombre.toUpperCase(),
                   tipoUsuario,
                   parseInt(codigo, 10),
-                  Contraseña
+                  Contraseña,
+                  parseInt(selectedDepartamento, 10) // Ensure selectedDepartamento is used correctly
                 );
                 GuardarDatosUsuario(parseInt(codigo, 10), Contraseña);
-                console.log(
-                  "El susuario: ",
-                  Nombre,
-                  " De tipo: ",
-                  tipoUsuario,
-                  " Con el codigo: ",
-                  codigo
-                );
                 navigation.dispatch(
                   CommonActions.reset({
                     index: 0,

@@ -27,7 +27,7 @@ const calcularDiferenciaHoras = (inicio, fin) => {
     .padStart(2, "0")}:${diffSecs.toString().padStart(2, "0")}`;
 };
 
-export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña) {
+export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña, idDepart) {
   let ChkUser = await checkUser(codigo);
   if (ChkUser) {
     Alert.alert("Ya existe un usuario asociado al codigo");
@@ -38,6 +38,7 @@ export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña) {
         Nombre: Nombre,
         TipoServidor: tipoUsuario,
         Contraseña: contraseña,
+        idDepartamento: idDepart,
       },
     ]);
     if (error) {
