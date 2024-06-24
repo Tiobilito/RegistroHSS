@@ -7,7 +7,6 @@ import {
   Dimensions,
   Button,
   Alert,
-  TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -49,7 +48,7 @@ export default function PaginaRegistro({ navigation }) {
 
   return (
     <View style={styles.background}>
-      <ScrollView>
+      <ScrollView style={styles.scrollView}>
         <Text style={styles.text}>Hola aspirante, registra tu usuario</Text>
         <Text style={styles.text}>Escribe tu nombre</Text>
         <TextInput
@@ -141,7 +140,7 @@ export default function PaginaRegistro({ navigation }) {
                   Contraseña,
                   parseInt(selectedDepartamento, 10) // Ensure selectedDepartamento is used correctly
                 );
-                GuardarDatosUsuario(parseInt(codigo, 10), Contraseña);
+                //GuardarDatosUsuario(parseInt(codigo, 10), Contraseña);
                 navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
@@ -168,6 +167,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
+  scrollView: {
+    marginTop: 30
+  },
   input: {
     height: Scale > 400 ? 60 : 40,
     borderWidth: 1,
@@ -181,7 +183,6 @@ const styles = StyleSheet.create({
   text: {
     fontSize: Scale > 400 ? 50 : 15,
     fontWeight: "bold",
-    margin: 10,
     color: "black",
   },
   container: {
