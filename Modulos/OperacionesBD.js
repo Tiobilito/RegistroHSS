@@ -2,31 +2,6 @@ import { supabase } from "./supabase";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 
-// Función para formatear la fecha y hora
-const formatearFechaHora = (fecha) => {
-  const opciones = {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-    hour12: true,
-  };
-  return fecha.toLocaleString("es-ES", opciones).replace(",", " a las");
-};
-
-// Función para calcular la diferencia en formato HH:MM:SS
-const calcularDiferenciaHoras = (inicio, fin) => {
-  const diffMs = fin - inicio;
-  const diffHrs = Math.floor(diffMs / 3600000);
-  const diffMins = Math.floor((diffMs % 3600000) / 60000);
-  const diffSecs = Math.floor((diffMs % 60000) / 1000);
-  return `${diffHrs.toString().padStart(2, "0")}:${diffMins
-    .toString()
-    .padStart(2, "0")}:${diffSecs.toString().padStart(2, "0")}`;
-};
-
 export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña, idDepart) {
   let ChkUser = await checkUser(codigo);
   if (ChkUser) {
@@ -63,19 +38,6 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   } else {
     console.log("El usuario no existe");
     return false;
-  }
-}
-
-// Inicia el tiempo
-export async function IniciarTiempoUsuario(TiempoInicio, codigo) {
-  const { data, error } = await supabase
-    .from("Usuarios")
-    .update({ Inicio: TiempoInicio })
-    .eq("Codigo", parseInt(codigo, 10));
-  if (error) {
-    console.error("Error al actualizar el registro:", error);
-  } else {
-    console.log("Tiempo iniciado");
   }
 }
 
@@ -123,34 +85,20 @@ export async function ObtenerDatosUSB() {
 }
 
 // Añade horas
-export async function añadirHoras(codigoUsuario) {
-  const DatosUsuario = await ObtenerDatosUSB();
-  const usuarioDatos = DatosUsuario[0];
-  const inicio = new Date(usuarioDatos.Inicio);
-  const fin = new Date();
-  const inicioFormateado = formatearFechaHora(inicio);
-  const finFormateado = formatearFechaHora(fin);
-  const total = calcularDiferenciaHoras(inicio, fin);
+export async function añadirHorasSup(codigoUsuario, inicio, fin, total) {
   const { data, error } = await supabase.from("Horas").insert([
     {
-      Inicio: inicioFormateado,
-      Final: finFormateado,
+      Inicio: inicio,
+      Final: fin,
       Total: total,
       CodigoUsuario: parseInt(codigoUsuario, 10),
     },
   ]);
   if (error) {
     console.log("Hubo un error", error);
-    return;
-  }
-  const { data: DUsuario, error: EUsuario } = await supabase
-    .from("Usuarios")
-    .update({ Inicio: null })
-    .eq("Codigo", parseInt(codigoUsuario, 10));
-  if (EUsuario) {
-    console.error("Error al actualizar el registro:", EUsuario);
+    return 0;
   } else {
-    console.log("Registro actualizado:", DUsuario);
+    return 1;
   }
 }
 

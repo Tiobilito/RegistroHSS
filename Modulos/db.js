@@ -1,5 +1,7 @@
 import * as SQLite from "expo-sqlite/legacy";
 import { ObtenerDatosUsuario } from "./InfoUsuario";
+import NetInfo from '@react-native-community/netinfo';
+import { añadirHorasSup } from "./OperacionesBD";
 
 const db = SQLite.openDatabase("Horario.db");
 
@@ -61,10 +63,21 @@ export const añadirHoras = async () => {
   const inicioFormateado = formatearFechaHora(inicio);
   const finFormateado = formatearFechaHora(fin);
   const total = calcularDiferenciaHoras(inicio, fin);
+  let isBacked;
+
+  const state = await NetInfo.fetch();
+  
+  if (state.isConnected) {
+    // El dispositivo tiene conexión a Internet
+    isBacked = await añadirHorasSup(usuario.Codigo, inicio, fin, total);
+  } else {
+    // El dispositivo no tiene conexión a Internet
+    isBacked = 0;
+  }  
 
   tx.executeSql(
-    `INSERT INTO Horas (Inicio, Final, Total, idUsuario) VALUES (?, ?, ?, ?);`,
-    [inicioFormateado, finFormateado, total, parseInt(usuario.Codigo, 10)],
+    `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase) VALUES (?, ?, ?, ?, ?);`,
+    [inicioFormateado, finFormateado, total, parseInt(usuario.Codigo, 10), isBacked],
     (_, result) => {
       console.log("Registro de horas añadido con id:", result.insertId);
     },
