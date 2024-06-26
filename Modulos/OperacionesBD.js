@@ -28,7 +28,13 @@ const alertLoging = () => {
   });
 };
 
-export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña, idDepart) {
+export async function AñadeUsuario(
+  Nombre,
+  tipoUsuario,
+  codigo,
+  contraseña,
+  idDepart
+) {
   let ChkUser = await checkUser(codigo);
   if (ChkUser) {
     Alert.alert("Ya existe un usuario asociado al codigo");
@@ -73,7 +79,9 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
       .eq("id", idDepartamento);
 
     if (errorDepartamento) {
-      console.log("Hubo un error al buscar el departamento: " + errorDepartamento);
+      console.log(
+        "Hubo un error al buscar el departamento: " + errorDepartamento
+      );
       return false;
     }
 
@@ -87,7 +95,9 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
         .eq("id", idCentroUniversitario);
 
       if (errorCentro) {
-        console.log("Hubo un error al buscar el centro universitario: " + errorCentro);
+        console.log(
+          "Hubo un error al buscar el centro universitario: " + errorCentro
+        );
         return false;
       }
 
@@ -98,13 +108,20 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
 
         // Llamar a la función GuardarDatosUsuario con las coordenadas
         const data = await ObtenerDatosUsuario();
-        if(data.Codigo != Codigo) {
-          const result = await alertLoging();
-          if(result) {
-            GuardarDatosUsuario(Codigo, Contraseña, latitud.toString(), longitud.toString());
-            return true;
-          } else {
-            return false;
+        if (data) {
+          if (data.Codigo != Codigo) {
+            const result = await alertLoging();
+            if (result) {
+              GuardarDatosUsuario(
+                Codigo,
+                Contraseña,
+                latitud.toString(),
+                longitud.toString()
+              );
+              return true;
+            } else {
+              return false;
+            }
           }
         }
         return true;
