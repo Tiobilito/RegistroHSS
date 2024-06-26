@@ -2,28 +2,31 @@ import { supabase } from "./supabase";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 
-const alertLoging = async () => {
-  Alert.alert(
-    "Confirmación",
-    "El usuario es diferente al ya registrado, si se logea el tiempo (si ya inicio) sera cancelado, esta seguro de continuar ? (El nuevo usuario no tendra su tiempo iniciado)",
-    [
-      {
-        text: "Cancelar",
-        onPress: () => {
-          return false
+// Función que envuelve el Alert en una promesa
+const alertLoging = () => {
+  return new Promise((resolve) => {
+    Alert.alert(
+      "Confirmación",
+      "El usuario es diferente al ya registrado, si se logea el tiempo (si ya inicio) sera cancelado, esta seguro de continuar ? (El nuevo usuario no tendra su tiempo iniciado)",
+      [
+        {
+          text: "Cancelar",
+          onPress: () => {
+            resolve(false);
+          },
+          style: "cancel",
         },
-        style: "cancel",
-      },
-      {
-        text: "Logearse",
-        onPress: () => {
-          return true
+        {
+          text: "Logearse",
+          onPress: () => {
+            resolve(true);
+          },
         },
-      },
-    ],
-    { cancelable: false }
-  );
-}
+      ],
+      { cancelable: false }
+    );
+  });
+};
 
 export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña, idDepart) {
   let ChkUser = await checkUser(codigo);
@@ -96,9 +99,12 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
         // Llamar a la función GuardarDatosUsuario con las coordenadas
         const data = await ObtenerDatosUsuario();
         if(data.Codigo != Codigo) {
-          const Result = await alertLoging();
-          if(Result) {
+          const result = await alertLoging();
+          if(result) {
             GuardarDatosUsuario(Codigo, Contraseña, latitud.toString(), longitud.toString());
+            return true;
+          } else {
+            return false;
           }
         }
         return true;
@@ -202,27 +208,4 @@ export async function EliminarUsuarioHoras() {
     console.log("Usuario borrado:", userData);
     return userData;
   }
-}
-
-// Función para obtener centros universitarios
-export async function obtenerCentros() {
-  const { data, error } = await supabase.from("CentroUniversitario").select("*");
-  if (error) {
-    console.error("Error al obtener centros universitarios:", error);
-    return [];
-  }
-  return data;
-}
-
-// Función para obtener departamentos asociados a un centro universitario
-export async function obtenerDepartamentos(idCentroUniversitario) {
-  const { data, error } = await supabase
-    .from("Departamento")
-    .select("*")
-    .eq("idCentroUniversitario", idCentroUniversitario);
-  if (error) {
-    console.error("Error al obtener departamentos:", error);
-    return [];
-  }
-  return data;
 }
