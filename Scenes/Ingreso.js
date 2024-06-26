@@ -7,11 +7,13 @@ import {
   Dimensions,
   TextInput,
   Alert,
+  TouchableOpacity,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/OperacionesBD";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import * as LocalAuthentication from "expo-local-authentication";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Scale = Dimensions.get("window").width;
 
@@ -69,7 +71,6 @@ export default function PaginaIngreso({ navigation }) {
     const data = await ObtenerDatosUsuario();
     if (data) {
       DefCodigo(data.Codigo);
-      //DefContraseña(data.Contraseña);
     }
   };
 
@@ -94,13 +95,13 @@ export default function PaginaIngreso({ navigation }) {
         secureTextEntry={true}
       />
       {biometricAvailable && (
-        <Button
-          color="black"
-          title="Ingreso AL"
+        <TouchableOpacity
           onPress={() => {
             Autentificacion();
           }}
-        />
+        >
+          <Ionicons name="finger-print" size={60} color="black" />
+        </TouchableOpacity>
       )}
       <Button
         color="blue"
