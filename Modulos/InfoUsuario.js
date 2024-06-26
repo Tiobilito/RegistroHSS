@@ -14,18 +14,19 @@ export const ObtenerDatosUsuario = async () => {
   }
 };
 
-export const GuardarDatosUsuario = async (codigo, contraseña) => {
+export const GuardarDatosUsuario = async (codigo, contraseña, Dlatitud, Dlongitud) => {
   try {
     const data = {
       Codigo: codigo.toString(),
       Contraseña: contraseña,
       Inicio: "null",
+      LatDepartamento: Dlatitud,
+      LonDepartamento: Dlongitud
     };
     const jsonData = JSON.stringify(data);
     await AsyncStorage.setItem("@UserData", jsonData);
     console.log("Datos guardados correctamente: ", jsonData);
     return codigo
-
   } catch (error) {
     console.error("Error al guardar los datos: ", error);
   }
