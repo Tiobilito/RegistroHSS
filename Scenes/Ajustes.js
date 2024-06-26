@@ -33,11 +33,7 @@ export default function PaginaAjustes({navigation}) {
               },
             ],
             { cancelable: false }
-           
           );
-
-
-        
         }}
       />
         <Button title="Cerrar Sesion" onPress={()=>

@@ -46,12 +46,15 @@ export default function PaginaIngreso({ navigation }) {
   }
 
   useEffect(() => {
-    checarUsuario();
-    checkBiometricSupport();
     if (isAuthenticated) {
       IngresoUsuario();
     }
   }, [Codigo, Contraseña, isAuthenticated]);
+
+  useEffect(() => {
+    checarUsuario();
+    checkBiometricSupport();
+  }, []);
 
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);

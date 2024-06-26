@@ -2,6 +2,29 @@ import { supabase } from "./supabase";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 
+const alertLoging = async () => {
+  Alert.alert(
+    "Confirmación",
+    "El usuario es diferente al ya registrado, si se logea el tiempo (si ya inicio) sera cancelado, esta seguro de continuar ? (El nuevo usuario no tendra su tiempo iniciado)",
+    [
+      {
+        text: "Cancelar",
+        onPress: () => {
+          return false
+        },
+        style: "cancel",
+      },
+      {
+        text: "Logearse",
+        onPress: () => {
+          return true
+        },
+      },
+    ],
+    { cancelable: false }
+  );
+}
+
 export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña, idDepart) {
   let ChkUser = await checkUser(codigo);
   if (ChkUser) {
@@ -24,17 +47,69 @@ export async function AñadeUsuario(Nombre, tipoUsuario, codigo, contraseña, id
 }
 
 export async function EncontrarUsuario(Codigo, Contraseña) {
-  const { data, error } = await supabase
+  // Buscar el usuario en la tabla Usuarios
+  const { data: usuarios, error: errorUsuario } = await supabase
     .from("Usuarios")
     .select("*")
     .eq("Codigo", parseInt(Codigo, 10))
     .eq("Contraseña", Contraseña);
-  if (error) {
-    console.log("hubo un error: " + error);
+
+  if (errorUsuario) {
+    console.log("Hubo un error: " + errorUsuario);
+    return false;
   }
-  if (data.length > 0) {
-    GuardarDatosUsuario(Codigo, Contraseña);
-    return true;
+
+  if (usuarios.length > 0) {
+    const usuario = usuarios[0];
+    const idDepartamento = usuario.idDepartamento;
+
+    // Buscar el departamento correspondiente al usuario
+    const { data: departamentos, error: errorDepartamento } = await supabase
+      .from("Departamento")
+      .select("idCentroUniversitario")
+      .eq("id", idDepartamento);
+
+    if (errorDepartamento) {
+      console.log("Hubo un error al buscar el departamento: " + errorDepartamento);
+      return false;
+    }
+
+    if (departamentos.length > 0) {
+      const idCentroUniversitario = departamentos[0].idCentroUniversitario;
+
+      // Buscar el centro universitario correspondiente al departamento
+      const { data: centros, error: errorCentro } = await supabase
+        .from("CentroUniversitario")
+        .select("Latitud, Longitud")
+        .eq("id", idCentroUniversitario);
+
+      if (errorCentro) {
+        console.log("Hubo un error al buscar el centro universitario: " + errorCentro);
+        return false;
+      }
+
+      if (centros.length > 0) {
+        const centro = centros[0];
+        const latitud = centro.Latitud;
+        const longitud = centro.Longitud;
+
+        // Llamar a la función GuardarDatosUsuario con las coordenadas
+        const data = await ObtenerDatosUsuario();
+        if(data.Codigo != Codigo) {
+          const Result = await alertLoging();
+          if(Result) {
+            GuardarDatosUsuario(Codigo, Contraseña, latitud.toString(), longitud.toString());
+          }
+        }
+        return true;
+      } else {
+        console.log("No se encontró el centro universitario");
+        return false;
+      }
+    } else {
+      console.log("No se encontró el departamento");
+      return false;
+    }
   } else {
     console.log("El usuario no existe");
     return false;
