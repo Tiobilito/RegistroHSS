@@ -8,7 +8,9 @@ export const obtenerUbicacion = async () => {
       console.log("Permission to access location was denied");
       return null;
     }
-    let location = await Location.getCurrentPositionAsync({});
+    let location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.High,
+    });
     const reverseGeocodedAddress = await Location.reverseGeocodeAsync({
       longitude: location.coords.longitude,
       latitude: location.coords.latitude,
@@ -18,7 +20,7 @@ export const obtenerUbicacion = async () => {
     console.error("Error obteniendo la localización:", error);
     Alert.alert(
       "Permiso denegado",
-      "Para usar la aplicacion necesuitas darme tu ubicacion. ¿Quieres intentarlo de nuevo?",
+      "Para usar la aplicación necesitas darme tu ubicación. ¿Quieres intentarlo de nuevo?",
       [{ text: "Reintentar", onPress: () => obtenerUbicacion() }]
     );
     return null;
@@ -29,43 +31,36 @@ export const functionGetLocation = async (setLocation) => {
   const location = await obtenerUbicacion();
   console.log(location);
   if (location === null) {
-    console.log("los datos son nulos");
+    console.log("Los datos son nulos");
     return false;
   } else {
-    console.log("los datos no son nulos");
+    console.log("Los datos no son nulos");
     setLocation(location);
     return true;
   }
 };
 
-export const validation = (location) => {
-  const localizacion =
-    "Blvd. Gral. Marcelino García Barragán 1421, Olímpica, 44840 Guadalajara, Jal., México";
-  const localizacionEng =
-    "Blvd. Gral. Marcelino García Barragán 1421, Olímpica, 44840 Guadalajara, Jal., Mexico";
-  const localizacion2 =
-    "Centro Universitario de Ciencias Exactas e Ingenierías";
+export const validation = (location, referenceLat, referenceLong) => {
+  const R = 6371; // Radio de la Tierra en kilómetros
+  const lat1 = location[0].latitude * (Math.PI / 180);
+  const lon1 = location[0].longitude * (Math.PI / 180);
+  const lat2 = referenceLat * (Math.PI / 180);
+  const lon2 = referenceLong * (Math.PI / 180);
 
-  if (location[0].formattedAddress) {
-    if (
-      location[0].formattedAddress == localizacion ||
-      location[0].formattedAddress == localizacionEng
-    ) {
-      console.log("estas dentro de cucei");
-      return true;
-    } else {
-      console.log("no estas dentro de cucei ");
-      console.log(location[0].formattedAddress);
-      console.log(localizacion);
-      return false;
-    }
-  } else if (location[0].name) {
-    if (location[0].name == localizacion2) {
-      console.log("Estas dentro de cucei");
-      return true;
-    } else {
-      console.log("no estas dentro de cucei ");
-      return false;
-    }
+  const dLon = lon2 - lon1;
+  const dLat = lat2 - lat1;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c * 1000; // Distancia en metros
+
+  if (distance <= 100) {
+    console.log("Estás dentro del rango de 100 metros");
+    return true;
+  } else {
+    console.log("No estás dentro del rango de 100 metros");
+    return false;
   }
 };
