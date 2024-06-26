@@ -56,11 +56,11 @@ export const validation = (location, referenceLat, referenceLong) => {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c * 1000; // Distancia en metros
 
-  if (distance <= 100) {
-    console.log("Estás dentro del rango de 100 metros");
+  if (distance <= 1000) {
+    console.log("Estás dentro del rango de 1000 metros");
     return true;
   } else {
-    console.log("No estás dentro del rango de 100 metros");
+    console.log("No estás dentro del rango de 1000 metros");
     return false;
   }
 };
