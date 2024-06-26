@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import { añadirHoras } from "../Modulos/db";
-import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
 
 const Scale = Dimensions.get("window").width;
@@ -56,7 +56,7 @@ export default function PaginaIngreso() {
                 onPress={() => {
                   const now = new Date();
                   DefFechaInicio(now);
-                  IniciarTiempoUsuario(now.toISOString());
+                  ActualizarInicio(now.toISOString());
                   DefMostrarCr(true);
                 }}
               />

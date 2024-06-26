@@ -1,8 +1,9 @@
-import React from "react";
+import React, {useEffect} from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { initializeDatabase } from "./Modulos/db";
 
 import PaginaPrincipal from "./Scenes/Principal";
 import PaginaRegistro from "./Scenes/Registro";
@@ -45,6 +46,11 @@ const TabNavigation = () => {
 };
 
 export default function App() {
+
+  useEffect(() => {
+    initializeDatabase();
+  }, []);
+
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>

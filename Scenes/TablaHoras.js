@@ -1,35 +1,29 @@
 import React, { useState } from "react";
 import { StyleSheet, Text, View, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { supabase } from "../Modulos/supabase";
-import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";  // Asegúrate de que la ruta es correcta
+import db from "../Modulos/db";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function PaginaTablaHoras() {
   const [Horas, DefHoras] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
-  async function obtenerHoras() {
-    try {
-      const usuario = await ObtenerDatosUsuario();
-      if (usuario && usuario.Codigo) {
-        const codigoUsuario = parseInt(usuario.Codigo, 10);
-        const { data, error } = await supabase
-          .from("Horas")
-          .select("*")
-          .eq("CodigoUsuario", codigoUsuario);
-        if (error) {
-          console.log("Error al obtener horas:", error);
-        } else {
-          DefHoras(data);
-          DefMostrarHoras(data.length > 0);
+  const obtenerHoras = () => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM Horas;`,
+        [],
+        (_, { rows }) => {
+          DefHoras(rows._array);
+          DefMostrarHoras(rows._array.length > 0);
+        },
+        (_, error) => {
+          console.log("Error al obtener las horas:", error);
+          return true; // Indica que el error fue manejado
         }
-      } else {
-        console.log("No se encontraron datos del usuario.");
-      }
-    } catch (error) {
-      console.log("Error al obtener datos del usuario:", error);
-    }
-  }
+      );
+    });
+  };
 
   useFocusEffect(
     React.useCallback(() => {
@@ -42,10 +36,14 @@ export default function PaginaTablaHoras() {
       {MostrarHoras ? (
         <FlatList
           data={Horas}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.item}>
-              <Text>ID: {item.id}</Text>
+              {item.IsBackedInSupabase == 0 ? (
+                <Ionicons name="cloud-offline" size={30} color="black"/>
+              ) : (
+                <Ionicons name="cloud" size={30} color="black"/>
+              )}
               <Text>Inicio: {item.Inicio}</Text>
               <Text>Final: {item.Final}</Text>
               <Text>Total: {item.Total}</Text>
