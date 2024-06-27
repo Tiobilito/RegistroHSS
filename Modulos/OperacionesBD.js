@@ -226,3 +226,26 @@ export async function EliminarUsuarioHoras() {
     return userData;
   }
 }
+
+// Función para obtener centros universitarios
+export async function obtenerCentros() {
+  const { data, error } = await supabase.from("CentroUniversitario").select("*");
+  if (error) {
+    console.error("Error al obtener centros universitarios:", error);
+    return [];
+  }
+  return data;
+}
+
+// Función para obtener departamentos asociados a un centro universitario
+export async function obtenerDepartamentos(idCentroUniversitario) {
+  const { data, error } = await supabase
+    .from("Departamento")
+    .select("*")
+    .eq("idCentroUniversitario", idCentroUniversitario);
+  if (error) {
+    console.error("Error al obtener departamentos:", error);
+    return [];
+  }
+  return data;
+}
