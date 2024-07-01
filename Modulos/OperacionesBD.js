@@ -69,66 +69,40 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   }
 
   if (usuarios.length > 0) {
-    const usuario = usuarios[0];
-    const idDepartamento = usuario.idDepartamento;
-
+    const idDepartamento = usuarios[0].idDepartamento;
     // Buscar el departamento correspondiente al usuario
     const { data: departamentos, error: errorDepartamento } = await supabase
       .from("Departamento")
-      .select("idCentroUniversitario")
+      .select("Latitud, Longitud")
       .eq("id", idDepartamento);
-
     if (errorDepartamento) {
       console.log(
         "Hubo un error al buscar el departamento: " + errorDepartamento
       );
       return false;
     }
-
     if (departamentos.length > 0) {
-      const idCentroUniversitario = departamentos[0].idCentroUniversitario;
-
-      // Buscar el centro universitario correspondiente al departamento
-      const { data: centros, error: errorCentro } = await supabase
-        .from("CentroUniversitario")
-        .select("Latitud, Longitud")
-        .eq("id", idCentroUniversitario);
-
-      if (errorCentro) {
-        console.log(
-          "Hubo un error al buscar el centro universitario: " + errorCentro
-        );
-        return false;
-      }
-
-      if (centros.length > 0) {
-        const centro = centros[0];
-        const latitud = centro.Latitud;
-        const longitud = centro.Longitud;
-
-        // Llamar a la función GuardarDatosUsuario con las coordenadas
-        const data = await ObtenerDatosUsuario();
-        if (data) {
-          if (data.Codigo != Codigo) {
-            const result = await alertLoging();
-            if (result) {
-              GuardarDatosUsuario(
-                Codigo,
-                Contraseña,
-                latitud.toString(),
-                longitud.toString()
-              );
-              return true;
-            } else {
-              return false;
-            }
+      const latitud = departamentos[0].Latitud;
+      const longitud = departamentos[0].Longitud;
+      // Llamar a la función GuardarDatosUsuario con las coordenadas
+      const data = await ObtenerDatosUsuario();
+      if (data) {
+        if (data.Codigo != Codigo) {
+          const result = await alertLoging();
+          if (result) {
+            GuardarDatosUsuario(
+              Codigo,
+              Contraseña,
+              latitud.toString(),
+              longitud.toString()
+            );
+            return true;
+          } else {
+            return false;
           }
         }
-        return true;
-      } else {
-        console.log("No se encontró el centro universitario");
-        return false;
       }
+      return true;
     } else {
       console.log("No se encontró el departamento");
       return false;
@@ -139,11 +113,11 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   }
 }
 
-export async function checkUser(user) {
+export async function checkUser(codigo) {
   const { data, error } = await supabase
     .from("Usuarios")
     .select("*")
-    .eq("Codigo", user);
+    .eq("Codigo", codigo);
   if (error) {
     console.log("hubo un error", error);
   }
@@ -229,7 +203,9 @@ export async function EliminarUsuarioHoras() {
 
 // Función para obtener centros universitarios
 export async function obtenerCentros() {
-  const { data, error } = await supabase.from("CentroUniversitario").select("*");
+  const { data, error } = await supabase
+    .from("CentroUniversitario")
+    .select("*");
   if (error) {
     console.error("Error al obtener centros universitarios:", error);
     return [];

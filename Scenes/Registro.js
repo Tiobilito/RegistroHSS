@@ -138,9 +138,8 @@ export default function PaginaRegistro({ navigation }) {
                   tipoUsuario,
                   parseInt(codigo, 10),
                   Contraseña,
-                  parseInt(selectedDepartamento, 10) // Ensure selectedDepartamento is used correctly
+                  parseInt(selectedDepartamento, 10)
                 );
-                //GuardarDatosUsuario(parseInt(codigo, 10), Contraseña);
                 navigation.dispatch(
                   CommonActions.reset({
                     index: 0,
