@@ -1,6 +1,6 @@
 import * as SQLite from "expo-sqlite/legacy";
 import { ObtenerDatosUsuario, ActualizarInicio } from "./InfoUsuario";
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo from "@react-native-community/netinfo";
 import { añadirHorasSup } from "./OperacionesBD";
 
 const db = SQLite.openDatabase("Horario.db");
@@ -66,10 +66,15 @@ export const añadirHoras = async () => {
   let isBacked;
 
   const state = await NetInfo.fetch();
-  
+
   if (state.isConnected) {
     // El dispositivo tiene conexión a Internet
-    isBacked = await añadirHorasSup(usuario.Codigo, inicioFormateado, finFormateado, total);
+    isBacked = await añadirHorasSup(
+      usuario.Codigo,
+      inicioFormateado,
+      finFormateado,
+      total
+    );
   } else {
     // El dispositivo no tiene conexión a Internet
     isBacked = 0;
@@ -77,7 +82,13 @@ export const añadirHoras = async () => {
   db.transaction(async (tx) => {
     tx.executeSql(
       `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase) VALUES (?, ?, ?, ?, ?);`,
-      [inicioFormateado, finFormateado, total, parseInt(usuario.Codigo, 10), isBacked],
+      [
+        inicioFormateado,
+        finFormateado,
+        total,
+        parseInt(usuario.Codigo, 10),
+        isBacked,
+      ],
       async (_, result) => {
         console.log("Registro de horas añadido con id:", result.insertId);
         await ActualizarInicio("null");
@@ -87,7 +98,55 @@ export const añadirHoras = async () => {
         return true; // Indica que el error fue manejado
       }
     );
-  });  
+  });
 };
+
+const RespaldarRegistroEnSupa = async (registro) => {
+  const isBacked = await añadirHorasSup(
+    registro.idUsuario,
+    registro.Inicio,
+    registro.Final,
+    registro.Total
+  );
+  if (isBacked != 0) {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `UPDATE Horas SET IsBackedInSupabase = 1 WHERE id = ?`,
+        [registro.id],
+        (_, result) => {
+          console.log("El registro se actualizo");
+        },
+        (_, error) => {
+          console.log("Error: ", error);
+          return true; // Indica que el error fue manejado
+        }
+      );
+    });
+  } else {
+    console.log("No se pudo respaldar correctamente");
+  }
+};
+
+export const ExportarASupaBD = async () => {
+  db.transaction(async (tx) => {
+    tx.executeSql(
+      `SELECT * FROM Horas WHERE IsBackedInSupabase = 0`,
+      [],
+      (_, { rows }) => {
+        rows._array.forEach(async (registro) => {
+          await RespaldarRegistroEnSupa(registro);
+        });
+      },
+      (_, error) => {
+        console.log("Error al obtener las horas:", error);
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+};
+
+export const ImportarDeSupaBD = async () => {
+  
+}
 
 export default db;
