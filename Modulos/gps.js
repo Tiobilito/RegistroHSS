@@ -59,10 +59,10 @@ export const validation = async (location) => {
   const distance = R * c * 1000; // Distancia en metros
 
   if (distance <= 100) {
-    console.log("Estás dentro del rango de 100 metros");
+    console.log("Estás dentro del rango de 100 metros del departamento");
     return true;
   } else {
-    console.log("No estás dentro del rango de 100 metros");
+    console.log("No estás dentro del rango de 100 metros del departamento");
     return false;
   }
 };

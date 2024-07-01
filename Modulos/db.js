@@ -74,21 +74,20 @@ export const añadirHoras = async () => {
     // El dispositivo no tiene conexión a Internet
     isBacked = 0;
   }
-
-  db.transaction((tx) => {
+  db.transaction(async (tx) => {
     tx.executeSql(
       `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase) VALUES (?, ?, ?, ?, ?);`,
       [inicioFormateado, finFormateado, total, parseInt(usuario.Codigo, 10), isBacked],
-      (_, result) => {
+      async (_, result) => {
         console.log("Registro de horas añadido con id:", result.insertId);
-        ActualizarInicio("null");
+        await ActualizarInicio("null");
       },
       (_, error) => {
         console.log("Error al añadir el registro de horas:", error);
         return true; // Indica que el error fue manejado
       }
     );
-  });
+  });  
 };
 
 export default db;

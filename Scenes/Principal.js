@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import { añadirHoras } from "../Modulos/db";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
+import { functionGetLocation, validation } from "../Modulos/gps";
 
 const Scale = Dimensions.get("window").width;
 
@@ -10,6 +11,7 @@ export default function PaginaIngreso() {
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
+  const [Ubicacion, DefUbicacion ] = useState(null);
 
   const tomarUsuario = async () => {
     let data = await ObtenerDatosUsuario();
