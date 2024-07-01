@@ -1,5 +1,6 @@
 import { Alert } from "react-native";
 import * as Location from "expo-location";
+import { ObtenerDatosUsuario } from "./InfoUsuario";
 
 export const obtenerUbicacion = async () => {
   try {
@@ -40,12 +41,13 @@ export const functionGetLocation = async (setLocation) => {
   }
 };
 
-export const validation = (location, referenceLat, referenceLong) => {
+export const validation = async (location) => {
+  const data = await ObtenerDatosUsuario();
   const R = 6371; // Radio de la Tierra en kilómetros
   const lat1 = location[0].latitude * (Math.PI / 180);
   const lon1 = location[0].longitude * (Math.PI / 180);
-  const lat2 = referenceLat * (Math.PI / 180);
-  const lon2 = referenceLong * (Math.PI / 180);
+  const lat2 = data.LatDepartamento * (Math.PI / 180);
+  const lon2 = data.LonDepartamento * (Math.PI / 180);
 
   const dLon = lon2 - lon1;
   const dLat = lat2 - lat1;
