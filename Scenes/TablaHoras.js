@@ -3,16 +3,18 @@ import { StyleSheet, Text, View, FlatList } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import db from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function PaginaTablaHoras() {
   const [Horas, DefHoras] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
-  const obtenerHoras = () => {
+  const obtenerHoras = async () => {
+    const User = await ObtenerDatosUsuario();
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT * FROM Horas;`,
-        [],
+        `SELECT * FROM Horas WHERE idUsuario = ?;`,
+        [User.Codigo],
         (_, { rows }) => {
           DefHoras(rows._array);
           DefMostrarHoras(rows._array.length > 0);

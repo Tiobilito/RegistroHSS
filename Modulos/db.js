@@ -1,5 +1,5 @@
 import * as SQLite from "expo-sqlite/legacy";
-import { ObtenerDatosUsuario } from "./InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarInicio } from "./InfoUsuario";
 import NetInfo from '@react-native-community/netinfo';
 import { añadirHorasSup } from "./OperacionesBD";
 
@@ -69,7 +69,7 @@ export const añadirHoras = async () => {
   
   if (state.isConnected) {
     // El dispositivo tiene conexión a Internet
-    isBacked = await añadirHorasSup(usuario.Codigo, inicio, fin, total);
+    isBacked = await añadirHorasSup(usuario.Codigo, inicioFormateado, finFormateado, total);
   } else {
     // El dispositivo no tiene conexión a Internet
     isBacked = 0;
@@ -81,6 +81,7 @@ export const añadirHoras = async () => {
       [inicioFormateado, finFormateado, total, parseInt(usuario.Codigo, 10), isBacked],
       (_, result) => {
         console.log("Registro de horas añadido con id:", result.insertId);
+        ActualizarInicio("null");
       },
       (_, error) => {
         console.log("Error al añadir el registro de horas:", error);
