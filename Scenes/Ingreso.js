@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
-import { EncontrarUsuario } from "../Modulos/OperacionesBD";
+import { EncontrarUsuario } from "../Modulos/VerificacionUsuario";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import * as LocalAuthentication from "expo-local-authentication";
 import Ionicons from "@expo/vector-icons/Ionicons";
