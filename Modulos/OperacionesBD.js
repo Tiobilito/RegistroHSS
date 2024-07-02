@@ -141,21 +141,6 @@ export async function changePassword(password, code) {
   }
 }
 
-// Obtiene los datos de la base de datos (supabase) retorna toda la informacion del usuario
-export async function ObtenerDatosUSB() {
-  const usuario = await ObtenerDatosUsuario();
-  const { data, error } = await supabase
-    .from("Usuarios")
-    .select("*")
-    .eq("Codigo", parseInt(usuario.Codigo, 10));
-  if (error) {
-    console.error("Error al obtener los datos del usuario:", error);
-    return null;
-  } else {
-    return data;
-  }
-}
-
 // Añade horas
 export async function añadirHorasSup(codigoUsuario, inicio, fin, total) {
   const { data, error } = await supabase.from("Horas").insert([
@@ -221,6 +206,19 @@ export async function obtenerDepartamentos(idCentroUniversitario) {
     .eq("idCentroUniversitario", idCentroUniversitario);
   if (error) {
     console.error("Error al obtener departamentos:", error);
+    return [];
+  }
+  return data;
+}
+
+// Función para obtener las horas asociadas a un usuario en especifico
+export async function obtenerHoras(codigo) {
+  const { data, error } = await supabase
+    .from("Horas")
+    .select("*")
+    .eq("CodigoUsuario", parseInt(codigo, 10));
+  if (error) {
+    console.error("Error al obtener las horas:", error);
     return [];
   }
   return data;

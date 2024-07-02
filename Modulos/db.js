@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite/legacy";
 import { ObtenerDatosUsuario, ActualizarInicio } from "./InfoUsuario";
 import NetInfo from "@react-native-community/netinfo";
-import { añadirHorasSup } from "./OperacionesBD";
+import { añadirHorasSup, obtenerHoras } from "./OperacionesBD";
 
 const db = SQLite.openDatabase("Horario.db");
 
@@ -146,7 +146,29 @@ export const ExportarASupaBD = async () => {
 };
 
 export const ImportarDeSupaBD = async () => {
-  
+  const Data = await ObtenerDatosUsuario();
+  const Horas = await obtenerHoras(Data.Codigo);
+  Horas.forEach((hora) => {
+    db.transaction(async (tx) => {
+      tx.executeSql(
+        `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase) VALUES (?, ?, ?, ?, ?);`,
+        [
+          hora.Inicio,
+          hora.Final,
+          hora.Total,
+          hora.CodigoUsuario,
+          parseInt("1", 10),
+        ],
+        async (_, result) => {
+          console.log("Registro de horas añadido");
+        },
+        (_, error) => {
+          console.log("Error al añadir el registro de horas:", error);
+          return true; // Indica que el error fue manejado
+        }
+      );
+    });
+  });
 }
 
 export default db;
