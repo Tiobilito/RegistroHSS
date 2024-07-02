@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
+import { StyleSheet, Text, View, Dimensions, Button, Alert } from "react-native";
 import { añadirHoras } from "../Modulos/db";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";

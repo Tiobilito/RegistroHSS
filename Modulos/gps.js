@@ -55,8 +55,6 @@ export const validation = async (location) => {
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c * 1000; // Distancia en metros
 
-  console.log(latitude, longitude);
-
   if (distance <= 100) {
     console.log("Estás dentro del rango de 100 metros del departamento");
     return true;
