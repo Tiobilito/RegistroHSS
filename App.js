@@ -11,8 +11,7 @@ import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
 import changepassword from "./Scenes/changePassword";
-
-
+import PaginaAyuda from "./Scenes/Ayuda";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -31,6 +30,8 @@ const TabNavigation = () => {
             iconName = focused ? "list" : "list-outline";
           } else if (route.name === "Ajustes") {
             iconName = focused ? "cog" : "cog-outline";
+          } else if (route.name === "Ayuda") {
+            iconName = focused ? "help-circle" : "help-circle-outline";
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -40,6 +41,7 @@ const TabNavigation = () => {
     >
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
+      <Tab.Screen name="Ayuda" component={PaginaAyuda} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
     </Tab.Navigator>
   );
