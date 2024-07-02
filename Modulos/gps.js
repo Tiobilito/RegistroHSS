@@ -12,11 +12,7 @@ export const obtenerUbicacion = async () => {
     let location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.High,
     });
-    const reverseGeocodedAddress = await Location.reverseGeocodeAsync({
-      longitude: location.coords.longitude,
-      latitude: location.coords.latitude,
-    });
-    return reverseGeocodedAddress;
+    return location;
   } catch (error) {
     console.error("Error obteniendo la localización:", error);
     Alert.alert(
@@ -43,11 +39,12 @@ export const functionGetLocation = async (setLocation) => {
 
 export const validation = async (location) => {
   const data = await ObtenerDatosUsuario();
+  const { latitude, longitude } = location.coords;
   const R = 6371; // Radio de la Tierra en kilómetros
-  const lat1 = location[0].latitude * (Math.PI / 180);
-  const lon1 = location[0].longitude * (Math.PI / 180);
-  const lat2 = data.LatDepartamento * (Math.PI / 180);
-  const lon2 = data.LonDepartamento * (Math.PI / 180);
+  const lat1 = latitude * (Math.PI / 180);
+  const lon1 = longitude * (Math.PI / 180);
+  const lat2 = parseFloat(data.LatDepartamento) * (Math.PI / 180);
+  const lon2 = parseFloat(data.LonDepartamento) * (Math.PI / 180);
 
   const dLon = lon2 - lon1;
   const dLat = lat2 - lat1;
@@ -57,6 +54,8 @@ export const validation = async (location) => {
     Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c * 1000; // Distancia en metros
+
+  console.log(latitude, longitude);
 
   if (distance <= 100) {
     console.log("Estás dentro del rango de 100 metros del departamento");

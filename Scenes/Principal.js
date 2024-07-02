@@ -11,7 +11,7 @@ export default function PaginaIngreso() {
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
-  const [Ubicacion, DefUbicacion ] = useState(null);
+  const [Ubicacion, DefUbicacion] = useState(null);
 
   const tomarUsuario = async () => {
     let data = await ObtenerDatosUsuario();
@@ -28,6 +28,7 @@ export default function PaginaIngreso() {
 
   useEffect(() => {
     tomarUsuario();
+    functionGetLocation(DefUbicacion);
   }, []);
 
   return (
@@ -43,9 +44,16 @@ export default function PaginaIngreso() {
               <Button
                 color="red"
                 title="Detener tiempo"
-                onPress={() => {
-                  añadirHoras();
-                  DefMostrarCr(false);
+                onPress={async () => {
+                  const VLocation = await functionGetLocation(DefUbicacion);
+                  if (VLocation === true) {
+                    if (await validation(Ubicacion)) {
+                      añadirHoras();
+                      DefMostrarCr(false);
+                    } else {
+                      Alert.alert("No estas en el departamento :(");
+                    }
+                  }
                 }}
               />
               <Cronometro startDate={FechaInicio} />
@@ -55,11 +63,18 @@ export default function PaginaIngreso() {
               <Button
                 color="blue"
                 title="Iniciar tiempo"
-                onPress={() => {
+                onPress={async () => {
                   const now = new Date();
-                  DefFechaInicio(now);
-                  ActualizarInicio(now.toISOString());
-                  DefMostrarCr(true);
+                  const VLocation = await functionGetLocation(DefUbicacion);
+                  if (VLocation === true) {
+                    if (await validation(Ubicacion)) {
+                      DefFechaInicio(now);
+                      ActualizarInicio(now.toISOString());
+                      DefMostrarCr(true);
+                    } else {
+                      Alert.alert("No estas dentro del Departamento :(");
+                    }
+                  }
                 }}
               />
             </View>
