@@ -1,6 +1,7 @@
 import { supabase } from "./supabase";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
+import { ImportarDeSupaBD } from "./db";
 
 // Función que envuelve el Alert en una promesa
 const alertLoging = () => {
@@ -67,7 +68,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
     console.log("Hubo un error: " + errorUsuario);
     return false;
   }
-
+  // Verificar si se encontró algún usuario correspontidente a la informacion optenida del usuario
   if (usuarios.length > 0) {
     const idDepartamento = usuarios[0].idDepartamento;
     // Buscar el departamento correspondiente al usuario
@@ -81,28 +82,43 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
       );
       return false;
     }
+    // Verificar si se encontró algún departamento
     if (departamentos.length > 0) {
       const latitud = departamentos[0].Latitud;
       const longitud = departamentos[0].Longitud;
-      // Llamar a la función GuardarDatosUsuario con las coordenadas
+      // Verificar si hay un usuario registrado localmente el la app o no
       const data = await ObtenerDatosUsuario();
       if (data) {
+        // Si el usuario local no coincide con el código, solicitar confirmación y actualizar datos
         if (data.Codigo != Codigo) {
           const result = await alertLoging();
           if (result) {
-            GuardarDatosUsuario(
+            await GuardarDatosUsuario(
               Codigo,
               Contraseña,
               latitud.toString(),
               longitud.toString()
             );
+            await ImportarDeSupaBD();
             return true;
           } else {
             return false;
           }
+        } else {
+          // Si el usuario local coincide con el código, retornar true
+          return true;
         }
+      } else {
+        // Si no hay usuario local, guardar los datos del usuario actual
+        await GuardarDatosUsuario(
+          Codigo,
+          Contraseña,
+          latitud.toString(),
+          longitud.toString()
+        );
+        await ImportarDeSupaBD();
+        return true;
       }
-      return true;
     } else {
       console.log("No se encontró el departamento");
       return false;
