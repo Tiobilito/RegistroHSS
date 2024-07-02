@@ -21,17 +21,19 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-        
       },
       "package": "com.tiobilito.RegistroHSS",
-    
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
         "ACCESS_BACKGROUND_LOCATION"
       ],
       "infoPlist": {
-        "UIBackgroundModes": ["location", "fetch", "remote-notification"]
+        "UIBackgroundModes": [
+          "location",
+          "fetch",
+          "remote-notification"
+        ]
       }
     },
     "web": {
@@ -42,6 +44,9 @@
         "projectId": "e23a6528-5f41-4d6c-bee6-10f5a0c439e1"
       }
     },
-    "owner": "tiobilito"
+    "owner": "tiobilito",
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
