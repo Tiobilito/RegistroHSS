@@ -48,7 +48,6 @@ export default function PaginaTablaHoras() {
         style={{
           width: "90%",
           marginTop: "8%",
-          //gap: 4,
         }}
       >
         <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "bold" }}>

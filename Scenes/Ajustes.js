@@ -6,15 +6,25 @@ import {
   Button,
   Alert,
   Dimensions,
+  ImageBackground,
 } from "react-native";
-import { CommonActions } from "@react-navigation/native";
 
 const Scale = Dimensions.get("window").width;
 
-export default function PaginaAjustes({navigation}) {
+const image = require("../assets/fondo.png");
+
+export default function PaginaAjustes({ navigation }) {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Ventana de ajustes</Text>
+    <ImageBackground source={image} style={styles.container}>
+      <View
+        style={{
+          width: "90%",
+          marginTop: "24%",
+          marginBottom: "56%",
+        }}
+      >
+        <Text style={styles.text}>Ajustes</Text>
+      </View>
       <Button
         title="Borrar El Usuario"
         onPress={() => {
@@ -36,26 +46,27 @@ export default function PaginaAjustes({navigation}) {
           );
         }}
       />
-        <Button title="Cerrar Sesion" onPress={()=>
-        {
-        navigation.navigate("Ingreso")
-      
-      }}/>
-    </View>
+      <Button
+        title="Cerrar Sesion"
+        onPress={() => {
+          navigation.navigate("Ingreso");
+        }}
+      />
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    resizeMode: "cover",
     alignItems: "center",
-    justifyContent: "center",
+    //justifyContent: "center",
   },
   text: {
-    fontSize: Scale > 400 ? 50 : 15,
+    fontSize: Scale > 400 ? 24 : 20,
     fontWeight: "bold",
-    margin: 20,
+    //margin: 20,
     color: "black",
   },
 });
