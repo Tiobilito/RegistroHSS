@@ -17,6 +17,7 @@ export const initializeDatabase = () => {
           "Total" TEXT,
           "idUsuario" INTENGER NOT NULL,
           "IsBackedInSupabase"	INTEGER DEFAULT 0,
+          "idSupabase INTENGER"
           PRIMARY KEY("id" AUTOINCREMENT)
         );
       `,
