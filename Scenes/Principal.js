@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View, Dimensions, Button, Alert } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  Alert,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import { añadirHoras } from "../Modulos/db";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
@@ -12,6 +20,7 @@ export default function PaginaIngreso() {
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
   const [Ubicacion, DefUbicacion] = useState(null);
+  let showAll = false;
 
   const tomarUsuario = async () => {
     let data = await ObtenerDatosUsuario();
@@ -26,24 +35,52 @@ export default function PaginaIngreso() {
     }
   };
 
+  if (usuario && Ubicacion) {
+    showAll = true;
+  }
+
   useEffect(() => {
     tomarUsuario();
     functionGetLocation(DefUbicacion);
   }, []);
 
+  const image = require("../assets/fondo.png");
+
   return (
-    <View style={styles.container}>
-      {usuario ? (
-        <View>
-          <Text style={styles.text}>
-            Hola {usuario.Nombre} a la app de registro de horas para{" "}
-            {usuario.Tipo}
-          </Text>
+    <ImageBackground source={image} style={styles.container}>
+      <View
+        style={{
+          marginTop: "24%",
+          marginBottom: "12%",
+          height: "10%",
+          width: "90%",
+          gap: 16,
+        }}
+      >
+        <Text style={styles.title}>Bienvenido</Text>
+        <Text style={styles.subtitle}>Registro de horas</Text>
+      </View>
+      {showAll ? (
+        <View
+          style={{
+            backgroundColor: "#ffffff",
+            width: "90%",
+            height: "50%",
+            borderRadius: 200,
+          }}
+        >
           {MostrarCr ? (
-            <View>
-              <Button
-                color="red"
-                title="Detener tiempo"
+            <View
+              style={{
+                alignItems: "center",
+                height: "100%",
+                justifyContent: "flex-end",
+                gap: 60,
+              }}
+            >
+              <Cronometro startDate={FechaInicio} />
+              <TouchableOpacity
+                style={styles.btnChrono}
                 onPress={async () => {
                   const VLocation = await functionGetLocation(DefUbicacion);
                   if (VLocation === true) {
@@ -55,14 +92,24 @@ export default function PaginaIngreso() {
                     }
                   }
                 }}
-              />
-              <Cronometro startDate={FechaInicio} />
+              >
+                <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
+                  Detener tiempo
+                </Text>
+              </TouchableOpacity>
             </View>
           ) : (
-            <View>
-              <Button
-                color="blue"
-                title="Iniciar tiempo"
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "flex-end",
+                height: "100%",
+                gap: 60,
+              }}
+            >
+              <Text style={styles.timeText}>00:00:00</Text>
+              <TouchableOpacity
+                style={styles.btnChrono}
                 onPress={async () => {
                   const now = new Date();
                   const VLocation = await functionGetLocation(DefUbicacion);
@@ -76,23 +123,26 @@ export default function PaginaIngreso() {
                     }
                   }
                 }}
-              />
+              >
+                <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
+                  Iniciar tiempo
+                </Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
       ) : (
         <Text>Cargando...</Text>
       )}
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
+    resizeMode: "cover",
   },
   Content: {
     margin: 50,
@@ -100,10 +150,35 @@ const styles = StyleSheet.create({
   Boton: {
     color: "red",
   },
-  text: {
-    fontSize: Scale > 400 ? 50 : 15,
+  title: {
+    fontSize: Scale > 400 ? 24 : 20,
     fontWeight: "bold",
-    margin: 20,
     color: "black",
+  },
+  subtitle: {
+    fontSize: Scale > 400 ? 24 : 20,
+    fontWeight: "regular",
+    color: "black",
+  },
+  btnChrono: {
+    backgroundColor: "#2272A7",
+    height: "16%",
+    width: "32%",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: "8%",
+    borderRadius: 10,
+    elevation: 15, //Android
+    shadowColor: "#333333", //A partir de aqui ios
+    shadowOffset: {
+      width: 0,
+      height: 6,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+  },
+  timeText: {
+    fontSize: 48,
+    fontWeight: "bold",
   },
 });
