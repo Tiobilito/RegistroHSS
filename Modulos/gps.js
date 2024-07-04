@@ -10,7 +10,7 @@ export const obtenerUbicacion = async () => {
       return null;
     }
     let location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.High,
+      accuracy: Location.Accuracy.Balanced,
     });
     return location;
   } catch (error) {
