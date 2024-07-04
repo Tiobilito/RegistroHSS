@@ -34,6 +34,22 @@ export default function PaginaTablaHoras() {
     });
   };
 
+  // Función para sumar los tiempos en formato "HH:MM:SS"
+  const sumarTiempos = (tiempoStrings) => {
+    const totalSegundos = tiempoStrings.reduce((total, tiempo) => {
+      const [horas, minutos, segundos] = tiempo.split(":").map(Number);
+      return total + horas * 3600 + minutos * 60 + segundos;
+    }, 0);
+
+    const horas = Math.floor(totalSegundos / 3600);
+    const minutos = Math.floor((totalSegundos % 3600) / 60);
+    const segundos = totalSegundos % 60;
+
+    return `${horas.toString().padStart(2, "0")}:${minutos
+      .toString()
+      .padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
+  };
+
   useFocusEffect(
     React.useCallback(() => {
       obtenerHoras();
@@ -61,22 +77,29 @@ export default function PaginaTablaHoras() {
       </View>
       <View style={styles.listContainer}>
         {MostrarHoras ? (
-          <FlatList
-            data={Horas}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <View style={styles.item}>
-                {item.IsBackedInSupabase == 0 ? (
-                  <Ionicons name="cloud-offline" size={30} color="black" />
-                ) : (
-                  <Ionicons name="cloud" size={30} color="white" />
-                )}
-                <Text style={styles.txt}>Inicio: {item.Inicio}</Text>
-                <Text style={styles.txt}>Final: {item.Final}</Text>
-                <Text style={styles.txt}>Total: {item.Total}</Text>
-              </View>
-            )}
-          />
+          <>
+            <FlatList
+              data={Horas}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <View style={styles.item}>
+                  {item.IsBackedInSupabase == 0 ? (
+                    <Ionicons name="cloud-offline" size={30} color="black" />
+                  ) : (
+                    <Ionicons name="cloud" size={30} color="white" />
+                  )}
+                  <Text style={styles.txt}>Inicio: {item.Inicio}</Text>
+                  <Text style={styles.txt}>Final: {item.Final}</Text>
+                  <Text style={styles.txt}>Total: {item.Total}</Text>
+                </View>
+              )}
+            />
+            <View style={{ marginTop: 20 }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                Total acumulado: ( {sumarTiempos(Horas.map((item) => item.Total))} )
+              </Text>
+            </View>
+          </>
         ) : (
           <Text>No hay registros</Text>
         )}
@@ -101,12 +124,8 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: "#2272A7",
-    // width: "100%",
-    // height: "20%",
     borderRadius: 20,
-    // //borderColor: "white",
     marginBottom: "8%",
-    //gap: "12%",
     // //De aqui para abajo son las sombras para los distintos sistemas
     elevation: 15, //Android
     shadowColor: "#333333", //A partir de aqui ios

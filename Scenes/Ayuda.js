@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     width: "90%",
     height: "70%",
     borderRadius: 20,
-    marginTop: "4%",
+    //marginTop: "4%",
     padding: "4%",
     //De aqui para abajo son las sombras para los distintos sistemas
     elevation: 15, //Android
