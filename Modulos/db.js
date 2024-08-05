@@ -11,13 +11,13 @@ export const initializeDatabase = () => {
     tx.executeSql(
       `
         CREATE TABLE IF NOT EXISTS "Horas" (
-          "id"  INTEGER NOT NULL UNIQUE,
-          "Inicio"  TEXT,
+          "id" INTEGER NOT NULL UNIQUE,
+          "Inicio" TEXT,
           "Final" TEXT,
           "Total" TEXT,
-          "idUsuario" INTENGER NOT NULL,
-          "IsBackedInSupabase"	INTEGER DEFAULT 0,
-          "idSupabase INTENGER"
+          "idUsuario" INTEGER NOT NULL,
+          "IsBackedInSupabase" INTEGER DEFAULT 0,
+          "idSupabase" INTEGER,
           PRIMARY KEY("id" AUTOINCREMENT)
         );
       `,
