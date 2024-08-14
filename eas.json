@@ -12,7 +12,9 @@
     },
     "production": {
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://api.production.com"
+        "EXPO_PUBLIC_SUPABASEURL": "https://jogjxpcmhnujrifsmqmt.supabase.co",
+        "EXPO_PUBLIC_SUPABASEANONKEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZ2p4cGNtaG51anJpZnNtcW10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2NDUwNzMsImV4cCI6MjAzNDIyMTA3M30._XBPuiPVslv5guX9vFaolx7mttxpT2jFQckprHlMpRk",
+        "EXPO_PUBLIC_GEMINIAPIKEY": "AIzaSyBLWtQ3K4N13T3zewGDv7fZM37NYY0yh80"
       }
     }
   },
