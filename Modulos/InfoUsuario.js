@@ -49,6 +49,23 @@ export const ActualizarInicio = async (valorInicio) => {
   }
 };
 
+export const ActualizarContraseña = async (valorContraseña) => {
+  try {
+    const jsonData = await AsyncStorage.getItem("@UserData");
+    if (jsonData != null) {
+      const userData = JSON.parse(jsonData);
+      userData.Contraseña = valorContraseña;
+      const updatedJsonData = JSON.stringify(userData);
+      await AsyncStorage.setItem("@UserData", updatedJsonData);
+      console.log("Valor Contraseña se actualizo correctamente");
+    } else {
+      console.log("No se encontraron datos para actualizar.");
+    }
+  } catch (error) {
+    console.error("Error al actualizar el valor de Inicio: ", error);
+  }
+};
+
 export const BorrarDatosUsuario = async () => {
   try {
     await AsyncStorage.removeItem("@UserData");

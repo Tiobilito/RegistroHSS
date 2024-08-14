@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { ObtenerDatosUsuario } from "./InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarContraseña } from "./InfoUsuario";
 import { Alert } from "react-native";
 
 export async function AñadeUsuario(
@@ -53,6 +53,7 @@ export async function changePassword(password, code) {
   if (error) {
     console.log("Error al cambiar la contraseña");
   } else {
+    ActualizarContraseña(password);
     Alert.alert("Contraseña cambiada");
   }
 }
