@@ -94,6 +94,7 @@ export default function PaginaIngreso({ navigation }) {
             onChangeText={(text) => {
               DefCodigo(text);
             }}
+            keyboardType="numeric"
             value={Codigo}
           />
           <Text style={styles.subtitle}>Contraseña</Text>
