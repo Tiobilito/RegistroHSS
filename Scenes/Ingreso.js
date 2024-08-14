@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/VerificacionUsuario";
-import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarContraseña } from "../Modulos/InfoUsuario";
 import * as LocalAuthentication from "expo-local-authentication";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -60,6 +60,10 @@ export default function PaginaIngreso({ navigation }) {
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
     if (BUsuario === true) {
+      const data = await ObtenerDatosUsuario();
+      if (data.Contraseña != Contraseña) {
+        ActualizarContraseña(Contraseña);
+      }
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
