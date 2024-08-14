@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store'
 import { createClient } from '@supabase/supabase-js'
-import { SupaLink, SupaAnonKey } from '../LocalV'
+//import { SupaLink, SupaAnonKey } from '../LocalV'
 
 const ExpoSecureStoreAdapter = {
   getItem: (key: string) => {
@@ -15,9 +15,9 @@ const ExpoSecureStoreAdapter = {
 }
 
 //Project URL
-const supabaseUrl = SupaLink
+const supabaseUrl = "https://jogjxpcmhnujrifsmqmt.supabase.co"
 //API Key
-const supabaseAnonKey= SupaAnonKey
+const supabaseAnonKey= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvZ2p4cGNtaG51anJpZnNtcW10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTg2NDUwNzMsImV4cCI6MjAzNDIyMTA3M30._XBPuiPVslv5guX9vFaolx7mttxpT2jFQckprHlMpRk"
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {

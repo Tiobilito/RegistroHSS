@@ -12,7 +12,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const handleGenericAPIRequest = async (message) => {
-  const API_KEY = process.env.EXPO_PUBLIC_GEMINIAPIKEY;
+  const API_KEY = "AIzaSyBLWtQ3K4N13T3zewGDv7fZM37NYY0yh80";
   console.log("El mensaje enviado es: " + message);
 
   if (!message.trim()) return null; // No hacer nada si el mensaje está vacío
