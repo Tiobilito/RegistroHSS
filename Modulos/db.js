@@ -233,29 +233,56 @@ export const InsertarSemana = async (InicioS, FinalS) => {
   const Inicio = InicioS.toLocaleDateString().toString();
   const Final = FinalS.toLocaleDateString().toString();
 
-  db.transaction(async (tx) => {
-    tx.executeSql(
-      `INSERT INTO Semanas (DInicioS, DFinalS, Inicio, Fin, idUsuario) VALUES (?, ?, ?, ?, ?);`,
-      [InicioS, FinalS, Inicio, Final, parseInt(usuario.Codigo, 10)],
-      async (_, result) => {
-        console.log("Registro de semanas añadido con id:", result.insertId);
-      },
-      (_, error) => {
-        console.log("Error al añadir el registro de semanas:", error);
-        return true; // Indica que el error fue manejado
-      }
-    );
+  return new Promise((resolve, reject) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        `INSERT INTO Semanas (DInicioS, DFinalS, Inicio, Fin, idUsuario) VALUES (?, ?, ?, ?, ?);`,
+        [InicioS, FinalS, Inicio, Final, parseInt(usuario.Codigo, 10)],
+        (_, result) => {
+          console.log("Registro de semanas añadido con id:", result.insertId);
+          resolve(result.insertId);
+        },
+        (_, error) => {
+          console.log("Error al añadir el registro de semanas:", error);
+          reject(error);
+        }
+      );
+    });
   });
 };
 
 export const ChecarSemana = async (FRef) => {
-  const BSemanas = ChecarTSemana();
-  if (BSemanas == 0) {
-    const Hoy = new Date();
-    const InicioS = await ObtenerIniSemana(Hoy);
-    const FinalS = await ObtenerFinSemana(Hoy);
-    await InsertarSemana(InicioS, FinalS);
-  }
+  return new Promise((resolve, reject) => {
+    db.transaction(async (tx) => {
+      try {
+        tx.executeSql(
+          `SELECT * FROM Semanas WHERE DInicioS = ?`,
+          [FRef.toString()],
+          async (_, { rows }) => {
+            if (rows.length > 0) {
+              // Si el registro correspondiente a la semana existe
+              console.log('Registro encontrado:', rows._array[0]);
+              resolve(rows._array[0].id);
+            } else {
+              // Si el registro no existe
+              console.log('No se encontró ningún registro.');
+              const InicioS = await ObtenerIniSemana(FRef);
+              const FinalS = await ObtenerFinSemana(FRef);
+              const id = await InsertarSemana(InicioS, FinalS);
+              resolve(id);
+            }
+          },
+          (_, error) => {
+            console.error('Error al verificar el registro:', error);
+            reject(error);
+          }
+        );
+      } catch (error) {
+        console.error('Error en la transacción:', error);
+        reject(error);
+      }
+    });
+  });
 };
 
 export default db;
