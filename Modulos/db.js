@@ -89,6 +89,8 @@ export const añadirHoras = async () => {
   const inicioFormateado = formatearFechaHora(inicio);
   const finFormateado = formatearFechaHora(fin);
   const total = calcularDiferenciaHoras(inicio, fin);
+  const idSem = await ChecarSemana(inicio);
+  console.log("id semana: ", idSem);
   let isBacked;
 
   const state = await NetInfo.fetch();
@@ -107,13 +109,14 @@ export const añadirHoras = async () => {
   }
   db.transaction(async (tx) => {
     tx.executeSql(
-      `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase) VALUES (?, ?, ?, ?, ?);`,
+      `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
       [
         inicioFormateado,
         finFormateado,
         total,
         parseInt(usuario.Codigo, 10),
         isBacked,
+        idSem,
       ],
       async (_, result) => {
         console.log("Registro de horas añadido con id:", result.insertId);
@@ -209,23 +212,6 @@ export const ObtenerFinSemana = async (FRef) => {
   const finSemana = new Date(FRef.setDate(ultimoDia));
   finSemana.setHours(23, 59, 59, 999);
   return finSemana;
-};
-
-export const ChecarTSemana = async () => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `SELECT EXISTS(SELECT 1 FROM Semanas) AS existe`,
-      [],
-      (_, result) => {
-        const existe = result.rows.item(0).existe;
-        resolve(existe);
-      },
-      (_, error) => {
-        console.log("Error: ", error);
-        return true; // Indica que el error fue manejado
-      }
-    );
-  });
 };
 
 export const InsertarSemana = async (InicioS, FinalS) => {
