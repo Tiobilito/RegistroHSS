@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { ImportarDeSupaBD } from "./db";
+import { ExportarASupaBD, ImportarDeSupaBD } from "./db";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 
@@ -73,6 +73,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
                 longitud.toString()
               );
               await ImportarDeSupaBD();
+              //await ExportarASupaBD();
               return true;
             } else {
               return false;
@@ -90,6 +91,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
             longitud.toString()
           );
           await ImportarDeSupaBD();
+          await ExportarASupaBD();
           return true;
         }
       } else {

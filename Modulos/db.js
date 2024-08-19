@@ -12,6 +12,7 @@ export const initializeDatabase = () => {
       `
         CREATE TABLE IF NOT EXISTS "Horas" (
           "id" INTEGER NOT NULL UNIQUE,
+          "DInicio" TEXT,
           "Inicio" TEXT,
           "Final" TEXT,
           "Total" TEXT,
@@ -25,6 +26,29 @@ export const initializeDatabase = () => {
       null,
       (_, error) => {
         console.log("Error al crear la tabla Horas:", error);
+        return true;
+      }
+    );
+  });
+
+  db.transaction((tx) => {
+    tx.executeSql(
+      `
+        CREATE TABLE IF NOT EXISTS "Semanas" (
+          "id" INTEGER NOT NULL UNIQUE,
+          "DInicioS" TEXT,
+          "DFinalS" TEXT,
+          "Inicio" TEXT,
+          "Fin" TEXT,
+          "Total" TEXT,
+          "idUsuario" INTEGER NOT NULL,
+          PRIMARY KEY("id" AUTOINCREMENT)
+        );
+      `,
+      [],
+      null,
+      (_, error) => {
+        console.log("Error al crear la tabla Semanas:", error);
         return true;
       }
     );
@@ -171,5 +195,21 @@ export const ImportarDeSupaBD = async () => {
     });
   });
 }
+
+export const ObtenerIniSemana = async (FRef) => {
+  const primerDia = FRef.getDate() - FRef.getDay() + 1; // Lunes
+  const inicioSemana = new Date(FRef.setDate(primerDia));
+  inicioSemana.setHours(0, 0, 0, 0);
+  return inicioSemana;
+}
+
+export const ObtenerFinSemana = async (FRef) => {
+  const ultimoDia = FRef.getDate() - FRef.getDay() + 7; // Domingo
+  const finSemana = new Date(FRef.setDate(ultimoDia));
+  finSemana.setHours(23, 59, 59, 999);
+  return finSemana;
+}
+
+
 
 export default db;
