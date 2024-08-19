@@ -89,8 +89,10 @@ export const añadirHoras = async () => {
   const inicioFormateado = formatearFechaHora(inicio);
   const finFormateado = formatearFechaHora(fin);
   const total = calcularDiferenciaHoras(inicio, fin);
-  const idSem = await ChecarSemana(await ObtenerIniSemana(inicio));
+  const dIni = await ObtenerIniSemana(inicio);
+  const idSem = await ChecarSemana(dIni);
   console.log("id semana: ", idSem);
+  console.log("Inicio semana: ", dIni);
   let isBacked;
 
   const state = await NetInfo.fetch();
