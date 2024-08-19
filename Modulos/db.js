@@ -17,6 +17,7 @@ export const initializeDatabase = () => {
           "Final" TEXT,
           "Total" TEXT,
           "idUsuario" INTEGER NOT NULL,
+          "idSemana" INTEGER,
           "IsBackedInSupabase" INTEGER DEFAULT 0,
           "idSupabase" INTEGER,
           PRIMARY KEY("id" AUTOINCREMENT)
@@ -194,22 +195,67 @@ export const ImportarDeSupaBD = async () => {
       );
     });
   });
-}
+};
 
 export const ObtenerIniSemana = async (FRef) => {
   const primerDia = FRef.getDate() - FRef.getDay() + 1; // Lunes
   const inicioSemana = new Date(FRef.setDate(primerDia));
   inicioSemana.setHours(0, 0, 0, 0);
   return inicioSemana;
-}
+};
 
 export const ObtenerFinSemana = async (FRef) => {
   const ultimoDia = FRef.getDate() - FRef.getDay() + 7; // Domingo
   const finSemana = new Date(FRef.setDate(ultimoDia));
   finSemana.setHours(23, 59, 59, 999);
   return finSemana;
-}
+};
 
+export const ChecarTSemana = async () => {
+  db.transaction((tx) => {
+    tx.executeSql(
+      `SELECT EXISTS(SELECT 1 FROM Semanas) AS existe`,
+      [],
+      (_, result) => {
+        const existe = result.rows.item(0).existe;
+        resolve(existe);
+      },
+      (_, error) => {
+        console.log("Error: ", error);
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+};
 
+export const InsertarSemana = async (InicioS, FinalS) => {
+  const usuario = await ObtenerDatosUsuario();
+  const Inicio = InicioS.toLocaleDateString().toString();
+  const Final = FinalS.toLocaleDateString().toString();
+
+  db.transaction(async (tx) => {
+    tx.executeSql(
+      `INSERT INTO Semanas (DInicioS, DFinalS, Inicio, Fin, idUsuario) VALUES (?, ?, ?, ?, ?);`,
+      [InicioS, FinalS, Inicio, Final, parseInt(usuario.Codigo, 10)],
+      async (_, result) => {
+        console.log("Registro de semanas añadido con id:", result.insertId);
+      },
+      (_, error) => {
+        console.log("Error al añadir el registro de semanas:", error);
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+};
+
+export const ChecarSemana = async (FRef) => {
+  const BSemanas = ChecarTSemana();
+  if (BSemanas == 0) {
+    const Hoy = new Date();
+    const InicioS = await ObtenerIniSemana(Hoy);
+    const FinalS = await ObtenerFinSemana(Hoy);
+    await InsertarSemana(InicioS, FinalS);
+  }
+};
 
 export default db;
