@@ -103,7 +103,8 @@ export const añadirHoras = async () => {
       usuario.Codigo,
       inicioFormateado,
       finFormateado,
-      total
+      total,
+      inicio
     );
   } else {
     // El dispositivo no tiene conexión a Internet
@@ -137,7 +138,8 @@ const RespaldarRegistroEnSupa = async (registro) => {
     registro.idUsuario,
     registro.Inicio,
     registro.Final,
-    registro.Total
+    registro.Total,
+    registro.DInicio,
   );
   if (isBacked != 0) {
     db.transaction((tx) => {
@@ -182,13 +184,14 @@ export const ImportarDeSupaBD = async () => {
   Horas.forEach((hora) => {
     db.transaction(async (tx) => {
       tx.executeSql(
-        `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase) VALUES (?, ?, ?, ?, ?);`,
+        `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
         [
           hora.Inicio,
           hora.Final,
           hora.Total,
           hora.CodigoUsuario,
           parseInt("1", 10),
+          ChecarSemana(new Date(hora.DateInicio))
         ],
         async (_, result) => {
           console.log("Registro de horas añadido");

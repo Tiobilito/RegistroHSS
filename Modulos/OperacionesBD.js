@@ -59,13 +59,14 @@ export async function changePassword(password, code) {
 }
 
 // Añade horas
-export async function añadirHorasSup(codigoUsuario, inicio, fin, total) {
+export async function añadirHorasSup(codigoUsuario, inicio, fin, total, Dinicio) {
   const { data, error } = await supabase.from("Horas").insert([
     {
       Inicio: inicio,
       Final: fin,
       Total: total,
       CodigoUsuario: parseInt(codigoUsuario, 10),
+      DateInicio: Dinicio,
     },
   ]);
   if (error) {
