@@ -12,9 +12,8 @@ import db from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
-export default function PaginaTablaHoras() {
+export default function PaginaTablaHoras({ navigation }) {
   const [Horas, DefHoras] = useState([]);
-  const [Semanas, DefSemanas] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
   const obtenerHoras = async () => {
@@ -35,23 +34,6 @@ export default function PaginaTablaHoras() {
     });
   };
 
-  const obtenerSemanas = async () => {
-    const User = await ObtenerDatosUsuario();
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Semanas WHERE idUsuario = ?;`,
-        [User.Codigo],
-        (_, { rows }) => {
-          DefSemanas(rows._array);
-        },
-        (_, error) => {
-          console.log("Error al obtener las horas:", error);
-          return true; // Indica que el error fue manejado
-        }
-      );
-    })
-  }
-
   // Función para sumar los tiempos en formato "HH:MM:SS"
   const sumarTiempos = (tiempoStrings) => {
     const totalSegundos = tiempoStrings.reduce((total, tiempo) => {
@@ -70,7 +52,6 @@ export default function PaginaTablaHoras() {
 
   useFocusEffect(
     React.useCallback(() => {
-      obtenerSemanas();
       obtenerHoras();
     }, [])
   );

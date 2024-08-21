@@ -12,7 +12,7 @@ import db from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
-export default function PaginaTablaSemanas() {
+export default function PaginaTablaSemanas({ navigation }) {
   const [Horas, DefHoras] = useState([]);
   const [Semanas, DefSemanas] = useState([]);
   const [MostrarSemanas, DefMostrarSemanas] = useState(false);
