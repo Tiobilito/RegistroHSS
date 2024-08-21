@@ -78,12 +78,11 @@ export async function añadirHorasSup(codigoUsuario, inicio, fin, total, Dinicio
 }
 
 export async function EliminarUsuarioHoras() {
-  const usuarioDatos = await ObtenerDatosUsuario();
-  const usuario = usuarioDatos[0];
+  const Data = await ObtenerDatosUsuario();
   const { data: hoursData, error: hoursError } = await supabase
     .from("Horas")
     .delete()
-    .eq("CodigoUsuario", parseInt(usuario.Codigo, 10));
+    .eq("CodigoUsuario", parseInt(Data.Codigo, 10));
   if (hoursError) {
     console.error("Error al borrar las horas asociadas:", hoursError);
     return null;
@@ -93,7 +92,7 @@ export async function EliminarUsuarioHoras() {
   const { data: userData, error: userError } = await supabase
     .from("Usuarios")
     .delete()
-    .eq("Codigo", parseInt(usuario.Codigo, 10));
+    .eq("Codigo", parseInt(Data.Codigo, 10));
 
   if (userError) {
     console.error("Error al borrar el usuario:", userError);

@@ -8,6 +8,7 @@ import {
   Dimensions,
   ImageBackground,
 } from "react-native";
+import { EliminarUsuarioHoras } from "../Modulos/OperacionesBD";
 
 const Scale = Dimensions.get("window").width;
 
@@ -39,7 +40,7 @@ export default function PaginaAjustes({ navigation }) {
               },
               {
                 text: "Borrar",
-                onPress: () => console.log("Espere funcionalidad"),
+                onPress: () => EliminarUsuarioHoras(),
               },
             ],
             { cancelable: false }
