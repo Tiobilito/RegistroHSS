@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { ExportarASupaBD, ImportarDeSupaBD } from "./db";
+import { BorrarTSemHoras, ExportarASupaBD, ImportarDeSupaBD } from "./db";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 
@@ -8,7 +8,7 @@ const alertLoging = () => {
     return new Promise((resolve) => {
       Alert.alert(
         "Confirmación",
-        "El usuario es diferente al ya registrado, si se logea el tiempo (si ya inicio) sera cancelado, esta seguro de continuar ? (El nuevo usuario no tendra su tiempo iniciado)",
+        "El usuario es diferente al ya registrado, si se logea el todo lo que no este respaldado se borrara, esta seguro de continuar ? (El nuevo usuario no tendra su tiempo iniciado)",
         [
           {
             text: "Cancelar",
@@ -66,6 +66,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
           if (data.Codigo != Codigo) {
             const result = await alertLoging();
             if (result) {
+              await BorrarTSemHoras();
               await GuardarDatosUsuario(
                 Codigo,
                 Contraseña,

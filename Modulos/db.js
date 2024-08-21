@@ -139,7 +139,7 @@ const RespaldarRegistroEnSupa = async (registro) => {
     registro.Inicio,
     registro.Final,
     registro.Total,
-    registro.DInicio,
+    registro.DInicio
   );
   if (isBacked != 0) {
     db.transaction((tx) => {
@@ -178,6 +178,38 @@ export const ExportarASupaBD = async () => {
   });
 };
 
+export const BorrarTSemHoras = async () => {
+  db.transaction(async (tx) => {
+    // Borrar las tablas Horas y Semanas
+    tx.executeSql(
+      `DELETE FROM Horas`,
+      [],
+      () => {
+        console.log("Contenido de la tabla Horas eliminado exitosamente");
+      },
+      (_, error) => {
+        console.log("Error al eliminar el contenido de la tabla Horas:", error);
+        return true; // Indica que el error fue manejado
+      }
+    );
+
+    tx.executeSql(
+      `DELETE FROM Semanas`,
+      [],
+      () => {
+        console.log("Contenido de la tabla Semanas eliminado exitosamente");
+      },
+      (_, error) => {
+        console.log(
+          "Error al eliminar el contenido de la tabla Semanas:",
+          error
+        );
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+};
+
 export const ImportarDeSupaBD = async () => {
   const Data = await ObtenerDatosUsuario();
   const Horas = await obtenerHoras(Data.Codigo);
@@ -191,7 +223,7 @@ export const ImportarDeSupaBD = async () => {
           hora.Total,
           hora.CodigoUsuario,
           parseInt("1", 10),
-          ChecarSemana(new Date(hora.DateInicio))
+          ChecarSemana(new Date(hora.DateInicio)),
         ],
         async (_, result) => {
           console.log("Registro de horas añadido");
@@ -253,11 +285,11 @@ export const ChecarSemana = async (FRef) => {
           async (_, { rows }) => {
             if (rows.length > 0) {
               // Si el registro correspondiente a la semana existe
-              console.log('Registro encontrado:', rows._array[0]);
+              console.log("Registro encontrado:", rows._array[0]);
               resolve(rows._array[0].id);
             } else {
               // Si el registro no existe
-              console.log('No se encontró ningún registro.');
+              console.log("No se encontró ningún registro.");
               const InicioS = await ObtenerIniSemana(FRef);
               const FinalS = await ObtenerFinSemana(FRef);
               const id = await InsertarSemana(InicioS, FinalS);
@@ -265,12 +297,12 @@ export const ChecarSemana = async (FRef) => {
             }
           },
           (_, error) => {
-            console.error('Error al verificar el registro:', error);
+            console.error("Error al verificar el registro:", error);
             reject(error);
           }
         );
       } catch (error) {
-        console.error('Error en la transacción:', error);
+        console.error("Error en la transacción:", error);
         reject(error);
       }
     });
