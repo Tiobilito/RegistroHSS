@@ -99,7 +99,7 @@ export default function PaginaTablaHoras({ navigation }) {
             />
             <View style={{ marginTop: 20 }}>
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                Total acumulado: ({" "}
+                Total acumulado en la semana: ({" "}
                 {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>
             </View>
