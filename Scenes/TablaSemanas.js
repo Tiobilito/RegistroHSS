@@ -12,10 +12,10 @@ import db from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
-export default function PaginaTablaHoras() {
+export default function PaginaTablaSemanas() {
   const [Horas, DefHoras] = useState([]);
   const [Semanas, DefSemanas] = useState([]);
-  const [MostrarHoras, DefMostrarHoras] = useState(false);
+  const [MostrarSemanas, DefMostrarSemanas] = useState(false);
 
   const obtenerHoras = async () => {
     const User = await ObtenerDatosUsuario();
@@ -25,7 +25,6 @@ export default function PaginaTablaHoras() {
         [User.Codigo],
         (_, { rows }) => {
           DefHoras(rows._array);
-          DefMostrarHoras(rows._array.length > 0);
         },
         (_, error) => {
           console.log("Error al obtener las horas:", error);
@@ -43,14 +42,15 @@ export default function PaginaTablaHoras() {
         [User.Codigo],
         (_, { rows }) => {
           DefSemanas(rows._array);
+          DefMostrarSemanas(rows._array.length > 0);
         },
         (_, error) => {
           console.log("Error al obtener las horas:", error);
           return true; // Indica que el error fue manejado
         }
       );
-    })
-  }
+    });
+  };
 
   // Función para sumar los tiempos en formato "HH:MM:SS"
   const sumarTiempos = (tiempoStrings) => {
@@ -95,27 +95,23 @@ export default function PaginaTablaHoras() {
         </Text>
       </View>
       <View style={styles.listContainer}>
-        {MostrarHoras ? (
+        {MostrarSemanas ? (
           <>
             <FlatList
-              data={Horas}
+              data={Semanas}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
                 <View style={styles.item}>
-                  {item.IsBackedInSupabase == 0 ? (
-                    <Ionicons name="cloud-offline" size={30} color="black" />
-                  ) : (
-                    <Ionicons name="cloud" size={30} color="white" />
-                  )}
-                  <Text style={styles.txt}>Inicio: {item.Inicio}</Text>
-                  <Text style={styles.txt}>Final: {item.Final}</Text>
-                  <Text style={styles.txt}>Total: {item.Total}</Text>
+                  <Text style={styles.txt}>
+                    {item.Inicio} - {item.Fin}
+                  </Text>
                 </View>
               )}
             />
             <View style={{ marginTop: 20 }}>
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                Total acumulado: ( {sumarTiempos(Horas.map((item) => item.Total))} )
+                Total acumulado: ({" "}
+                {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>
             </View>
           </>
