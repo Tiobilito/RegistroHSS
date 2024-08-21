@@ -91,8 +91,8 @@ export const añadirHoras = async () => {
   const total = calcularDiferenciaHoras(inicio, fin);
   const dIni = await ObtenerIniSemana(inicio);
   const idSem = await ChecarSemana(dIni);
-  console.log("id semana: ", idSem);
-  console.log("Inicio semana: ", dIni);
+  //console.log("id semana: ", idSem);
+  //console.log("Inicio semana: ", dIni);
   let isBacked;
 
   const state = await NetInfo.fetch();
@@ -245,7 +245,7 @@ export const ChecarSemana = async (FRef) => {
       try {
         tx.executeSql(
           `SELECT * FROM Semanas WHERE DInicioS = ?`,
-          [FRef.toString()],
+          [FRef],
           async (_, { rows }) => {
             if (rows.length > 0) {
               // Si el registro correspondiente a la semana existe
