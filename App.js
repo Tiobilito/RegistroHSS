@@ -8,6 +8,7 @@ import { initializeDatabase } from "./Modulos/db";
 import PaginaPrincipal from "./Scenes/Principal";
 import PaginaRegistro from "./Scenes/Registro";
 import PaginaTablaHoras from "./Scenes/TablaHoras";
+import PaginaTablaSemanas from "./Scenes/TablaSemanas";
 import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
 import changepassword from "./Scenes/changePassword";
@@ -15,6 +16,16 @@ import PaginaAyuda from "./Scenes/Ayuda";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
+const TablaSemanasHoras = createNativeStackNavigator();
+
+const TablaSemHoras = () => {
+  return (
+    <TablaSemanasHoras.Navigator screenOptions={{ headerShown: false }}>
+      <TablaSemanasHoras.Screen name="TablaSemanas" component={PaginaTablaSemanas} />
+      <TablaSemanasHoras.Screen name="TablaHoras" component={PaginaTablaHoras} />
+    </TablaSemanasHoras.Navigator>
+  );
+}
 
 const TabNavigation = () => {
   return (
@@ -26,7 +37,7 @@ const TabNavigation = () => {
           let iconName;
           if (route.name === "Principal") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "TablaHoras") {
+          } else if (route.name === "Horas") {
             iconName = focused ? "list" : "list-outline";
           } else if (route.name === "Ajustes") {
             iconName = focused ? "cog" : "cog-outline";
@@ -40,7 +51,7 @@ const TabNavigation = () => {
       })}
     >
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
-      <Tab.Screen name="TablaHoras" component={PaginaTablaHoras} />
+      <Tab.Screen name="Horas" component={TablaSemHoras} />
       <Tab.Screen name="Ayuda" component={PaginaAyuda} />
       <Tab.Screen name="Ajustes" component={PaginaAjustes} />
     </Tab.Navigator>
