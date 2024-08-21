@@ -9,6 +9,7 @@ import {
   ImageBackground,
 } from "react-native";
 import { EliminarUsuarioHoras } from "../Modulos/OperacionesBD";
+import { BorrarDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
 
@@ -40,7 +41,11 @@ export default function PaginaAjustes({ navigation }) {
               },
               {
                 text: "Borrar",
-                onPress: () => EliminarUsuarioHoras(),
+                onPress: () => {
+                  EliminarUsuarioHoras();
+                  BorrarDatosUsuario();
+                  navigation.navigate("Ingreso");
+                },
               },
             ],
             { cancelable: false }

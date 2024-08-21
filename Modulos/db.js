@@ -243,12 +243,13 @@ export const InsertarSemana = async (InicioS, FinalS) => {
 };
 
 export const ChecarSemana = async (FRef) => {
+  const data = await ObtenerDatosUsuario();
   return new Promise((resolve, reject) => {
     db.transaction(async (tx) => {
       try {
         tx.executeSql(
-          `SELECT * FROM Semanas WHERE DInicioS = ?`,
-          [FRef],
+          `SELECT * FROM Semanas WHERE DInicioS = ? AND idUsuario = ?`,
+          [FRef, parseInt(data.Codigo, 10)],
           async (_, { rows }) => {
             if (rows.length > 0) {
               // Si el registro correspondiente a la semana existe
