@@ -8,11 +8,14 @@ import {
   Scale,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
+import { useRoute } from "@react-navigation/native";
 import db from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function PaginaTablaHoras({ navigation }) {
+  const route = useRoute();
+  const { idSem } = route.params;
   const [Horas, DefHoras] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
@@ -20,8 +23,8 @@ export default function PaginaTablaHoras({ navigation }) {
     const User = await ObtenerDatosUsuario();
     db.transaction((tx) => {
       tx.executeSql(
-        `SELECT * FROM Horas WHERE idUsuario = ?;`,
-        [User.Codigo],
+        `SELECT * FROM Horas WHERE idUsuario = ? AND idSemana = ?;`,
+        [User.Codigo, idSem],
         (_, { rows }) => {
           DefHoras(rows._array);
           DefMostrarHoras(rows._array.length > 0);
@@ -67,7 +70,7 @@ export default function PaginaTablaHoras({ navigation }) {
         }}
       >
         <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "bold" }}>
-          Tabla de registros
+          Tabla de horas:
         </Text>
         <Text
           style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}
@@ -96,7 +99,8 @@ export default function PaginaTablaHoras({ navigation }) {
             />
             <View style={{ marginTop: 20 }}>
               <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                Total acumulado: ( {sumarTiempos(Horas.map((item) => item.Total))} )
+                Total acumulado: ({" "}
+                {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>
             </View>
           </>

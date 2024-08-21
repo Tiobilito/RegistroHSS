@@ -6,10 +6,10 @@ import {
   FlatList,
   ImageBackground,
   Scale,
+  TouchableOpacity,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import db from "../Modulos/db";
-import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function PaginaTablaSemanas({ navigation }) {
@@ -86,7 +86,7 @@ export default function PaginaTablaSemanas({ navigation }) {
         }}
       >
         <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "bold" }}>
-          Tabla de registros
+          Tabla de semanas
         </Text>
         <Text
           style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}
@@ -101,11 +101,19 @@ export default function PaginaTablaSemanas({ navigation }) {
               data={Semanas}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <View style={styles.item}>
-                  <Text style={styles.txt}>
-                    {item.Inicio} - {item.Fin}
-                  </Text>
-                </View>
+                <TouchableOpacity 
+                    onPress={() => {
+                        navigation.navigate("TablaHoras", {
+                            idSem: item.id
+                        })
+                    }}
+                >
+                  <View style={styles.item}>
+                    <Text style={styles.txt}>
+                      {item.Inicio} - {item.Fin}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
               )}
             />
             <View style={{ marginTop: 20 }}>
