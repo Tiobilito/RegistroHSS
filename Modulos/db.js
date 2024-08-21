@@ -81,6 +81,59 @@ const calcularDiferenciaHoras = (inicio, fin) => {
     .padStart(2, "0")}:${diffSecs.toString().padStart(2, "0")}`;
 };
 
+//Borra un registro en la tabla horas, ademas de verificar que la semana tenga al menos 1 registro asociado, sino la borra
+export const BorrarHora = async (idHora, idSemana) => {
+  const data = await ObtenerDatosUsuario();
+
+  // Primero, eliminamos el registro de horas
+  db.transaction((tx) => {
+    tx.executeSql(
+      `DELETE FROM Horas WHERE id = ?`,
+      [idHora],
+      () => {
+        console.log(`Registro con id ${idHora} eliminado exitosamente`);
+
+        // Luego, verificamos si la semana tiene otros registros asociados
+        db.transaction((tx) => {
+          tx.executeSql(
+            `SELECT * FROM Horas WHERE idSemana = ? AND idUsuario = ?`,
+            [idSemana, parseInt(data.Codigo, 10)],
+            (_, { rows }) => {
+              if (rows.length > 0) {
+                // Si hay al menos 1 registro asociado a la semana del registro eliminado
+                console.log("Semana con al menos 1 registro asociado");
+              } else {
+                // Si la semana ya no tiene registros asociados, la eliminamos
+                db.transaction((tx) => {
+                  tx.executeSql(
+                    `DELETE FROM Semanas WHERE id = ?`,
+                    [idSemana],
+                    () => {
+                      console.log(
+                        `Semana con id ${idSemana} eliminada exitosamente`
+                      );
+                    },
+                    (_, error) => {
+                      console.error("Error al eliminar la semana: ", error);
+                    }
+                  );
+                });
+              }
+            },
+            (_, error) => {
+              console.error("Error al verificar la semana: ", error);
+            }
+          );
+        });
+      },
+      (_, error) => {
+        console.log(`Error al eliminar el registro con id ${idHora}:`, error);
+        return true; // Indica que el error fue manejado
+      }
+    );
+  });
+};
+
 // Añade horas
 export const añadirHoras = async () => {
   const usuario = await ObtenerDatosUsuario();

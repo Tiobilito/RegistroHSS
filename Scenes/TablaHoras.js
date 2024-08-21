@@ -6,10 +6,12 @@ import {
   FlatList,
   ImageBackground,
   Scale,
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import db from "../Modulos/db";
+import db, { BorrarHora } from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
@@ -87,13 +89,37 @@ export default function PaginaTablaHoras({ navigation }) {
               renderItem={({ item }) => (
                 <View style={styles.item}>
                   {item.IsBackedInSupabase == 0 ? (
-                    <Ionicons name="cloud-offline" size={30} color="black" />
+                    <Ionicons name="cloud-offline" size={30} color="white" />
                   ) : (
                     <Ionicons name="cloud" size={30} color="white" />
                   )}
                   <Text style={styles.txt}>Inicio: {item.Inicio}</Text>
                   <Text style={styles.txt}>Final: {item.Final}</Text>
                   <Text style={styles.txt}>Total: {item.Total}</Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      Alert.alert(
+                        "Confirmación",
+                        "¿Estás seguro de que quieres eliminar este registro?",
+                        [
+                          {
+                            text: "Cancelar",
+                            onPress: () => console.log("Borrado Cancelado"),
+                            style: "cancel",
+                          },
+                          {
+                            text: "Borrar",
+                            onPress: () => {
+                              BorrarHora(item.id, item.idSemana);
+                            },
+                          },
+                        ],
+                        { cancelable: false }
+                      );
+                    }}
+                  >
+                    <Ionicons name="trash" size={50} color="white" />
+                  </TouchableOpacity>
                 </View>
               )}
             />
