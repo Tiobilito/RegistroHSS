@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import db from "../Modulos/db";
+import db, { sumarTiempos } from "../Modulos/db";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function PaginaTablaSemanas({ navigation }) {
@@ -52,22 +52,6 @@ export default function PaginaTablaSemanas({ navigation }) {
     });
   };
 
-  // Función para sumar los tiempos en formato "HH:MM:SS"
-  const sumarTiempos = (tiempoStrings) => {
-    const totalSegundos = tiempoStrings.reduce((total, tiempo) => {
-      const [horas, minutos, segundos] = tiempo.split(":").map(Number);
-      return total + horas * 3600 + minutos * 60 + segundos;
-    }, 0);
-
-    const horas = Math.floor(totalSegundos / 3600);
-    const minutos = Math.floor((totalSegundos % 3600) / 60);
-    const segundos = totalSegundos % 60;
-
-    return `${horas.toString().padStart(2, "0")}:${minutos
-      .toString()
-      .padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
-  };
-
   useFocusEffect(
     React.useCallback(() => {
       obtenerSemanas();
@@ -101,12 +85,12 @@ export default function PaginaTablaSemanas({ navigation }) {
               data={Semanas}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <TouchableOpacity 
-                    onPress={() => {
-                        navigation.navigate("TablaHoras", {
-                            idSem: item.id
-                        })
-                    }}
+                <TouchableOpacity
+                  onPress={() => {
+                    navigation.navigate("TablaHoras", {
+                      idSem: item.id,
+                    });
+                  }}
                 >
                   <View style={styles.item}>
                     <Text style={styles.txt}>
@@ -147,17 +131,17 @@ const styles = StyleSheet.create({
   },
   item: {
     backgroundColor: "#2272A7",
-    borderRadius: 20,
+    borderRadius: 15,
     marginBottom: "8%",
     // //De aqui para abajo son las sombras para los distintos sistemas
     elevation: 15, //Android
     shadowColor: "#333333", //A partir de aqui ios
     shadowOffset: {
       width: 0,
-      height: 6,
+      height: 2,
     },
     shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowRadius: 1,
     padding: 10,
   },
   listContainer: {

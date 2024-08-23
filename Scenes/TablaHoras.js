@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import db, { BorrarHora } from "../Modulos/db";
+import db, { BorrarHora, sumarTiempos } from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
@@ -37,22 +37,6 @@ export default function PaginaTablaHoras({ navigation }) {
         }
       );
     });
-  };
-
-  // Función para sumar los tiempos en formato "HH:MM:SS"
-  const sumarTiempos = (tiempoStrings) => {
-    const totalSegundos = tiempoStrings.reduce((total, tiempo) => {
-      const [horas, minutos, segundos] = tiempo.split(":").map(Number);
-      return total + horas * 3600 + minutos * 60 + segundos;
-    }, 0);
-
-    const horas = Math.floor(totalSegundos / 3600);
-    const minutos = Math.floor((totalSegundos % 3600) / 60);
-    const segundos = totalSegundos % 60;
-
-    return `${horas.toString().padStart(2, "0")}:${minutos
-      .toString()
-      .padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
   };
 
   useFocusEffect(
