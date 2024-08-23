@@ -74,13 +74,13 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
                 longitud.toString()
               );
               await ImportarDeSupaBD();
-              //await ExportarASupaBD();
               return true;
             } else {
               return false;
             }
           } else {
             // Si el usuario local coincide con el código, retornar true
+            await ExportarASupaBD();
             return true;
           }
         } else {
@@ -92,7 +92,6 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
             longitud.toString()
           );
           await ImportarDeSupaBD();
-          await ExportarASupaBD();
           return true;
         }
       } else {

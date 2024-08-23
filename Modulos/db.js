@@ -266,7 +266,11 @@ export const BorrarTSemHoras = async () => {
 export const ImportarDeSupaBD = async () => {
   const Data = await ObtenerDatosUsuario();
   const Horas = await obtenerHoras(Data.Codigo);
-  Horas.forEach((hora) => {
+  let idSemana;
+
+  for (let i = 0; i < Horas.length; i++) {
+    const hora = Horas[i];
+    idSemana = await ChecarSemana(new Date(hora.DateInicio));
     db.transaction(async (tx) => {
       tx.executeSql(
         `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
@@ -276,7 +280,7 @@ export const ImportarDeSupaBD = async () => {
           hora.Total,
           hora.CodigoUsuario,
           parseInt("1", 10),
-          ChecarSemana(new Date(hora.DateInicio)),
+          idSemana,
         ],
         async (_, result) => {
           console.log("Registro de horas añadido");
@@ -287,19 +291,21 @@ export const ImportarDeSupaBD = async () => {
         }
       );
     });
-  });
+  }
 };
 
 export const ObtenerIniSemana = async (FRef) => {
-  const primerDia = FRef.getDate() - FRef.getDay() + 1; // Lunes
-  const inicioSemana = new Date(FRef.setDate(primerDia));
+  const dateRef = new Date(FRef);
+  const primerDia = dateRef.getDate() - dateRef.getDay() + 1; // Lunes
+  const inicioSemana = new Date(dateRef.setDate(primerDia));
   inicioSemana.setHours(0, 0, 0, 0);
   return inicioSemana;
 };
 
 export const ObtenerFinSemana = async (FRef) => {
-  const ultimoDia = FRef.getDate() - FRef.getDay() + 7; // Domingo
-  const finSemana = new Date(FRef.setDate(ultimoDia));
+  const dateRef = new Date(FRef);
+  const ultimoDia = dateRef.getDate() - dateRef.getDay() + 7; // Domingo
+  const finSemana = new Date(dateRef.setDate(ultimoDia));
   finSemana.setHours(23, 59, 59, 999);
   return finSemana;
 };

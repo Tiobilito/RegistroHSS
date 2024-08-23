@@ -23,7 +23,7 @@
     "expo-device": "^6.0.2",
     "expo-local-authentication": "~14.0.1",
     "expo-location": "^17.0.1",
-    "expo-notifications": "~0.28.15",
+    "expo-notifications": "~0.28.16",
     "expo-secure-store": "~13.0.2",
     "expo-sqlite": "~14.0.6",
     "expo-status-bar": "~1.12.1",
