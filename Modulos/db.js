@@ -41,7 +41,6 @@ export const initializeDatabase = () => {
           "DFinalS" TEXT,
           "Inicio" TEXT,
           "Fin" TEXT,
-          "Total" TEXT,
           "idUsuario" INTEGER NOT NULL,
           PRIMARY KEY("id" AUTOINCREMENT)
         );
@@ -382,24 +381,6 @@ export const sumarTiempos = (tiempoStrings) => {
   return `${horas.toString().padStart(2, "0")}:${minutos
     .toString()
     .padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
-};
-
-export const CalTotalSemana = async (idSemana) => {
-  let HorasAsociadas = [];
-  let TiempoAcumulado;
-  db.transaction((tx) => {
-    tx.executeSql(
-      `SELECT * FROM Horas WHERE idSemana = ?;`,
-      [idSemana],
-      (_, { rows }) => {
-        HorasAsociadas = rows._array;
-      },
-      (_, error) => {
-        console.log("Error al obtener las horas:", error);
-        return true; // Indica que el error fue manejado
-      }
-    );
-  });
 };
 
 export default db;
