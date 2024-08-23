@@ -7,15 +7,19 @@ import {
   Text,
   ImageBackground,
   ScrollView,
+  Alert,
 } from "react-native";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ChecCadPalabrasClave } from "../Modulos/VerificacionCad";
 
 const handleGenericAPIRequest = async (message) => {
   const API_KEY = "AIzaSyBLWtQ3K4N13T3zewGDv7fZM37NYY0yh80";
+  const Verif = ChecCadPalabrasClave(message);
   console.log("El mensaje enviado es: " + message);
 
   if (!message.trim()) return null; // No hacer nada si el mensaje está vacío
+  else if (Verif == false) return "Mensaje no valido";
 
   const genAI = new GoogleGenerativeAI(API_KEY);
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
