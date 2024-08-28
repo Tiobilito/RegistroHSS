@@ -37,8 +37,6 @@ export const initializeDatabase = () => {
       `
         CREATE TABLE IF NOT EXISTS "Semanas" (
           "id" INTEGER NOT NULL UNIQUE,
-          "DInicioS" TEXT,
-          "DFinalS" TEXT,
           "Inicio" TEXT,
           "Fin" TEXT,
           "idUsuario" INTEGER NOT NULL,
@@ -143,8 +141,8 @@ export const añadirHoras = async () => {
   const total = calcularDiferenciaHoras(inicio, fin);
   const dIni = await ObtenerIniSemana(inicio);
   const idSem = await ChecarSemana(dIni);
-  //console.log("id semana: ", idSem);
-  //console.log("Inicio semana: ", dIni);
+  console.log("id semana: ", idSem);
+  console.log("Inicio semana: ", dIni);
   let isBacked;
 
   const state = await NetInfo.fetch();
@@ -317,8 +315,8 @@ export const InsertarSemana = async (InicioS, FinalS) => {
   return new Promise((resolve, reject) => {
     db.transaction((tx) => {
       tx.executeSql(
-        `INSERT INTO Semanas (DInicioS, DFinalS, Inicio, Fin, idUsuario) VALUES (?, ?, ?, ?, ?);`,
-        [InicioS, FinalS, Inicio, Final, parseInt(usuario.Codigo, 10)],
+        `INSERT INTO Semanas (Inicio, Fin, idUsuario) VALUES (?, ?, ?);`,
+        [Inicio, Final, parseInt(usuario.Codigo, 10)],
         (_, result) => {
           console.log("Registro de semanas añadido con id:", result.insertId);
           resolve(result.insertId);
@@ -334,35 +332,27 @@ export const InsertarSemana = async (InicioS, FinalS) => {
 
 export const ChecarSemana = async (FRef) => {
   const data = await ObtenerDatosUsuario();
+  const InicioS = await ObtenerIniSemana(FRef);
+  const FinalS = await ObtenerFinSemana(FRef);
+
   return new Promise((resolve, reject) => {
-    db.transaction(async (tx) => {
-      try {
-        tx.executeSql(
-          `SELECT * FROM Semanas WHERE DInicioS = ? AND idUsuario = ?`,
-          [FRef, parseInt(data.Codigo, 10)],
-          async (_, { rows }) => {
-            if (rows.length > 0) {
-              // Si el registro correspondiente a la semana existe
-              console.log("Registro encontrado:", rows._array[0]);
-              resolve(rows._array[0].id);
-            } else {
-              // Si el registro no existe
-              console.log("No se encontró ningún registro.");
-              const InicioS = await ObtenerIniSemana(FRef);
-              const FinalS = await ObtenerFinSemana(FRef);
-              const id = await InsertarSemana(InicioS, FinalS);
-              resolve(id);
-            }
-          },
-          (_, error) => {
-            console.error("Error al verificar el registro:", error);
-            reject(error);
+    db.transaction((tx) => {
+      tx.executeSql(
+        `SELECT * FROM Semanas WHERE Inicio = ? AND Fin = ? AND idUsuario = ?`,
+        [InicioS.toLocaleDateString(), FinalS.toLocaleDateString(), parseInt(data.Codigo, 10)],
+        async (_, { rows }) => {
+          if (rows.length > 0) {
+            resolve(rows._array[0].id);
+          } else {
+            const id = await InsertarSemana(InicioS, FinalS);
+            resolve(id);
           }
-        );
-      } catch (error) {
-        console.error("Error en la transacción:", error);
-        reject(error);
-      }
+        },
+        (_, error) => {
+          console.error("Error al verificar el registro:", error);
+          reject(error);
+        }
+      );
     });
   });
 };

@@ -72,7 +72,7 @@ export default function PaginaIngreso({ navigation }) {
       );
     } else {
       setIsAuthenticated(false);
-      console.log("No existe el usuario");
+      Alert.alert("Datos incorrectos");
     }
   };
 
