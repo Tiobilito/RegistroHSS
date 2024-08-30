@@ -13,17 +13,28 @@ import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
 import changepassword from "./Scenes/changePassword";
 import PaginaAyuda from "./Scenes/Ayuda";
+import PaginaModUsuario from "./Scenes/ModificarUsuario";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 const TablaSemanasHoras = createNativeStackNavigator();
+const PGAjuste = createNativeStackNavigator();
 
 const TablaSemHoras = () => {
   return (
-    <TablaSemanasHoras.Navigator screenOptions={{ headerShown: false }}>
+    <TablaSemanasHoras.Navigator screenOptions={{ headerShown: false }} initialRouteName="TablaSemanas">
       <TablaSemanasHoras.Screen name="TablaSemanas" component={PaginaTablaSemanas} />
       <TablaSemanasHoras.Screen name="TablaHoras" component={PaginaTablaHoras} />
     </TablaSemanasHoras.Navigator>
+  );
+}
+
+const Ajustes = () => {
+  return (
+    <PGAjuste.Navigator screenOptions={{ headerShown: false }} initialRouteName="PaginaModificarUsusario">
+      <PGAjuste.Screen name="Ajustes" component={PaginaAjustes} />
+      <PGAjuste.Screen name="PaginaModificarUsusario" component={PaginaModUsuario} />
+    </PGAjuste.Navigator>
   );
 }
 
