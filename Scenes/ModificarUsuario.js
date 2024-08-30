@@ -12,11 +12,14 @@ import {
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import {
-  AñadeUsuario,
+  ModificaUsuario,
+  obtenerCentro,
   obtenerCentros,
+  ObtenerDatosUsuarioSupa,
+  obtenerDepartamento,
   obtenerDepartamentos,
 } from "../Modulos/OperacionesBD";
-import { GuardarDatosUsuario } from "../Modulos/InfoUsuario";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import { CommonActions } from "@react-navigation/native";
 
 const Scale = Dimensions.get("window").width;
@@ -31,12 +34,28 @@ export default function PaginaModUsuario({ navigation }) {
   const [selectedCentro, setSelectedCentro] = useState(null);
   const [selectedDepartamento, setSelectedDepartamento] = useState(null);
 
-  useEffect(() => {
-    const fetchCentros = async () => {
-      const data = await obtenerCentros();
-      setCentros(data);
-    };
+  const DefDatosUsuario = async () => {
+    const dataL = await ObtenerDatosUsuario();
+    const data = await ObtenerDatosUsuarioSupa(dataL.Codigo);
+    if(data) {
+      //console.log("Datos usuario: ", data);
+      DefNombre(data.Nombre);
+      DefCodigo(data.Codigo.toString());
+      DeftipoUsuario(data.TipoServidor);
+      DefContraseña(data.Contraseña);
+      //const Departamento = await obtenerDepartamento(data.idDepartamento);
+      //const Centro = await obtenerCentro(Departamento.idCentroUniversitario);
+      //console.log(Departamento);
+    }
+  };
 
+  const fetchCentros = async () => {
+    const data = await obtenerCentros();
+    setCentros(data);
+  };
+
+  useEffect(() => {
+    DefDatosUsuario();
     fetchCentros();
   }, []);
 
@@ -57,7 +76,7 @@ export default function PaginaModUsuario({ navigation }) {
   return (
     <ImageBackground source={image} style={styles.background}>
       <View style={styles.titleContainer}>
-        <Text style={styles.title}>Registro</Text>
+        <Text style={styles.title}>Editar usuario</Text>
       </View>
 
       <ScrollView style={styles.formContainer}>
@@ -70,16 +89,8 @@ export default function PaginaModUsuario({ navigation }) {
           value={Nombre}
           placeholder="Nombre"
         />
-        <Text style={styles.subtitle}>Código</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => {
-            DefCodigo(text);
-          }}
-          keyboardType="numeric"
-          value={codigo}
-          placeholder="Codigo"
-        />
+        <Text style={styles.subtitle }>Código</Text>
+        <Text style = {{fontSize: 30}}>{codigo}</Text>
         <Text style={styles.subtitle}>Rol </Text>
         <View style={{ width: 240, height: 150 }}>
           <Picker
@@ -160,6 +171,7 @@ export default function PaginaModUsuario({ navigation }) {
         <TouchableOpacity
           style={styles.btnRegistro}
           onPress={() => {
+            console.log(codigo.length);
             if (
               Nombre !== "" &&
               tipoUsuario !== "" &&
@@ -168,28 +180,23 @@ export default function PaginaModUsuario({ navigation }) {
               selectedDepartamento !== null
             ) {
               if (codigo.length === 9) {
-                AñadeUsuario(
+                ModificaUsuario(
                   Nombre.toUpperCase(),
                   tipoUsuario,
                   parseInt(codigo, 10),
                   Contraseña,
                   parseInt(selectedDepartamento, 10)
                 );
-                navigation.dispatch(
-                  CommonActions.reset({
-                    index: 0,
-                    routes: [{ name: "Ingreso" }],
-                  })
-                );
+                navigation.goBack();
               } else {
                 Alert.alert("Digite un codigo valido");
               }
             } else {
-              Alert.alert("Por favor rellene todos los datos");
+              Alert.alert("Por favor rellene todos los datos, o cancele");
             }
           }}
         >
-          <Text style={styles.txtBtn}>Registrar</Text>
+          <Text style={styles.txtBtn}>Modificar</Text>
         </TouchableOpacity>
       </ScrollView>
     </ImageBackground>

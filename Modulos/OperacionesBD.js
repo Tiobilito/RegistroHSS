@@ -29,6 +29,30 @@ export async function AñadeUsuario(
   }
 }
 
+export async function ModificaUsuario(
+  Nombre,
+  tipoUsuario,
+  codigo,
+  contraseña,
+  idDepart,
+) {
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .update({
+      Nombre: Nombre,
+      TipoServidor: tipoUsuario,
+      Contraseña: contraseña,
+      idDepartamento: idDepart,
+    })
+    .eq("Codigo", parseInt(codigo, 10));
+  if (error) {
+    console.log("Hubo un error", error);
+    return;
+  } else {
+    Alert.alert("Usuario actualizado correctamente");
+  }
+}
+
 export async function checkUser(codigo) {
   const { data, error } = await supabase
     .from("Usuarios")
@@ -59,7 +83,13 @@ export async function changePassword(password, code) {
 }
 
 // Añade horas
-export async function añadirHorasSup(codigoUsuario, inicio, fin, total, Dinicio) {
+export async function añadirHorasSup(
+  codigoUsuario,
+  inicio,
+  fin,
+  total,
+  Dinicio
+) {
   const { data, error } = await supabase.from("Horas").insert([
     {
       Inicio: inicio,
@@ -126,6 +156,57 @@ export async function obtenerDepartamentos(idCentroUniversitario) {
     return [];
   }
   return data;
+}
+
+export async function obtenerDepartamento(idDepartamento) {
+  const { data, error } = await supabase
+    .from("Departamento")
+    .select("*")
+    .eq("id", idDepartamento);
+  if (error) {
+    console.log("Hubo un error:", error);
+    return null;
+  }
+  if (data.length > 0) {
+    return data[0];
+  } else {
+    console.log("No se encontró el departamento con el id proporcionado.");
+    return null;
+  }
+}
+
+export async function obtenerCentro(idCentro) {
+  const { data, error } = await supabase
+    .from("CentroUniversitario")
+    .select("*")
+    .eq("id", idCentro);
+  if (error) {
+    console.log("Hubo un error:", error);
+    return null;
+  }
+  if (data.length > 0) {
+    return data[0];
+  } else {
+    console.log("No se encontró el centro con el id proporcionado.");
+    return null;
+  }
+}
+
+export async function ObtenerDatosUsuarioSupa(codigo) {
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .select("*")
+    .eq("Codigo", codigo);
+  if (error) {
+    console.log("Hubo un error:", error);
+    return null;
+  }
+  if (data.length > 0) {
+    return data[0];
+  } else {
+    console.log("No se encontró el usuario con el código proporcionado.");
+    return null;
+  }
 }
 
 // Función para obtener las horas asociadas a un usuario en especifico

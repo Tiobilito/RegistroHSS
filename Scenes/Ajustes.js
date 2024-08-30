@@ -21,12 +21,19 @@ export default function PaginaAjustes({ navigation }) {
       <View
         style={{
           width: "90%",
-          marginTop: "24%",
-          marginBottom: "56%",
+          marginTop: 50,
+          marginBottom: 250,
+          marginLeft: 125
         }}
       >
         <Text style={styles.text}>Ajustes</Text>
       </View>
+      <Button
+        title="Editar usuario"
+        onPress={() => {
+          navigation.navigate("PaginaModificarUsusario");
+        }}
+      />
       <Button
         title="Borrar El Usuario"
         onPress={() => {
@@ -66,11 +73,10 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     resizeMode: "cover",
-    alignItems: "center",
     //justifyContent: "center",
   },
   text: {
-    fontSize: Scale > 400 ? 24 : 20,
+    fontSize: Scale > 400 ? 40 : 35,
     fontWeight: "bold",
     //margin: 20,
     color: "black",

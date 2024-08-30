@@ -29,9 +29,9 @@ const TablaSemHoras = () => {
   );
 }
 
-const Ajustes = () => {
+const TabAjustes = () => {
   return (
-    <PGAjuste.Navigator screenOptions={{ headerShown: false }} initialRouteName="PaginaModificarUsusario">
+    <PGAjuste.Navigator screenOptions={{ headerShown: false }} initialRouteName="Ajustes">
       <PGAjuste.Screen name="Ajustes" component={PaginaAjustes} />
       <PGAjuste.Screen name="PaginaModificarUsusario" component={PaginaModUsuario} />
     </PGAjuste.Navigator>
@@ -48,9 +48,9 @@ const TabNavigation = () => {
           let iconName;
           if (route.name === "Principal") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "Horas") {
+          } else if (route.name === "TabHoras") {
             iconName = focused ? "list" : "list-outline";
-          } else if (route.name === "Ajustes") {
+          } else if (route.name === "TabAjustes") {
             iconName = focused ? "cog" : "cog-outline";
           } /*else if (route.name === "Ayuda") {
             iconName = focused ? "help-circle" : "help-circle-outline";
@@ -62,9 +62,9 @@ const TabNavigation = () => {
       })}
     >
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
-      <Tab.Screen name="Horas" component={TablaSemHoras} />
+      <Tab.Screen name="TabHoras" component={TablaSemHoras} />
       {/*<Tab.Screen name="Ayuda" component={PaginaAyuda} />*/}
-      <Tab.Screen name="Ajustes" component={PaginaAjustes} />
+      <Tab.Screen name="TabAjustes" component={TabAjustes} />
     </Tab.Navigator>
   );
 };
