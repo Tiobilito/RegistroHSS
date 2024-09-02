@@ -49,6 +49,24 @@ export const ActualizarInicio = async (valorInicio) => {
   }
 };
 
+export const ActualizarLatLong = async (Lat, Long) => {
+  try {
+    const jsonData = await AsyncStorage.getItem("@UserData");
+    if (jsonData != null) {
+      const userData = JSON.parse(jsonData);
+      userData.LatDepartamento = Lat;
+      userData.LonDepartamento = Long;
+      const updatedJsonData = JSON.stringify(userData);
+      await AsyncStorage.setItem("@UserData", updatedJsonData);
+      console.log("La latitud y la longitud se actualizaron correctamente");
+    } else {
+      console.log("No se encontraron datos para actualizar.");
+    }
+  } catch (error) {
+    console.error("Error al actualizar la latitud y longitud ", error);
+  }
+};
+
 export const ActualizarContraseña = async (valorContraseña) => {
   try {
     const jsonData = await AsyncStorage.getItem("@UserData");

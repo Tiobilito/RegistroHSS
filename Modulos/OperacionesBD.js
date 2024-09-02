@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { ObtenerDatosUsuario, ActualizarContraseña } from "./InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarContraseña, ActualizarLatLong } from "./InfoUsuario";
 import { Alert } from "react-native";
 
 export async function AñadeUsuario(
@@ -49,6 +49,12 @@ export async function ModificaUsuario(
     console.log("Hubo un error", error);
     return;
   } else {
+    const data = await ObtenerDatosUsuario();
+    if(contraseña != data.Contraseña) {
+      await ActualizarContraseña(contraseña);
+    }
+    const departamento = await obtenerDepartamento(idDepart);
+    await ActualizarLatLong(departamento.Latitud, departamento.Longitud);
     Alert.alert("Usuario actualizado correctamente");
   }
 }
