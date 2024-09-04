@@ -62,9 +62,9 @@ const TabNavigation = () => {
       })}
     >
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
-      <Tab.Screen name="TabHoras" component={TablaSemHoras} />
+      <Tab.Screen name="Horas" component={TablaSemHoras} />
       {/*<Tab.Screen name="Ayuda" component={PaginaAyuda} />*/}
-      <Tab.Screen name="TabAjustes" component={TabAjustes} />
+      <Tab.Screen name="Ajustes" component={TabAjustes} />
     </Tab.Navigator>
   );
 };
