@@ -48,9 +48,9 @@ const TabNavigation = () => {
           let iconName;
           if (route.name === "Principal") {
             iconName = focused ? "home" : "home-outline";
-          } else if (route.name === "TabHoras") {
+          } else if (route.name === "Horas") {
             iconName = focused ? "list" : "list-outline";
-          } else if (route.name === "TabAjustes") {
+          } else if (route.name === "Ajustes") {
             iconName = focused ? "cog" : "cog-outline";
           } /*else if (route.name === "Ayuda") {
             iconName = focused ? "help-circle" : "help-circle-outline";
