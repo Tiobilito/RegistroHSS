@@ -32,7 +32,7 @@ const TablaSemHoras = () => {
 const TabAjustes = () => {
   return (
     <PGAjuste.Navigator screenOptions={{ headerShown: false }} initialRouteName="Ajustes">
-      <PGAjuste.Screen name="Ajustes" component={PaginaAjustes} />
+      <PGAjuste.Screen name="AjustesP" component={PaginaAjustes} />
       <PGAjuste.Screen name="PaginaModificarUsusario" component={PaginaModUsuario} />
     </PGAjuste.Navigator>
   );
