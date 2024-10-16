@@ -357,20 +357,28 @@ export const ChecarSemana = async (FRef) => {
   });
 };
 
-// Función para sumar los tiempos en formato "HH:MM:SS"
 export const sumarTiempos = (tiempoStrings) => {
-  const totalSegundos = tiempoStrings.reduce((total, tiempo) => {
-    const [horas, minutos, segundos] = tiempo.split(":").map(Number);
-    return total + horas * 3600 + minutos * 60 + segundos;
-  }, 0);
+  let totalSegundos = 0;
+
+  tiempoStrings.forEach((tiempo) => {
+    // Validar que el tiempo tenga el formato correcto y evitar errores de NaN
+    if (typeof tiempo === 'string' && tiempo.includes(":")) {
+      const [horas, minutos, segundos] = tiempo.split(":").map(Number);
+
+      // Validar que horas, minutos y segundos sean números válidos
+      if (!isNaN(horas) && !isNaN(minutos) && !isNaN(segundos)) {
+        totalSegundos += horas * 3600 + minutos * 60 + segundos;
+      }
+    }
+  });
 
   const horas = Math.floor(totalSegundos / 3600);
   const minutos = Math.floor((totalSegundos % 3600) / 60);
   const segundos = totalSegundos % 60;
 
-  return `${horas.toString().padStart(2, "0")}:${minutos
+  return `${horas}:${minutos.toString().padStart(2, "0")}:${segundos
     .toString()
-    .padStart(2, "0")}:${segundos.toString().padStart(2, "0")}`;
+    .padStart(2, "0")}`;
 };
 
 export default db;
