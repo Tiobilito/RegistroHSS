@@ -5,7 +5,7 @@ import {
   View,
   ImageBackground,
   Image,
-  TouchableOpacity,
+  Pressable,
   Dimensions,
   TextInput,
   Alert,
@@ -120,7 +120,7 @@ export default function PaginaIngreso({ navigation }) {
                 flexDirection: "row",
               }}
             >
-              <TouchableOpacity
+              <Pressable
                 style={styles.btnIngresar}
                 onPress={() => {
                   if (Codigo != "" && Contraseña != "") {
@@ -131,10 +131,10 @@ export default function PaginaIngreso({ navigation }) {
                 }}
               >
                 <Text style={styles.txtBtn}>Ingresar</Text>
-              </TouchableOpacity>
+              </Pressable>
 
               {biometricAvailable ? (
-                <TouchableOpacity
+                <Pressable
                   style={{
                     backgroundColor: "#57A9D9",
                     justifyContent: "center",
@@ -146,7 +146,7 @@ export default function PaginaIngreso({ navigation }) {
                   onPress={() => Autentificacion()}
                 >
                   <Ionicons name="finger-print" size={38} color="black" />
-                </TouchableOpacity>
+                </Pressable>
               ) : null}
 
             </View>
@@ -156,22 +156,22 @@ export default function PaginaIngreso({ navigation }) {
               <View style={styles.line} />
             </View>
             <Text style={styles.subtitle}>Si no estas registrado</Text>
-            <TouchableOpacity
+            <Pressable
               style={styles.btnRegistro}
               onPress={() => {
                 navigation.navigate("Registro");
               }}
             >
               <Text style={styles.txtBtn}>Registro</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
+            </Pressable>
+            <Pressable
               style={styles.btnChangePass}
               onPress={() => {
                 navigation.navigate("changepassword");
               }}
             >
               <Text style={styles.txtBtn}>Recuperar contraseña</Text>
-            </TouchableOpacity>
+            </Pressable>
           </View>
         </View>
       </View>

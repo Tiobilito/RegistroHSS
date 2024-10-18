@@ -5,7 +5,7 @@ import {
   View,
   TextInput,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   Alert,
   ScrollView,
   ImageBackground,
@@ -157,7 +157,7 @@ export default function PaginaRegistro({ navigation }) {
           value={Contraseña}
           placeholder="Contraseña"
         />
-        <TouchableOpacity
+        <Pressable
           style={styles.btnRegistro}
           onPress={() => {
             if (
@@ -190,7 +190,7 @@ export default function PaginaRegistro({ navigation }) {
           }}
         >
           <Text style={styles.txtBtn}>Registrar</Text>
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </ImageBackground>
   );

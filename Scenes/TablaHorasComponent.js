@@ -16,6 +16,22 @@ export default function PaginaTablaHorasComponent({ idSem }) {
   const [Horas, DefHoras] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
+  const handleDelete = (id, idSemana) => {
+    console.log("Se intenta eliminar el registro: ", id);
+    Alert.alert(
+      "Confirmación",
+      "¿Estás seguro de que quieres eliminar este registro?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Borrar",
+          onPress: () => handleBorrarHora(id, idSemana),
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
   const obtenerHoras = async () => {
     const User = await ObtenerDatosUsuario();
     db.transaction((tx) => {
@@ -43,7 +59,9 @@ export default function PaginaTablaHorasComponent({ idSem }) {
   return (
     <>
       <View style={styles.listContainer}>
-        <Text style={{fontSize: 25, fontWeight: "bold", width: "auto"}}>Horas:</Text>
+        <Text style={{ fontSize: 25, fontWeight: "bold", width: "auto" }}>
+          Horas:
+        </Text>
         {MostrarHoras ? (
           <>
             <FlatList
@@ -62,32 +80,20 @@ export default function PaginaTablaHorasComponent({ idSem }) {
                   <Text style={styles.txt}>Total: {item.Total}</Text>
                   <Pressable
                     style={{ padding: 10 }}
-                    onPress={() => {
-                      Alert.alert(
-                        "Confirmación",
-                        "¿Estás seguro de que quieres eliminar este registro?",
-                        [
-                          {
-                            text: "Cancelar",
-                            onPress: () => console.log("Borrado Cancelado"),
-                            style: "cancel",
-                          },
-                          {
-                            text: "Borrar",
-                            onPress: () => {
-                              BorrarHora(item.id, item.idSemana);
-                            },
-                          },
-                        ],
-                        { cancelable: false }
-                      );
-                    }}
+                    onPress={() => handleDelete(item.id, item.idSemana)}
                   >
                     <View style={{ marginLeft: 200, marginTop: -50 }}>
                       <Ionicons name="trash" size={30} color="white" />
                     </View>
                   </Pressable>
                 </View>
+              )}
+              initialNumToRender={2}
+              maxToRenderPerBatch={5}
+              updateCellsBatchingPeriod={50} // Controla cómo se actualizan las celdas
+              removeClippedSubviews={true} // Ayuda con el rendimiento cuando hay muchos ítems
+              getItemLayout={(data, index) => (
+                { length: 70, offset: 70 * index, index }
               )}
             />
             <View style={{ marginTop: 20 }}>

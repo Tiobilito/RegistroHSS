@@ -6,7 +6,7 @@ import {
   TextInput,
   Alert,
   ImageBackground,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { useState } from "react";
 import { changePassword, checkUser } from "../Modulos/OperacionesBD";
@@ -67,12 +67,12 @@ export default function ChangePassword({ navigation }) {
             />
           </View>
 
-          <TouchableOpacity
+          <Pressable
             style={styles.btnIngresar}
             onPress={verificationUser}
           >
             <Text style={styles.txtBtn}>Cambiar contraseña</Text>
-          </TouchableOpacity>
+          </Pressable>
         </>
       ) : (
         <>
@@ -98,9 +98,9 @@ export default function ChangePassword({ navigation }) {
               onChangeText={setnewPassword}
             />
           </View>
-          <TouchableOpacity style={styles.btnIngresar} onPress={verification}>
+          <Pressable style={styles.btnIngresar} onPress={verification}>
             <Text style={styles.txtBtn}>Cambiar contraseña</Text>
-          </TouchableOpacity>
+          </Pressable>
         </>
       )}
     </ImageBackground>

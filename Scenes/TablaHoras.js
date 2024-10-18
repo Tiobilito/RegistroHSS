@@ -6,7 +6,7 @@ import {
   FlatList,
   ImageBackground,
   Scale,
-  TouchableOpacity,
+  Pressable,
   Alert,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
@@ -80,7 +80,8 @@ export default function PaginaTablaHoras({ navigation }) {
                   <Text style={styles.txt}>Inicio: {item.Inicio}</Text>
                   <Text style={styles.txt}>Final: {item.Final}</Text>
                   <Text style={styles.txt}>Total: {item.Total}</Text>
-                  <TouchableOpacity
+                  <Pressable
+                    style={{ padding: 10 }}
                     onPress={() => {
                       Alert.alert(
                         "Confirmación",
@@ -102,13 +103,15 @@ export default function PaginaTablaHoras({ navigation }) {
                       );
                     }}
                   >
-                    <Ionicons name="trash" size={50} color="white" />
-                  </TouchableOpacity>
+                    <View style={{ marginLeft: 200, marginTop: -65 }}>
+                      <Ionicons name="trash" size={50} color="white" />
+                    </View>
+                  </Pressable>
                 </View>
               )}
             />
             <View style={{ marginTop: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", width: 'auto' }}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", width: "auto" }}>
                 Total acumulado en la semana: ({" "}
                 {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>

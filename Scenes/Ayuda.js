@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import {
   View,
   TextInput,
-  TouchableOpacity,
+  Pressable,
   StyleSheet,
   Text,
   ImageBackground,
@@ -70,7 +70,7 @@ export default function PaginaAyuda() {
           value={ChatMessage}
           placeholder="Mensaje"
         />
-        <TouchableOpacity
+        <Pressable
           onPress={() => {
             if (ChatMessage !== "") {
               DefChatRequest(handleGenericAPIRequest(ChatMessage));
@@ -79,7 +79,7 @@ export default function PaginaAyuda() {
           }}
         >
           <Ionicons name="paper-plane" size={35} color="black" />
-        </TouchableOpacity>
+        </Pressable>
       </View>
     </ImageBackground>
   );

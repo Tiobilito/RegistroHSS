@@ -6,7 +6,7 @@ import {
   Dimensions,
   Alert,
   ImageBackground,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { añadirHoras } from "../Modulos/db";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
@@ -79,7 +79,7 @@ export default function PaginaIngreso() {
               }}
             >
               <Cronometro startDate={FechaInicio} />
-              <TouchableOpacity
+              <Pressable
                 style={styles.btnChrono}
                 onPress={async () => {
                   const VLocation = await functionGetLocation(DefUbicacion);
@@ -96,7 +96,7 @@ export default function PaginaIngreso() {
                 <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
                   Detener tiempo
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           ) : (
             <View
@@ -108,7 +108,7 @@ export default function PaginaIngreso() {
               }}
             >
               <Text style={styles.timeText}>00:00:00</Text>
-              <TouchableOpacity
+              <Pressable
                 style={styles.btnChrono}
                 onPress={async () => {
                   const now = new Date();
@@ -127,7 +127,7 @@ export default function PaginaIngreso() {
                 <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
                   Iniciar tiempo
                 </Text>
-              </TouchableOpacity>
+              </Pressable>
             </View>
           )}
         </View>

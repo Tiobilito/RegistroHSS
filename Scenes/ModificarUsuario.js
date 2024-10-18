@@ -5,7 +5,7 @@ import {
   View,
   TextInput,
   Dimensions,
-  TouchableOpacity,
+  Pressable,
   Alert,
   ScrollView,
   ImageBackground,
@@ -168,7 +168,7 @@ export default function PaginaModUsuario({ navigation }) {
           value={Contraseña}
           placeholder="Contraseña"
         />
-        <TouchableOpacity
+        <Pressable
           style={styles.btnRegistro}
           onPress={() => {
             console.log(codigo.length);
@@ -197,7 +197,7 @@ export default function PaginaModUsuario({ navigation }) {
           }}
         >
           <Text style={styles.txtBtn}>Modificar</Text>
-        </TouchableOpacity>
+        </Pressable>
       </ScrollView>
     </ImageBackground>
   );
