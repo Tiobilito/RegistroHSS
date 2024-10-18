@@ -11,7 +11,8 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import db, { sumarTiempos } from "../Modulos/db";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
-import Checkbox from 'expo-checkbox';
+import Checkbox from "expo-checkbox";
+import { Ionicons } from "@expo/vector-icons";
 
 const Scale = Dimensions.get("window").width;
 
@@ -86,17 +87,29 @@ export default function PaginaTablaSemanas({ navigation }) {
         style={{
           width: "90%",
           marginTop: "8%",
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
         <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "bold" }}>
           Tabla de semanas
         </Text>
-        <Text
-          style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}
+        {/* Botón Refresh */}
+        <TouchableOpacity
+          onPress={() => setSemanasSeleccionadas([])} // Deselecciona todo
+          disabled={semanasSeleccionadas.length === 0} // Deshabilita si no hay seleccionadas
+          style={{marginLeft:40}}
         >
-          Horas formato de total HH:MM:SS
-        </Text>
+          <Ionicons
+            name="refresh-circle"
+            size={70}
+            color={semanasSeleccionadas.length === 0 ? "gray" : "black"} // Color gris si está deshabilitado
+          />
+        </TouchableOpacity>
       </View>
+      <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}>
+        Horas formato de total HH:MM:SS
+      </Text>
       <View style={styles.listContainer}>
         {MostrarSemanas ? (
           <>
@@ -108,7 +121,12 @@ export default function PaginaTablaSemanas({ navigation }) {
                   <Checkbox
                     value={semanasSeleccionadas.includes(item.id)}
                     onValueChange={() => handleCheckboxChange(item.id)}
-                    style={{ width: 30, height: 30 }}
+                    style={{
+                      width: 30,
+                      height: 30,
+                      backgroundColor: "white",
+                      borderRadius: 10,
+                    }}
                   />
                   <TouchableOpacity
                     onPress={() => {
@@ -117,21 +135,28 @@ export default function PaginaTablaSemanas({ navigation }) {
                       });
                     }}
                   >
-                      <Text style={styles.txt}>
-                        {item.Inicio} - {item.Fin}
-                      </Text>
+                    <Text style={styles.txt}>
+                      {"    "}
+                      {item.Inicio} - {item.Fin}
+                    </Text>
                   </TouchableOpacity>
                 </View>
               )}
             />
             <View style={{ marginTop: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", width: 'auto'}}>
+              <Text style={{ fontSize: 18, fontWeight: "bold", width: "auto" }}>
                 Total acumulado: ({" "}
                 {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>
-              <Text style={{ fontSize: 18, fontWeight: "bold", width: 'auto', marginTop: 10 }}>
-                Total de horas seleccionadas: ({" "}
-                {calcularTotalSeleccionado()} )
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "bold",
+                  width: "auto",
+                  marginTop: 10,
+                }}
+              >
+                Total de horas seleccionadas: ( {calcularTotalSeleccionado()} )
               </Text>
             </View>
           </>
@@ -170,8 +195,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 1,
     padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center'
+    flexDirection: "row",
+    alignItems: "center",
   },
   listContainer: {
     backgroundColor: "#ffffff",
