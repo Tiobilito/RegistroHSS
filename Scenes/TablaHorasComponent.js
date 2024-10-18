@@ -4,20 +4,15 @@ import {
   Text,
   View,
   FlatList,
-  ImageBackground,
-  Scale,
-  TouchableOpacity,
   Alert,
+  Pressable,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { useRoute } from "@react-navigation/native";
 import db, { BorrarHora, sumarTiempos } from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
-export default function PaginaTablaHoras({ navigation }) {
-  const route = useRoute();
-  const { idSem } = route.params;
+export default function PaginaTablaHorasComponent({ idSem }) {
   const [Horas, DefHoras] = useState([]);
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
@@ -45,29 +40,14 @@ export default function PaginaTablaHoras({ navigation }) {
     }, [])
   );
 
-  const image = require("../assets/fondo.png");
-
   return (
-    <ImageBackground source={image} style={styles.container}>
-      <View
-        style={{
-          width: "90%",
-          marginTop: "8%",
-        }}
-      >
-        <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "bold" }}>
-          Tabla de horas:
-        </Text>
-        <Text
-          style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}
-        >
-          Horas formato de total HH:MM:SS
-        </Text>
-      </View>
+    <>
       <View style={styles.listContainer}>
+        <Text style={{fontSize: 25, fontWeight: "bold", width: "auto"}}>Horas:</Text>
         {MostrarHoras ? (
           <>
             <FlatList
+              contentContainerStyle={{ paddingBottom: 20 }}
               data={Horas}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
@@ -75,12 +55,13 @@ export default function PaginaTablaHoras({ navigation }) {
                   {item.IsBackedInSupabase == 0 ? (
                     <Ionicons name="cloud-offline" size={30} color="white" />
                   ) : (
-                    <Ionicons name="cloud" size={30} color="white" />
+                    <Ionicons name="cloud" size={15} color="white" />
                   )}
                   <Text style={styles.txt}>Inicio: {item.Inicio}</Text>
                   <Text style={styles.txt}>Final: {item.Final}</Text>
                   <Text style={styles.txt}>Total: {item.Total}</Text>
-                  <TouchableOpacity
+                  <Pressable
+                    style={{ padding: 10 }}
                     onPress={() => {
                       Alert.alert(
                         "Confirmación",
@@ -102,13 +83,15 @@ export default function PaginaTablaHoras({ navigation }) {
                       );
                     }}
                   >
-                    <Ionicons name="trash" size={50} color="white" />
-                  </TouchableOpacity>
+                    <View style={{ marginLeft: 200, marginTop: -50 }}>
+                      <Ionicons name="trash" size={30} color="white" />
+                    </View>
+                  </Pressable>
                 </View>
               )}
             />
             <View style={{ marginTop: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", width: 'auto' }}>
+              <Text style={{ fontSize: 15, fontWeight: "bold", width: "auto" }}>
                 Total acumulado en la semana: ({" "}
                 {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>
@@ -118,7 +101,7 @@ export default function PaginaTablaHoras({ navigation }) {
           <Text>No hay registros</Text>
         )}
       </View>
-    </ImageBackground>
+    </>
   );
 }
 
@@ -129,6 +112,7 @@ const styles = StyleSheet.create({
   },
   txt: {
     color: "white",
+    fontSize: 12,
   },
   container: {
     flex: 1,
@@ -142,30 +126,16 @@ const styles = StyleSheet.create({
     marginTop: "2%",
     // //De aqui para abajo son las sombras para los distintos sistemas
     elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
     padding: 10,
   },
   listContainer: {
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f0f0f0",
     width: "90%",
-    height: "70%",
-    borderRadius: 20,
-    marginTop: "8%",
+    flex: 1, // Cambiar height a flex
+    borderRadius: 10,
+    marginTop: "2%",
+    width: "100%",
     padding: "4%",
-    //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    elevation: 15,
   },
 });

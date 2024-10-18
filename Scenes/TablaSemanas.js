@@ -6,13 +6,14 @@ import {
   FlatList,
   Dimensions,
   ImageBackground,
-  TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import db, { sumarTiempos } from "../Modulos/db";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
+import PaginaTablaHorasComponent from "./TablaHorasComponent";
 
 const Scale = Dimensions.get("window").width;
 
@@ -21,6 +22,7 @@ export default function PaginaTablaSemanas({ navigation }) {
   const [Semanas, DefSemanas] = useState([]);
   const [MostrarSemanas, DefMostrarSemanas] = useState(false);
   const [semanasSeleccionadas, setSemanasSeleccionadas] = useState([]);
+  const [mostrarTablaPorSemana, setMostrarTablaPorSemana] = useState({}); // Estado para controlar visibilidad por semana
 
   const obtenerHoras = async () => {
     const User = await ObtenerDatosUsuario();
@@ -79,6 +81,13 @@ export default function PaginaTablaSemanas({ navigation }) {
     return sumarTiempos(horasSeleccionadas.map((item) => item.Total));
   };
 
+  const toggleMostrarTabla = (idSem) => {
+    setMostrarTablaPorSemana((prevState) => ({
+      ...prevState,
+      [idSem]: !prevState[idSem], // Alterna el estado de la semana seleccionada
+    }));
+  };
+
   const image = require("../assets/fondo.png");
 
   return (
@@ -95,17 +104,17 @@ export default function PaginaTablaSemanas({ navigation }) {
           Tabla de semanas
         </Text>
         {/* Botón Refresh */}
-        <TouchableOpacity
+        <Pressable
           onPress={() => setSemanasSeleccionadas([])} // Deselecciona todo
           disabled={semanasSeleccionadas.length === 0} // Deshabilita si no hay seleccionadas
-          style={{marginLeft:40}}
+          style={{ marginLeft: 40 }}
         >
           <Ionicons
             name="refresh-circle"
             size={70}
             color={semanasSeleccionadas.length === 0 ? "gray" : "black"} // Color gris si está deshabilitado
           />
-        </TouchableOpacity>
+        </Pressable>
       </View>
       <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}>
         Horas formato de total HH:MM:SS
@@ -114,32 +123,35 @@ export default function PaginaTablaSemanas({ navigation }) {
         {MostrarSemanas ? (
           <>
             <FlatList
+              contentContainerStyle={{ paddingBottom: 20 }}
               data={Semanas}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <View style={styles.item}>
-                  <Checkbox
-                    value={semanasSeleccionadas.includes(item.id)}
-                    onValueChange={() => handleCheckboxChange(item.id)}
-                    style={{
-                      width: 30,
-                      height: 30,
-                      backgroundColor: "white",
-                      borderRadius: 10,
-                    }}
-                  />
-                  <TouchableOpacity
-                    onPress={() => {
-                      navigation.navigate("TablaHoras", {
-                        idSem: item.id,
-                      });
-                    }}
-                  >
-                    <Text style={styles.txt}>
-                      {"    "}
-                      {item.Inicio} - {item.Fin}
-                    </Text>
-                  </TouchableOpacity>
+                <View>
+                  <View style={styles.item}>
+                    <Checkbox
+                      value={semanasSeleccionadas.includes(item.id)}
+                      onValueChange={() => handleCheckboxChange(item.id)}
+                      style={{
+                        width: 30,
+                        height: 30,
+                        backgroundColor: "white",
+                        borderRadius: 10,
+                      }}
+                    />
+                    <Pressable
+                      onPress={() => toggleMostrarTabla(item.id)} // Toca para mostrar/ocultar tabla
+                    >
+                      <Text style={styles.txt}>
+                        {"    "}
+                        {item.Inicio} - {item.Fin}
+                      </Text>
+                    </Pressable>
+                  </View>
+                  {/* Mostrar componente de tabla solo si el estado lo indica */}
+                  {mostrarTablaPorSemana[item.id] && (
+                    <PaginaTablaHorasComponent idSem={item.id} />
+                  )}
                 </View>
               )}
             />
@@ -185,15 +197,8 @@ const styles = StyleSheet.create({
   item: {
     backgroundColor: "#2272A7",
     borderRadius: 15,
-    marginBottom: "8%",
+    marginTop: 20,
     elevation: 15,
-    shadowColor: "#333333",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 1,
     padding: 10,
     flexDirection: "row",
     alignItems: "center",
@@ -201,17 +206,9 @@ const styles = StyleSheet.create({
   listContainer: {
     backgroundColor: "#ffffff",
     width: "90%",
-    height: "70%",
+    flex: 1, // Cambiar height a flex
     borderRadius: 20,
     marginTop: "8%",
     padding: "4%",
-    elevation: 15,
-    shadowColor: "#333333",
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
   },
 });
