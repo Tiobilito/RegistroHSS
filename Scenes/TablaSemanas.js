@@ -4,18 +4,22 @@ import {
   Text,
   View,
   FlatList,
+  Dimensions,
   ImageBackground,
-  Scale,
   TouchableOpacity,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import db, { sumarTiempos } from "../Modulos/db";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
+import Checkbox from 'expo-checkbox';
+
+const Scale = Dimensions.get("window").width;
 
 export default function PaginaTablaSemanas({ navigation }) {
   const [Horas, DefHoras] = useState([]);
   const [Semanas, DefSemanas] = useState([]);
   const [MostrarSemanas, DefMostrarSemanas] = useState(false);
+  const [semanasSeleccionadas, setSemanasSeleccionadas] = useState([]);
 
   const obtenerHoras = async () => {
     const User = await ObtenerDatosUsuario();
@@ -28,7 +32,7 @@ export default function PaginaTablaSemanas({ navigation }) {
         },
         (_, error) => {
           console.log("Error al obtener las horas:", error);
-          return true; // Indica que el error fue manejado
+          return true;
         }
       );
     });
@@ -45,8 +49,8 @@ export default function PaginaTablaSemanas({ navigation }) {
           DefMostrarSemanas(rows._array.length > 0);
         },
         (_, error) => {
-          console.log("Error al obtener las horas:", error);
-          return true; // Indica que el error fue manejado
+          console.log("Error al obtener las semanas:", error);
+          return true;
         }
       );
     });
@@ -58,6 +62,21 @@ export default function PaginaTablaSemanas({ navigation }) {
       obtenerHoras();
     }, [])
   );
+
+  const handleCheckboxChange = (idSem) => {
+    setSemanasSeleccionadas((prevSeleccionadas) =>
+      prevSeleccionadas.includes(idSem)
+        ? prevSeleccionadas.filter((id) => id !== idSem)
+        : [...prevSeleccionadas, idSem]
+    );
+  };
+
+  const calcularTotalSeleccionado = () => {
+    const horasSeleccionadas = Horas.filter((hora) =>
+      semanasSeleccionadas.includes(hora.idSemana)
+    );
+    return sumarTiempos(horasSeleccionadas.map((item) => item.Total));
+  };
 
   const image = require("../assets/fondo.png");
 
@@ -85,25 +104,34 @@ export default function PaginaTablaSemanas({ navigation }) {
               data={Semanas}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => {
-                    navigation.navigate("TablaHoras", {
-                      idSem: item.id,
-                    });
-                  }}
-                >
-                  <View style={styles.item}>
-                    <Text style={styles.txt}>
-                      {item.Inicio} - {item.Fin}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                <View style={styles.item}>
+                  <Checkbox
+                    value={semanasSeleccionadas.includes(item.id)}
+                    onValueChange={() => handleCheckboxChange(item.id)}
+                    style={{ width: 30, height: 30 }}
+                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate("TablaHoras", {
+                        idSem: item.id,
+                      });
+                    }}
+                  >
+                      <Text style={styles.txt}>
+                        {item.Inicio} - {item.Fin}
+                      </Text>
+                  </TouchableOpacity>
+                </View>
               )}
             />
             <View style={{ marginTop: 20 }}>
               <Text style={{ fontSize: 18, fontWeight: "bold", width: 'auto'}}>
                 Total acumulado: ({" "}
                 {sumarTiempos(Horas.map((item) => item.Total))} )
+              </Text>
+              <Text style={{ fontSize: 18, fontWeight: "bold", width: 'auto', marginTop: 10 }}>
+                Total de horas seleccionadas: ({" "}
+                {calcularTotalSeleccionado()} )
               </Text>
             </View>
           </>
@@ -133,9 +161,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#2272A7",
     borderRadius: 15,
     marginBottom: "8%",
-    // //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
+    elevation: 15,
+    shadowColor: "#333333",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -143,6 +170,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 1,
     padding: 10,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   listContainer: {
     backgroundColor: "#ffffff",
@@ -151,9 +180,8 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginTop: "8%",
     padding: "4%",
-    //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
+    elevation: 15,
+    shadowColor: "#333333",
     shadowOffset: {
       width: 0,
       height: 6,
