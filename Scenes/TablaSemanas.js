@@ -95,17 +95,6 @@ export default function PaginaTablaSemanas({ navigation }) {
           Tabla de semanas
         </Text>
         {/* Botón Refresh */}
-        <Pressable
-          onPress={() => setSemanasSeleccionadas([])} // Deselecciona todo
-          disabled={semanasSeleccionadas.length === 0} // Deshabilita si no hay seleccionadas
-          style={{marginLeft:40}}
-        >
-          <Ionicons
-            name="refresh-circle"
-            size={70}
-            color={semanasSeleccionadas.length === 0 ? "gray" : "black"} // Color gris si está deshabilitado
-          />
-        </Pressable>
       </View>
       <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}>
         Horas formato de total HH:MM:SS
@@ -113,6 +102,21 @@ export default function PaginaTablaSemanas({ navigation }) {
       <View style={styles.listContainer}>
         {MostrarSemanas ? (
           <>
+            <Pressable
+              style={{ marginTop: -5, marginBottom: 15 }}
+              onPress={() => setSemanasSeleccionadas([])} // Deselecciona todo
+              disabled={semanasSeleccionadas.length === 0} // Deshabilita si no hay seleccionadas
+            >
+              <Ionicons
+                name="refresh-circle"
+                size={50}
+                color={semanasSeleccionadas.length === 0 ? "gray" : "black"} // Color gris si está deshabilitado
+              />
+            </Pressable>
+            <Text style={{ marginLeft: 60, marginTop: -55, fontSize: 18 }}>
+              Fecha de inicio - Fecha de fin
+            </Text>
+            <View style={{marginBottom: 20}}/>
             <FlatList
               data={Semanas}
               keyExtractor={(item) => item.id}
