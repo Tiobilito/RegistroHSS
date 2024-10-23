@@ -7,20 +7,102 @@ import {
   Dimensions,
   ImageBackground,
   Pressable,
+  Button,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import db, { sumarTiempos } from "../Modulos/db";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
+import ModalFormulario from "../Modulos/ModalFormularioHoras";
 
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaTablaSemanas({ navigation }) {
+  const [modalVisible, DetModalVisible] = useState(false);
   const [Horas, DefHoras] = useState([]);
   const [Semanas, DefSemanas] = useState([]);
   const [MostrarSemanas, DefMostrarSemanas] = useState(false);
   const [semanasSeleccionadas, setSemanasSeleccionadas] = useState([]);
+  const [formData, setFormData] = useState({
+    entryHours: "",
+    entryMinutes: "",
+    entrySeconds: "",
+    exitHours: "",
+    exitMinutes: "",
+    exitSeconds: "",
+    day: "",
+    month: "",
+    year: "",
+  });
+
+  const openModal = () => {
+    DetModalVisible(true);
+  };
+
+  const closeModal = () => {
+    DetModalVisible(false);
+    console.log(formData);
+    setFormData({
+      entryHours: "",
+      entryMinutes: "",
+      entrySeconds: "",
+      exitHours: "",
+      exitMinutes: "",
+      exitSeconds: "",
+      date: new Date(),
+    }); // Restablecer el formulario al cerrar
+  };
+
+  const handleDateChange = (field, value) => {
+    // Permite el valor vacío y no aplica validación hasta que haya un número.
+    if (value === "") {
+      setFormData((prev) => ({ ...prev, [field]: "" }));
+      return;
+    }
+    const validatedValue = Math.max(0, parseInt(value) || 0);
+    if (field === "day") {
+      setFormData((prev) => ({
+        ...prev,
+        day: String(Math.min(validatedValue, 31)).padStart(2, "0"),
+      }));
+    } else if (field === "month") {
+      setFormData((prev) => ({
+        ...prev,
+        month: String(Math.min(validatedValue, 12)).padStart(2, "0"),
+      }));
+    } else if (field === "year") {
+      setFormData((prev) => ({
+        ...prev,
+        year: String(Math.min(validatedValue, 9999)),
+      })); // Limita el año a 4 dígitos
+    }
+  };
+
+  const handleTimeChange = (field, value) => {
+    // Permite el valor vacío y no aplica validación hasta que haya un número.
+    if (value === "") {
+      setFormData((prev) => ({ ...prev, [field]: "" }));
+      return;
+    }
+    const validatedValue = Math.max(0, parseInt(value) || 0);
+    if (field === "entryHours" || field === "exitHours") {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: String(Math.min(validatedValue, 23)),
+      }));
+    } else if (
+      field === "entryMinutes" ||
+      field === "entrySeconds" ||
+      field === "exitMinutes" ||
+      field === "exitSeconds"
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: String(Math.min(validatedValue, 59)),
+      }));
+    }
+  };
 
   const obtenerHoras = async () => {
     const User = await ObtenerDatosUsuario();
@@ -99,6 +181,14 @@ export default function PaginaTablaSemanas({ navigation }) {
       <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}>
         Horas formato de total HH:MM:SS
       </Text>
+      <Button title="Abrir formulario" onPress={openModal} />
+      <ModalFormulario
+        modalVisible={modalVisible}
+        closeModal={closeModal}
+        formData={formData}
+        handleDateChange={(field, value) => handleDateChange(field, value)}
+        handleTimeChange={(field, value) => handleTimeChange(field, value)}
+      />
       <View style={styles.listContainer}>
         {MostrarSemanas ? (
           <>
@@ -116,7 +206,7 @@ export default function PaginaTablaSemanas({ navigation }) {
             <Text style={{ marginLeft: 60, marginTop: -55, fontSize: 18 }}>
               Fecha de inicio - Fecha de fin
             </Text>
-            <View style={{marginBottom: 20}}/>
+            <View style={{ marginBottom: 20 }} />
             <FlatList
               data={Semanas}
               keyExtractor={(item) => item.id}
