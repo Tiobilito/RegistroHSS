@@ -44,7 +44,7 @@ export default function PaginaIngreso() {
     functionGetLocation(DefUbicacion);
   }, []);
 
-  const image = require("../assets/fondo.png");
+  const image = require("../assets/fondo.webp");
 
   return (
     <ImageBackground source={image} style={styles.container}>

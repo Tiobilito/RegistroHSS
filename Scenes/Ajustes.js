@@ -13,7 +13,7 @@ import { BorrarDatosUsuario } from "../Modulos/InfoUsuario";
 
 const Scale = Dimensions.get("window").width;
 
-const image = require("../assets/fondo.png");
+const image = require("../assets/fondo.webp");
 
 export default function PaginaAjustes({ navigation }) {
   return (

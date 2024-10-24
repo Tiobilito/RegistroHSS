@@ -52,7 +52,7 @@ export default function PaginaAyuda() {
   const [ChatRequest, DefChatRequest] = useState("");
   const [ChatMessage, DefChatMessage] = useState("");
 
-  const image = require("../assets/fondo.png");
+  const image = require("../assets/fondo.webp");
 
   return (
     <ImageBackground source={image} style={styles.container}>

@@ -54,56 +54,6 @@ export default function PaginaTablaSemanas({ navigation }) {
     }); // Restablecer el formulario al cerrar
   };
 
-  const handleDateChange = (field, value) => {
-    // Permite el valor vacío y no aplica validación hasta que haya un número.
-    if (value === "") {
-      setFormData((prev) => ({ ...prev, [field]: "" }));
-      return;
-    }
-    const validatedValue = Math.max(0, parseInt(value) || 0);
-    if (field === "day") {
-      setFormData((prev) => ({
-        ...prev,
-        day: String(Math.min(validatedValue, 31)).padStart(2, "0"),
-      }));
-    } else if (field === "month") {
-      setFormData((prev) => ({
-        ...prev,
-        month: String(Math.min(validatedValue, 12)).padStart(2, "0"),
-      }));
-    } else if (field === "year") {
-      setFormData((prev) => ({
-        ...prev,
-        year: String(Math.min(validatedValue, 9999)),
-      })); // Limita el año a 4 dígitos
-    }
-  };
-
-  const handleTimeChange = (field, value) => {
-    // Permite el valor vacío y no aplica validación hasta que haya un número.
-    if (value === "") {
-      setFormData((prev) => ({ ...prev, [field]: "" }));
-      return;
-    }
-    const validatedValue = Math.max(0, parseInt(value) || 0);
-    if (field === "entryHours" || field === "exitHours") {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: String(Math.min(validatedValue, 23)),
-      }));
-    } else if (
-      field === "entryMinutes" ||
-      field === "entrySeconds" ||
-      field === "exitMinutes" ||
-      field === "exitSeconds"
-    ) {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: String(Math.min(validatedValue, 59)),
-      }));
-    }
-  };
-
   const obtenerHoras = async () => {
     const User = await ObtenerDatosUsuario();
     db.transaction((tx) => {
@@ -161,7 +111,7 @@ export default function PaginaTablaSemanas({ navigation }) {
     return sumarTiempos(horasSeleccionadas.map((item) => item.Total));
   };
 
-  const image = require("../assets/fondo.png");
+  const image = require("../assets/fondo.webp");
 
   return (
     <ImageBackground source={image} style={styles.container}>
@@ -186,6 +136,7 @@ export default function PaginaTablaSemanas({ navigation }) {
         modalVisible={modalVisible}
         closeModal={closeModal}
         formData={formData}
+        setFormData={setFormData}
         handleDateChange={(field, value) => handleDateChange(field, value)}
         handleTimeChange={(field, value) => handleTimeChange(field, value)}
       />

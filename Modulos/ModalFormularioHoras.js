@@ -9,13 +9,57 @@ import {
   StyleSheet,
 } from "react-native";
 
-const ModalFormulario = ({
-  modalVisible,
-  closeModal,
-  formData,
-  handleDateChange,
-  handleTimeChange,
-}) => {
+const ModalFormulario = ({ modalVisible, closeModal, formData, setFormData }) => {
+  const handleDateChange = (field, value) => {
+    // Permite el valor vacío y no aplica validación hasta que haya un número.
+    if (value === "") {
+      setFormData((prev) => ({ ...prev, [field]: "" }));
+      return;
+    }
+    const validatedValue = Math.max(0, parseInt(value) || 0);
+    if (field === "day") {
+      setFormData((prev) => ({
+        ...prev,
+        day: String(Math.min(validatedValue, 31)).padStart(2, "0"),
+      }));
+    } else if (field === "month") {
+      setFormData((prev) => ({
+        ...prev,
+        month: String(Math.min(validatedValue, 12)).padStart(2, "0"),
+      }));
+    } else if (field === "year") {
+      setFormData((prev) => ({
+        ...prev,
+        year: String(Math.min(validatedValue, 9999)),
+      })); // Limita el año a 4 dígitos
+    }
+  };
+
+  const handleTimeChange = (field, value) => {
+    // Permite el valor vacío y no aplica validación hasta que haya un número.
+    if (value === "") {
+      setFormData((prev) => ({ ...prev, [field]: "" }));
+      return;
+    }
+    const validatedValue = Math.max(0, parseInt(value) || 0);
+    if (field === "entryHours" || field === "exitHours") {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: String(Math.min(validatedValue, 23)),
+      }));
+    } else if (
+      field === "entryMinutes" ||
+      field === "entrySeconds" ||
+      field === "exitMinutes" ||
+      field === "exitSeconds"
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        [field]: String(Math.min(validatedValue, 59)),
+      }));
+    }
+  };
+
   return (
     <Modal
       animationType="fade"
@@ -108,9 +152,7 @@ const ModalFormulario = ({
               <TextInput
                 style={styles.timeInput}
                 value={formData.exitMinutes}
-                onChangeText={(value) =>
-                  handleTimeChange("exitMinutes", value)
-                }
+                onChangeText={(value) => handleTimeChange("exitMinutes", value)}
                 keyboardType="numeric"
                 maxLength={2}
                 placeholder="MM"
@@ -119,9 +161,7 @@ const ModalFormulario = ({
               <TextInput
                 style={styles.timeInput}
                 value={formData.exitSeconds}
-                onChangeText={(value) =>
-                  handleTimeChange("exitSeconds", value)
-                }
+                onChangeText={(value) => handleTimeChange("exitSeconds", value)}
                 keyboardType="numeric"
                 maxLength={2}
                 placeholder="SS"
