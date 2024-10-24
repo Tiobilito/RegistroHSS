@@ -9,29 +9,48 @@ import {
   StyleSheet,
 } from "react-native";
 
-const ModalFormulario = ({ modalVisible, closeModal, formData, setFormData }) => {
+const ModalFormulario = ({
+  modalVisible,
+  closeModal,
+  closeModalAndSent,
+  formData,
+  setFormData,
+}) => {
   const handleDateChange = (field, value) => {
-    // Permite el valor vacío y no aplica validación hasta que haya un número.
-    if (value === "") {
-      setFormData((prev) => ({ ...prev, [field]: "" }));
+    // Permitir que el valor sea vacío o parcial y no forzar la validación inmediata.
+    if (value === "" || value === "0" || value === "00") {
+      setFormData((prev) => ({ ...prev, [field]: value }));
       return;
     }
     const validatedValue = Math.max(0, parseInt(value) || 0);
     if (field === "day") {
-      setFormData((prev) => ({
-        ...prev,
-        day: String(Math.min(validatedValue, 31)).padStart(2, "0"),
-      }));
+      // Aplicar validación solo cuando el valor es completo (2 dígitos)
+      if (value.length === 2) {
+        setFormData((prev) => ({
+          ...prev,
+          day: String(Math.min(validatedValue, 31)).padStart(2, "0"),
+        }));
+      } else {
+        setFormData((prev) => ({ ...prev, day: value })); // Permitir valor parcial
+      }
     } else if (field === "month") {
-      setFormData((prev) => ({
-        ...prev,
-        month: String(Math.min(validatedValue, 12)).padStart(2, "0"),
-      }));
+      if (value.length === 2) {
+        setFormData((prev) => ({
+          ...prev,
+          month: String(Math.min(validatedValue, 12)).padStart(2, "0"),
+        }));
+      } else {
+        setFormData((prev) => ({ ...prev, month: value }));
+      }
     } else if (field === "year") {
-      setFormData((prev) => ({
-        ...prev,
-        year: String(Math.min(validatedValue, 9999)),
-      })); // Limita el año a 4 dígitos
+      if (value.length === 4) {
+        setFormData((prev) => ({
+          ...prev,
+          year: String(Math.min(validatedValue, 9999)),
+        }));
+      } else {
+        setFormData((prev) => ({ ...prev, year: value }));
+      }
     }
   };
 
@@ -174,7 +193,7 @@ const ModalFormulario = ({ modalVisible, closeModal, formData, setFormData }) =>
               <Text style={styles.buttonText}>Cancelar</Text>
             </Pressable>
             <View style={{ marginHorizontal: 10 }} />
-            <Pressable onPress={closeModal} style={styles.button}>
+            <Pressable onPress={closeModalAndSent} style={styles.button}>
               <Text style={styles.buttonText}>Aceptar</Text>
             </Pressable>
           </View>

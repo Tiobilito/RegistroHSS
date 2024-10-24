@@ -41,6 +41,19 @@ export default function PaginaTablaSemanas({ navigation }) {
 
   const closeModal = () => {
     DetModalVisible(false);
+    setFormData({
+      entryHours: "",
+      entryMinutes: "",
+      entrySeconds: "",
+      exitHours: "",
+      exitMinutes: "",
+      exitSeconds: "",
+      date: new Date(),
+    }); // Restablecer el formulario al cerrar
+  };
+
+  const closeModalAndSent = () => {
+    DetModalVisible(false);
     console.log(formData);
     setFormData({
       entryHours: "",
@@ -156,6 +169,7 @@ export default function PaginaTablaSemanas({ navigation }) {
             <ModalFormulario
               modalVisible={modalVisible}
               closeModal={closeModal}
+              closeModalAndSent={closeModalAndSent}
               formData={formData}
               setFormData={setFormData}
               handleDateChange={(field, value) =>
