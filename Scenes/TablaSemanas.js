@@ -7,7 +7,6 @@ import {
   Dimensions,
   ImageBackground,
   Pressable,
-  Button,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import db, { sumarTiempos } from "../Modulos/db";
@@ -131,15 +130,6 @@ export default function PaginaTablaSemanas({ navigation }) {
       <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}>
         Horas formato de total HH:MM:SS
       </Text>
-      <Button title="Abrir formulario" onPress={openModal} />
-      <ModalFormulario
-        modalVisible={modalVisible}
-        closeModal={closeModal}
-        formData={formData}
-        setFormData={setFormData}
-        handleDateChange={(field, value) => handleDateChange(field, value)}
-        handleTimeChange={(field, value) => handleTimeChange(field, value)}
-      />
       <View style={styles.listContainer}>
         {MostrarSemanas ? (
           <>
@@ -154,9 +144,27 @@ export default function PaginaTablaSemanas({ navigation }) {
                 color={semanasSeleccionadas.length === 0 ? "gray" : "black"} // Color gris si está deshabilitado
               />
             </Pressable>
-            <Text style={{ marginLeft: 60, marginTop: -55, fontSize: 18 }}>
+            <Text style={{ marginLeft: 60, marginTop: -50, fontSize: 14 }}>
               Fecha de inicio - Fecha de fin
             </Text>
+            <Pressable
+              style={{ marginTop: -35, marginLeft: 245 }}
+              onPress={openModal} // Deselecciona todo
+            >
+              <Ionicons name="add-circle" size={50} />
+            </Pressable>
+            <ModalFormulario
+              modalVisible={modalVisible}
+              closeModal={closeModal}
+              formData={formData}
+              setFormData={setFormData}
+              handleDateChange={(field, value) =>
+                handleDateChange(field, value)
+              }
+              handleTimeChange={(field, value) =>
+                handleTimeChange(field, value)
+              }
+            />
             <View style={{ marginBottom: 20 }} />
             <FlatList
               data={Semanas}
