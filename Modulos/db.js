@@ -183,6 +183,61 @@ export const añadirHoras = async () => {
   });
 };
 
+// Función para añadir horas desde los datos del formulario en el modal
+export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
+  try {
+    // Formateo de fechas
+    const inicio = new Date(inicioFormulario);
+    const fin = new Date(finFormulario);
+    const inicioFormateado = formatearFechaHora(inicio);
+    const finFormateado = formatearFechaHora(fin);
+    // Cálculo de total de horas
+    const total = calcularDiferenciaHoras(inicio, fin);
+    // Obtención de datos de usuario y semana
+    const usuario = await ObtenerDatosUsuario();
+    const dIni = await ObtenerIniSemana(inicio);
+    const idSem = await ChecarSemana(dIni);
+    // Verificación de conexión y respaldo en Supabase si está disponible
+    const state = await NetInfo.fetch();
+    let isBacked = 0;
+    if (state.isConnected) {
+      isBacked = await añadirHorasSup(
+        usuario.Codigo,
+        inicioFormateado,
+        finFormateado,
+        total,
+        inicio
+      );
+    }
+    // Inserción en la base de datos local
+    db.transaction((tx) => {
+      tx.executeSql(
+        `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
+        [
+          inicioFormateado,
+          finFormateado,
+          total,
+          parseInt(usuario.Codigo, 10),
+          isBacked,
+          idSem,
+        ],
+        (_, result) => {
+          console.log("Registro de horas añadido con id:", result.insertId);
+          // Restablece el valor de inicio en usuario
+          ActualizarInicio("null");
+        },
+        (_, error) => {
+          console.error("Error al añadir el registro de horas:", error);
+          return true;
+        }
+      );
+    });
+  } catch (error) {
+    console.error("Error en la función añadirHora:", error);
+  }
+};
+
+
 const RespaldarRegistroEnSupa = async (registro) => {
   const isBacked = await añadirHorasSup(
     registro.idUsuario,

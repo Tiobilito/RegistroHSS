@@ -9,7 +9,7 @@ import {
   Pressable,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import db, { sumarTiempos } from "../Modulos/db";
+import db, { añadirHoraModal, sumarTiempos } from "../Modulos/db";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
@@ -35,6 +35,11 @@ export default function PaginaTablaSemanas({ navigation }) {
     year: "",
   });
 
+  // Función para construir una fecha a partir de los valores del formulario
+  const construirFecha = (day, month, year, hours, minutes, seconds) => {
+    return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
+  };
+
   const openModal = () => {
     DetModalVisible(true);
   };
@@ -52,9 +57,14 @@ export default function PaginaTablaSemanas({ navigation }) {
     }); // Restablecer el formulario al cerrar
   };
 
-  const closeModalAndSent = () => {
+  const closeModalAndSent = async() => {
     DetModalVisible(false);
     console.log(formData);
+    const { day, month, year, entryHours, entryMinutes, entrySeconds, exitHours, exitMinutes, exitSeconds } = formData;
+    // Construye las fechas de entrada y salida
+    const fechaEntrada = construirFecha(day, month, year, entryHours, entryMinutes, entrySeconds);
+    const fechaSalida = construirFecha(day, month, year, exitHours, exitMinutes, exitSeconds);
+    await añadirHoraModal(fechaEntrada, fechaSalida);
     setFormData({
       entryHours: "",
       entryMinutes: "",
