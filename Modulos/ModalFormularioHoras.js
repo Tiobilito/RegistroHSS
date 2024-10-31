@@ -121,6 +121,7 @@ const ModalFormulario = ({
           </View>
 
           <View style={styles.timeInputSection}>
+            <Text style={{fontSize:20, marginTop: -30}}>Formato de 24 horas</Text>
             <Text style={styles.modalSubtitle}>Hora de Entrada</Text>
             <View style={styles.timeInputContainer}>
               <TextInput
