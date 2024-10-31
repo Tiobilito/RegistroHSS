@@ -57,13 +57,37 @@ export default function PaginaTablaSemanas({ navigation }) {
     }); // Restablecer el formulario al cerrar
   };
 
-  const closeModalAndSent = async() => {
+  const closeModalAndSent = async () => {
     DetModalVisible(false);
     console.log(formData);
-    const { day, month, year, entryHours, entryMinutes, entrySeconds, exitHours, exitMinutes, exitSeconds } = formData;
+    const {
+      day,
+      month,
+      year,
+      entryHours,
+      entryMinutes,
+      entrySeconds,
+      exitHours,
+      exitMinutes,
+      exitSeconds,
+    } = formData;
     // Construye las fechas de entrada y salida
-    const fechaEntrada = construirFecha(day, month, year, entryHours, entryMinutes, entrySeconds);
-    const fechaSalida = construirFecha(day, month, year, exitHours, exitMinutes, exitSeconds);
+    const fechaEntrada = construirFecha(
+      day,
+      month,
+      year,
+      entryHours,
+      entryMinutes,
+      entrySeconds
+    );
+    const fechaSalida = construirFecha(
+      day,
+      month,
+      year,
+      exitHours,
+      exitMinutes,
+      exitSeconds
+    );
     await añadirHoraModal(fechaEntrada, fechaSalida);
     setFormData({
       entryHours: "",
@@ -154,41 +178,37 @@ export default function PaginaTablaSemanas({ navigation }) {
         Horas formato de total HH:MM:SS
       </Text>
       <View style={styles.listContainer}>
+        <Pressable
+          style={{ marginTop: -5, marginBottom: 15 }}
+          onPress={() => setSemanasSeleccionadas([])} // Deselecciona todo
+          disabled={semanasSeleccionadas.length === 0} // Deshabilita si no hay seleccionadas
+        >
+          <Ionicons
+            name="refresh-circle"
+            size={50}
+            color={semanasSeleccionadas.length === 0 ? "gray" : "black"} // Color gris si está deshabilitado
+          />
+        </Pressable>
+        <Text style={{ marginLeft: 60, marginTop: -50, fontSize: 14 }}>
+          Fecha de inicio - Fecha de fin
+        </Text>
+        <Pressable
+          style={{ marginTop: -35, marginLeft: 245 }}
+          onPress={openModal} // Deselecciona todo
+        >
+          <Ionicons name="add-circle" size={50} />
+        </Pressable>
+        <ModalFormulario
+          modalVisible={modalVisible}
+          closeModal={closeModal}
+          closeModalAndSent={closeModalAndSent}
+          formData={formData}
+          setFormData={setFormData}
+          handleDateChange={(field, value) => handleDateChange(field, value)}
+          handleTimeChange={(field, value) => handleTimeChange(field, value)}
+        />
         {MostrarSemanas ? (
           <>
-            <Pressable
-              style={{ marginTop: -5, marginBottom: 15 }}
-              onPress={() => setSemanasSeleccionadas([])} // Deselecciona todo
-              disabled={semanasSeleccionadas.length === 0} // Deshabilita si no hay seleccionadas
-            >
-              <Ionicons
-                name="refresh-circle"
-                size={50}
-                color={semanasSeleccionadas.length === 0 ? "gray" : "black"} // Color gris si está deshabilitado
-              />
-            </Pressable>
-            <Text style={{ marginLeft: 60, marginTop: -50, fontSize: 14 }}>
-              Fecha de inicio - Fecha de fin
-            </Text>
-            <Pressable
-              style={{ marginTop: -35, marginLeft: 245 }}
-              onPress={openModal} // Deselecciona todo
-            >
-              <Ionicons name="add-circle" size={50} />
-            </Pressable>
-            <ModalFormulario
-              modalVisible={modalVisible}
-              closeModal={closeModal}
-              closeModalAndSent={closeModalAndSent}
-              formData={formData}
-              setFormData={setFormData}
-              handleDateChange={(field, value) =>
-                handleDateChange(field, value)
-              }
-              handleTimeChange={(field, value) =>
-                handleTimeChange(field, value)
-              }
-            />
             <View style={{ marginBottom: 20 }} />
             <FlatList
               data={Semanas}
