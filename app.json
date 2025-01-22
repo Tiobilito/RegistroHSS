@@ -39,7 +39,8 @@
     },
     "owner": "tiobilito",
     "plugins": [
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-sqlite"
     ]
   }
 }

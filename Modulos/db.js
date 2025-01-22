@@ -1,56 +1,47 @@
-import * as SQLite from "expo-sqlite/legacy";
+import * as SQLite from "expo-sqlite";
 import { ObtenerDatosUsuario, ActualizarInicio } from "./InfoUsuario";
 import NetInfo from "@react-native-community/netinfo";
 import { añadirHorasSup, obtenerHoras } from "./OperacionesBD";
 
-const db = SQLite.openDatabase("Horario.db");
+const initDB = async () => {
+  try {
+    const db = await SQLite.openDatabaseAsync("Horario.db");
+    return db;
+  } catch (error) {
+    console.error("Error al abrir la base de datos:", error);
+  }
+};
 
 // Inicializa la base de datos
-export const initializeDatabase = () => {
-  db.transaction((tx) => {
-    tx.executeSql(
-      `
-        CREATE TABLE IF NOT EXISTS "Horas" (
-          "id" INTEGER NOT NULL UNIQUE,
-          "DInicio" TEXT,
-          "Inicio" TEXT,
-          "Final" TEXT,
-          "Total" TEXT,
-          "idUsuario" INTEGER NOT NULL,
-          "idSemana" INTEGER,
-          "IsBackedInSupabase" INTEGER DEFAULT 0,
-          "idSupabase" INTEGER,
-          PRIMARY KEY("id" AUTOINCREMENT)
-        );
-      `,
-      [],
-      null,
-      (_, error) => {
-        console.log("Error al crear la tabla Horas:", error);
-        return true;
-      }
-    );
-  });
-
-  db.transaction((tx) => {
-    tx.executeSql(
-      `
-        CREATE TABLE IF NOT EXISTS "Semanas" (
-          "id" INTEGER NOT NULL UNIQUE,
-          "Inicio" TEXT,
-          "Fin" TEXT,
-          "idUsuario" INTEGER NOT NULL,
-          PRIMARY KEY("id" AUTOINCREMENT)
-        );
-      `,
-      [],
-      null,
-      (_, error) => {
-        console.log("Error al crear la tabla Semanas:", error);
-        return true;
-      }
-    );
-  });
+export const initializeDatabase = async () => {
+  const db = await initDB();
+  await db.execAsync(
+    `
+      CREATE TABLE IF NOT EXISTS "Horas" (
+        "id" INTEGER NOT NULL UNIQUE,
+        "DInicio" TEXT,
+        "Inicio" TEXT,
+        "Final" TEXT,
+        "Total" TEXT,
+        "idUsuario" INTEGER NOT NULL,
+        "idSemana" INTEGER,
+        "IsBackedInSupabase" INTEGER DEFAULT 0,
+        "idSupabase" INTEGER,
+        PRIMARY KEY("id" AUTOINCREMENT)
+      );
+    `
+  );
+  await db.execAsync(
+    `
+      CREATE TABLE IF NOT EXISTS "Semanas" (
+        "id" INTEGER NOT NULL UNIQUE,
+        "Inicio" TEXT,
+        "Fin" TEXT,
+        "idUsuario" INTEGER NOT NULL,
+        PRIMARY KEY("id" AUTOINCREMENT)
+      );
+    `,
+  );
 };
 
 // Función para formatear la fecha y hora
@@ -237,7 +228,6 @@ export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
   }
 };
 
-
 const RespaldarRegistroEnSupa = async (registro) => {
   const isBacked = await añadirHorasSup(
     registro.idUsuario,
@@ -394,7 +384,11 @@ export const ChecarSemana = async (FRef) => {
     db.transaction((tx) => {
       tx.executeSql(
         `SELECT * FROM Semanas WHERE Inicio = ? AND Fin = ? AND idUsuario = ?`,
-        [InicioS.toLocaleDateString(), FinalS.toLocaleDateString(), parseInt(data.Codigo, 10)],
+        [
+          InicioS.toLocaleDateString(),
+          FinalS.toLocaleDateString(),
+          parseInt(data.Codigo, 10),
+        ],
         async (_, { rows }) => {
           if (rows.length > 0) {
             resolve(rows._array[0].id);
@@ -417,7 +411,7 @@ export const sumarTiempos = (tiempoStrings) => {
 
   tiempoStrings.forEach((tiempo) => {
     // Validar que el tiempo tenga el formato correcto y evitar errores de NaN
-    if (typeof tiempo === 'string' && tiempo.includes(":")) {
+    if (typeof tiempo === "string" && tiempo.includes(":")) {
       const [horas, minutos, segundos] = tiempo.split(":").map(Number);
 
       // Validar que horas, minutos y segundos sean números válidos
