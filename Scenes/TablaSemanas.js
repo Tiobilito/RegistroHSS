@@ -9,8 +9,7 @@ import {
   Pressable,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import db, { añadirHoraModal, sumarTiempos } from "../Modulos/db";
-import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
+import { añadirHoraModal, obtenerHorasUsuario, sumarTiempos } from "../Modulos/db";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import ModalFormulario from "../Modulos/ModalFormularioHoras";
@@ -101,38 +100,14 @@ export default function PaginaTablaSemanas({ navigation }) {
   };
 
   const obtenerHoras = async () => {
-    const User = await ObtenerDatosUsuario();
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Horas WHERE idUsuario = ?;`,
-        [User.Codigo],
-        (_, { rows }) => {
-          DefHoras(rows._array);
-        },
-        (_, error) => {
-          console.log("Error al obtener las horas:", error);
-          return true;
-        }
-      );
-    });
+    const HorasSemana = await obtenerHorasUsuario();
+    DefHoras(HorasSemana);
   };
 
   const obtenerSemanas = async () => {
-    const User = await ObtenerDatosUsuario();
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Semanas WHERE idUsuario = ?;`,
-        [User.Codigo],
-        (_, { rows }) => {
-          DefSemanas(rows._array);
-          DefMostrarSemanas(rows._array.length > 0);
-        },
-        (_, error) => {
-          console.log("Error al obtener las semanas:", error);
-          return true;
-        }
-      );
-    });
+    const Semanas = await obtenerSemanas();
+    DefSemanas(Semanas);
+    DefMostrarSemanas(Semanas.length > 0);
   };
 
   useFocusEffect(

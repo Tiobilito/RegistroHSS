@@ -3,7 +3,7 @@ import { ObtenerDatosUsuario, ActualizarInicio } from "./InfoUsuario";
 import NetInfo from "@react-native-community/netinfo";
 import { añadirHorasSup, obtenerHoras } from "./OperacionesBD";
 
-const initDB = async () => {
+export const initDB = async () => {
   try {
     const db = await SQLite.openDatabaseAsync("Horario.db");
     return db;
@@ -29,10 +29,6 @@ export const initializeDatabase = async () => {
         "idSupabase" INTEGER,
         PRIMARY KEY("id" AUTOINCREMENT)
       );
-    `
-  );
-  await db.execAsync(
-    `
       CREATE TABLE IF NOT EXISTS "Semanas" (
         "id" INTEGER NOT NULL UNIQUE,
         "Inicio" TEXT,
@@ -40,7 +36,7 @@ export const initializeDatabase = async () => {
         "idUsuario" INTEGER NOT NULL,
         PRIMARY KEY("id" AUTOINCREMENT)
       );
-    `,
+    `
   );
 };
 
@@ -69,73 +65,50 @@ const calcularDiferenciaHoras = (inicio, fin) => {
     .padStart(2, "0")}:${diffSecs.toString().padStart(2, "0")}`;
 };
 
-//Borra un registro en la tabla horas, ademas de verificar que la semana tenga al menos 1 registro asociado, sino la borra
 export const BorrarHora = async (idHora, idSemana) => {
   const data = await ObtenerDatosUsuario();
-
-  // Primero, eliminamos el registro de horas
-  db.transaction((tx) => {
-    tx.executeSql(
-      `DELETE FROM Horas WHERE id = ?`,
-      [idHora],
-      () => {
-        console.log(`Registro con id ${idHora} eliminado exitosamente`);
-
-        // Luego, verificamos si la semana tiene otros registros asociados
-        db.transaction((tx) => {
-          tx.executeSql(
-            `SELECT * FROM Horas WHERE idSemana = ? AND idUsuario = ?`,
-            [idSemana, parseInt(data.Codigo, 10)],
-            (_, { rows }) => {
-              if (rows.length > 0) {
-                // Si hay al menos 1 registro asociado a la semana del registro eliminado
-                console.log("Semana con al menos 1 registro asociado");
-              } else {
-                // Si la semana ya no tiene registros asociados, la eliminamos
-                db.transaction((tx) => {
-                  tx.executeSql(
-                    `DELETE FROM Semanas WHERE id = ?`,
-                    [idSemana],
-                    () => {
-                      console.log(
-                        `Semana con id ${idSemana} eliminada exitosamente`
-                      );
-                    },
-                    (_, error) => {
-                      console.error("Error al eliminar la semana: ", error);
-                    }
-                  );
-                });
-              }
-            },
-            (_, error) => {
-              console.error("Error al verificar la semana: ", error);
-            }
-          );
-        });
-      },
-      (_, error) => {
-        console.log(`Error al eliminar el registro con id ${idHora}:`, error);
-        return true; // Indica que el error fue manejado
+  const db = await initDB();
+  try {
+    await db.runAsync(`DELETE FROM Horas WHERE id = ?`, [idHora]);
+    console.log(`Registro con id ${idHora} eliminado exitosamente`);
+    try {
+      const HorasSemana = await db.allAsync(
+        `SELECT * FROM Horas WHERE idSemana = ? AND idUsuario = ?`,
+        [idSemana, parseInt(data.Codigo, 10)]
+      );
+      if (HorasSemana.length === 0) {
+        try {
+          await db.runAsync(`DELETE FROM Semanas WHERE id = ?`, [idSemana]);
+          console.log(`Semana con id ${idSemana} eliminada exitosamente`);
+        } catch (error) {
+          console.error("Error al eliminar la semana: ", error);
+        }
       }
-    );
-  });
+    } catch (error) {
+      console.error("Error al verificar la semana: ", error);
+    }
+  } catch (error) {
+    console.error("Error al abrir la base de datos:", error);
+  }
 };
 
-// Añade horas
 export const añadirHoras = async () => {
+  const db = await initDB();
+  // Formateo de fechas
   const usuario = await ObtenerDatosUsuario();
   const inicio = new Date(usuario.Inicio);
   const fin = new Date();
   const inicioFormateado = formatearFechaHora(inicio);
   const finFormateado = formatearFechaHora(fin);
+  // Cálculo de total de horas
   const total = calcularDiferenciaHoras(inicio, fin);
+  // Obtención de datos de usuario y semana
   const dIni = await ObtenerIniSemana(inicio);
   const idSem = await ChecarSemana(dIni);
   console.log("id semana: ", idSem);
   console.log("Inicio semana: ", dIni);
   let isBacked;
-
+  // Verificación de conexión y respaldo en Supabase si está disponible
   const state = await NetInfo.fetch();
 
   if (state.isConnected) {
@@ -151,9 +124,10 @@ export const añadirHoras = async () => {
     // El dispositivo no tiene conexión a Internet
     isBacked = 0;
   }
-  db.transaction(async (tx) => {
-    tx.executeSql(
-      `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
+
+  try {
+    await db.runAsync(
+      "INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);",
       [
         inicioFormateado,
         finFormateado,
@@ -161,74 +135,62 @@ export const añadirHoras = async () => {
         parseInt(usuario.Codigo, 10),
         isBacked,
         idSem,
-      ],
-      async (_, result) => {
-        console.log("Registro de horas añadido con id:", result.insertId);
-        await ActualizarInicio("null");
-      },
-      (_, error) => {
-        console.log("Error al añadir el registro de horas:", error);
-        return true; // Indica que el error fue manejado
-      }
+      ]
     );
-  });
+    console.log("Registro de horas añadido exitosamente");
+    await ActualizarInicio("null");
+  } catch (error) {
+    console.error("Error al añadir el registro de horas:", error);
+  }
 };
 
-// Función para añadir horas desde los datos del formulario en el modal
 export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
+  const db = await initDB();
+  // Formateo de fechas
+  const inicio = new Date(inicioFormulario);
+  const fin = new Date(finFormulario);
+  const inicioFormateado = formatearFechaHora(inicio);
+  const finFormateado = formatearFechaHora(fin);
+  // Cálculo de total de horas
+  const total = calcularDiferenciaHoras(inicio, fin);
+  // Obtención de datos de usuario y semana
+  const usuario = await ObtenerDatosUsuario();
+  const dIni = await ObtenerIniSemana(inicio);
+  const idSem = await ChecarSemana(dIni);
+  console.log("id semana: ", idSem);
+  console.log("Inicio semana: ", dIni);
+  // Verificación de conexión y respaldo en Supabase si está disponible
+  const state = await NetInfo.fetch();
+  let isBacked = 0;
+  if (state.isConnected) {
+    isBacked = await añadirHorasSup(
+      usuario.Codigo,
+      inicioFormateado,
+      finFormateado,
+      total,
+      inicio
+    );
+  }
   try {
-    // Formateo de fechas
-    const inicio = new Date(inicioFormulario);
-    const fin = new Date(finFormulario);
-    const inicioFormateado = formatearFechaHora(inicio);
-    const finFormateado = formatearFechaHora(fin);
-    // Cálculo de total de horas
-    const total = calcularDiferenciaHoras(inicio, fin);
-    // Obtención de datos de usuario y semana
-    const usuario = await ObtenerDatosUsuario();
-    const dIni = await ObtenerIniSemana(inicio);
-    const idSem = await ChecarSemana(dIni);
-    // Verificación de conexión y respaldo en Supabase si está disponible
-    const state = await NetInfo.fetch();
-    let isBacked = 0;
-    if (state.isConnected) {
-      isBacked = await añadirHorasSup(
-        usuario.Codigo,
+    await db.runAsync(
+      "INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);",
+      [
         inicioFormateado,
         finFormateado,
         total,
-        inicio
-      );
-    }
-    // Inserción en la base de datos local
-    db.transaction((tx) => {
-      tx.executeSql(
-        `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
-        [
-          inicioFormateado,
-          finFormateado,
-          total,
-          parseInt(usuario.Codigo, 10),
-          isBacked,
-          idSem,
-        ],
-        (_, result) => {
-          console.log("Registro de horas añadido con id:", result.insertId);
-          // Restablece el valor de inicio en usuario
-          ActualizarInicio("null");
-        },
-        (_, error) => {
-          console.error("Error al añadir el registro de horas:", error);
-          return true;
-        }
-      );
-    });
+        parseInt(usuario.Codigo, 10),
+        isBacked,
+        idSem,
+      ]
+    );
+    console.log("Registro de horas añadido exitosamente");
   } catch (error) {
-    console.error("Error en la función añadirHora:", error);
+    console.error("Error al añadir el registro de horas:", error);
   }
 };
 
 const RespaldarRegistroEnSupa = async (registro) => {
+  const db = await initDB();
   const isBacked = await añadirHorasSup(
     registro.idUsuario,
     registro.Inicio,
@@ -237,102 +199,70 @@ const RespaldarRegistroEnSupa = async (registro) => {
     registro.DInicio
   );
   if (isBacked != 0) {
-    db.transaction((tx) => {
-      tx.executeSql(
+    try {
+      await db.runAsync(
         `UPDATE Horas SET IsBackedInSupabase = 1 WHERE id = ?`,
-        [registro.id],
-        (_, result) => {
-          console.log("El registro se actualizo");
-        },
-        (_, error) => {
-          console.log("Error: ", error);
-          return true; // Indica que el error fue manejado
-        }
+        [registro.id]
       );
-    });
+      console.log("El registro se actualizo");
+    } catch (error) {
+      console.log("Error: ", error);
+    }
   } else {
     console.log("No se pudo respaldar correctamente");
   }
 };
 
 export const ExportarASupaBD = async () => {
-  db.transaction(async (tx) => {
-    tx.executeSql(
-      `SELECT * FROM Horas WHERE IsBackedInSupabase = 0`,
-      [],
-      (_, { rows }) => {
-        rows._array.forEach(async (registro) => {
-          await RespaldarRegistroEnSupa(registro);
-        });
-      },
-      (_, error) => {
-        console.log("Error al obtener las horas:", error);
-        return true; // Indica que el error fue manejado
-      }
+  const db = await initDB();
+  try {
+    const HorasARespaldar = await db.allAsync(
+      "SELECT * FROM Horas WHERE IsBackedInSupabase = 0"
     );
-  });
+    for (const registro of HorasARespaldar) {
+      await RespaldarRegistroEnSupa(registro);
+    }
+  } catch (error) {
+    console.log("Error al obtener horas: ", error);
+  }
 };
 
 export const BorrarTSemHoras = async () => {
-  db.transaction(async (tx) => {
-    // Borrar las tablas Horas y Semanas
-    tx.executeSql(
-      `DELETE FROM Horas`,
-      [],
-      () => {
-        console.log("Contenido de la tabla Horas eliminado exitosamente");
-      },
-      (_, error) => {
-        console.log("Error al eliminar el contenido de la tabla Horas:", error);
-        return true; // Indica que el error fue manejado
-      }
-    );
-
-    tx.executeSql(
-      `DELETE FROM Semanas`,
-      [],
-      () => {
-        console.log("Contenido de la tabla Semanas eliminado exitosamente");
-      },
-      (_, error) => {
-        console.log(
-          "Error al eliminar el contenido de la tabla Semanas:",
-          error
-        );
-        return true; // Indica que el error fue manejado
-      }
-    );
-  });
+  const db = await initDB();
+  try {
+    await db.runAsync("DELETE FROM Horas");
+    await db.runAsync("DELETE FROM Semanas");
+    console.log("Registros de horas y semanas eliminados exitosamente");
+  } catch (error) {
+    console.error("Error al borrar los registros:", error);
+  }
 };
 
 export const ImportarDeSupaBD = async () => {
-  const Data = await ObtenerDatosUsuario();
-  const Horas = await obtenerHoras(Data.Codigo);
+  const db = await initDB();
+  const Usuario = await ObtenerDatosUsuario();
+  const HorasSupa = await obtenerHoras(Usuario.Codigo);
   let idSemana;
-
-  for (let i = 0; i < Horas.length; i++) {
-    const hora = Horas[i];
+  for (let i = 0; i < HorasSupa.length; i++) {
+    const hora = HorasSupa[i];
     idSemana = await ChecarSemana(new Date(hora.DateInicio));
-    db.transaction(async (tx) => {
-      tx.executeSql(
-        `INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
+    try {
+      await db.runAsync(
+        `INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
         [
+          hora.DateInicio,
           hora.Inicio,
           hora.Final,
           hora.Total,
           hora.CodigoUsuario,
-          parseInt("1", 10),
+          1,
           idSemana,
-        ],
-        async (_, result) => {
-          console.log("Registro de horas añadido");
-        },
-        (_, error) => {
-          console.log("Error al añadir el registro de horas:", error);
-          return true; // Indica que el error fue manejado
-        }
+        ]
       );
-    });
+      console.log("Registro de horas añadido exitosamente");
+    } catch (error) {
+      console.error("Error al añadir el registro de horas:", error);
+    }
   }
 };
 
@@ -353,57 +283,46 @@ export const ObtenerFinSemana = async (FRef) => {
 };
 
 export const InsertarSemana = async (InicioS, FinalS) => {
+  const db = await initDB();
   const usuario = await ObtenerDatosUsuario();
   const Inicio = InicioS.toLocaleDateString().toString();
   const Final = FinalS.toLocaleDateString().toString();
-
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `INSERT INTO Semanas (Inicio, Fin, idUsuario) VALUES (?, ?, ?);`,
-        [Inicio, Final, parseInt(usuario.Codigo, 10)],
-        (_, result) => {
-          console.log("Registro de semanas añadido con id:", result.insertId);
-          resolve(result.insertId);
-        },
-        (_, error) => {
-          console.log("Error al añadir el registro de semanas:", error);
-          reject(error);
-        }
-      );
-    });
-  });
+  try {
+    const Semana = await db.runAsync(
+      "INSERT INTO Semanas (Inicio, Fin, idUsuario) VALUES (?, ?, ?);",
+      [Inicio, Final, parseInt(usuario.Codigo, 10)]
+    );
+    console.log("Semana añadida exitosamente");
+    return Semana.id;
+  } catch (error) {
+    console.error("Error al añadir la semana:", error);
+  }
 };
 
 export const ChecarSemana = async (FRef) => {
+  const db = await initDB();
   const data = await ObtenerDatosUsuario();
   const InicioS = await ObtenerIniSemana(FRef);
   const FinalS = await ObtenerFinSemana(FRef);
 
-  return new Promise((resolve, reject) => {
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Semanas WHERE Inicio = ? AND Fin = ? AND idUsuario = ?`,
-        [
-          InicioS.toLocaleDateString(),
-          FinalS.toLocaleDateString(),
-          parseInt(data.Codigo, 10),
-        ],
-        async (_, { rows }) => {
-          if (rows.length > 0) {
-            resolve(rows._array[0].id);
-          } else {
-            const id = await InsertarSemana(InicioS, FinalS);
-            resolve(id);
-          }
-        },
-        (_, error) => {
-          console.error("Error al verificar el registro:", error);
-          reject(error);
-        }
-      );
-    });
-  });
+  try {
+    const Semana = await db.getFirstAsync(
+      "SELECT * FROM Semanas WHERE Inicio = ? AND Fin = ? AND idUsuario = ?",
+      [
+        InicioS.toLocaleDateString(),
+        FinalS.toLocaleDateString(),
+        parseInt(data.Codigo, 10),
+      ]
+    );
+    if (Semana) {
+      return Semana.id;
+    } else {
+      const id = await InsertarSemana(InicioS, FinalS);
+      return id;
+    }
+  } catch (error) {
+    console.error("Error al obtener la semana:", error);
+  }
 };
 
 export const sumarTiempos = (tiempoStrings) => {
@@ -430,4 +349,44 @@ export const sumarTiempos = (tiempoStrings) => {
     .padStart(2, "0")}`;
 };
 
-export default db;
+export const obtenerHorasSemana = async (idSemana) => {
+  const db = await initDB();
+  const User = await ObtenerDatosUsuario();
+  try {
+    const Horas = await db.getAllAsync(
+      `SELECT * FROM Horas WHERE idUsuario = ? AND idSemana = ?;`,
+      [User.Codigo, idSemana]
+    );
+    return Horas;
+  } catch (error) {
+    console.error("Error al obtener las horas:", error);
+  }
+}
+
+export const obtenerHorasUsuario = async () => {
+  const Usuario = await ObtenerDatosUsuario();
+  const db = await initDB();
+  try {
+    const Horas = await db.getAllAsync(
+      `SELECT * FROM Horas WHERE idUsuario = ?;`,
+      [Usuario.Codigo]
+    );
+    return Horas;
+  } catch (error) {
+    console.error("Error al obtener las horas:", error);
+  }
+}
+
+export const obtenerSemanasUsuario = async () => {
+  const Usuario = await ObtenerDatosUsuario();
+  const db = await initDB();
+  try {
+    const Semanas = await db.getAllAsync(
+      `SELECT * FROM Semanas WHERE idUsuario = ?;`,
+      [Usuario.Codigo]
+    );
+    return Semanas;
+  } catch (error) {
+    console.error("Error al obtener las semanas:", error);
+  }
+}

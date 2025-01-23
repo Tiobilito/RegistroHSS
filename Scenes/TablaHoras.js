@@ -11,9 +11,8 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import db, { BorrarHora, sumarTiempos } from "../Modulos/db";
+import { BorrarHora, obtenerHorasSemana, sumarTiempos } from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function PaginaTablaHoras({ navigation }) {
   const route = useRoute();
@@ -22,21 +21,9 @@ export default function PaginaTablaHoras({ navigation }) {
   const [MostrarHoras, DefMostrarHoras] = useState(false);
 
   const obtenerHoras = async () => {
-    const User = await ObtenerDatosUsuario();
-    db.transaction((tx) => {
-      tx.executeSql(
-        `SELECT * FROM Horas WHERE idUsuario = ? AND idSemana = ?;`,
-        [User.Codigo, idSem],
-        (_, { rows }) => {
-          DefHoras(rows._array);
-          DefMostrarHoras(rows._array.length > 0);
-        },
-        (_, error) => {
-          console.log("Error al obtener las horas:", error);
-          return true; // Indica que el error fue manejado
-        }
-      );
-    });
+    const HorasSemana = await obtenerHorasSemana(idSem);
+    DefHoras(HorasSemana);
+    DefMostrarHoras(Horas.length > 0);
   };
 
   useFocusEffect(
