@@ -9,7 +9,7 @@ import {
   Pressable,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { añadirHoraModal, obtenerHorasUsuario, sumarTiempos } from "../Modulos/db";
+import { añadirHoraModal, obtenerHorasUsuario, obtenerSemanasUsuario, sumarTiempos } from "../Modulos/db";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import ModalFormulario from "../Modulos/ModalFormularioHoras";
@@ -106,7 +106,7 @@ export default function PaginaTablaSemanas({ navigation }) {
   };
 
   const obtenerSemanas = async () => {
-    const SemanasBD = await obtenerSemanas();
+    const SemanasBD = await obtenerSemanasUsuario();
     console.log("Semanas: ", SemanasBD);
     DefSemanas(Semanas);
     DefMostrarSemanas(Semanas.length > 0);
