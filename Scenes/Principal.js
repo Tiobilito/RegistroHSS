@@ -82,15 +82,13 @@ export default function PaginaIngreso() {
               <Pressable
                 style={styles.btnChrono}
                 onPress={async () => {
-                  const VLocation = await functionGetLocation(DefUbicacion);
-                  if (VLocation === true) {
-                    if (await validation(Ubicacion)) {
+                //  const VLocation = await functionGetLocation(DefUbicacion);
+                 // if (VLocation === true) {
+                 
                       añadirHoras();
                       DefMostrarCr(false);
-                    } else {
-                      Alert.alert("No estas en el departamento :(");
-                    }
-                  }
+                  
+                ///  }
                 }}
               >
                 <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
@@ -113,15 +111,15 @@ export default function PaginaIngreso() {
                 onPress={async () => {
                   const now = new Date();
                   const VLocation = await functionGetLocation(DefUbicacion);
-                  if (VLocation === true) {
-                    if (await validation(Ubicacion)) {
+                 // if (VLocation === true) {
+                    //if (await validation(Ubicacion)) {
                       DefFechaInicio(now);
                       ActualizarInicio(now.toISOString());
                       DefMostrarCr(true);
-                    } else {
-                      Alert.alert("No estas dentro del Departamento :(");
-                    }
-                  }
+                  //  } else {
+                   //   Alert.alert("No estas dentro del Departamento :(");
+                   // }
+                 // }
                 }}
               >
                 <Text style={{ color: "#ffffff", fontWeight: "bold" }}>

@@ -22,8 +22,9 @@ export default function PaginaTablaHoras({ navigation }) {
 
   const obtenerHoras = async () => {
     const HorasSemana = await obtenerHorasSemana(idSem);
+    console.log("horas semana",HorasSemana)
     DefHoras(HorasSemana);
-    DefMostrarHoras(Horas.length > 0);
+    DefMostrarHoras(HorasSemana);
   };
 
   useFocusEffect(

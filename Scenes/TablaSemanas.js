@@ -106,10 +106,17 @@ export default function PaginaTablaSemanas({ navigation }) {
   };
 
   const obtenerSemanas = async () => {
-    const SemanasBD = await obtenerSemanasUsuario();
-    console.log("Semanas: ", SemanasBD);
-    DefSemanas(Semanas);
-    DefMostrarSemanas(Semanas.length > 0);
+
+    try{
+      const SemanasBD = await obtenerSemanasUsuario();
+        console.log("Semanas: ", SemanasBD);
+        DefSemanas(SemanasBD);
+        DefMostrarSemanas(SemanasBD);
+    }catch(e){
+      console.log(e)
+
+    }
+  
   };
 
   useFocusEffect(

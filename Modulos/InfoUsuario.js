@@ -35,6 +35,7 @@ export const GuardarDatosUsuario = async (codigo, contraseña, Dlatitud, Dlongit
 export const ActualizarInicio = async (valorInicio) => {
   try {
     const jsonData = await AsyncStorage.getItem("@UserData");
+    console.log("lo que llega a actualizar inicio es",jsonData)
     if (jsonData != null) {
       const userData = JSON.parse(jsonData);
       userData.Inicio = valorInicio;
