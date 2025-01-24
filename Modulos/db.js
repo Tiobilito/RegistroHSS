@@ -3,18 +3,10 @@ import { ObtenerDatosUsuario, ActualizarInicio } from "./InfoUsuario";
 import NetInfo from "@react-native-community/netinfo";
 import { añadirHorasSup, obtenerHoras } from "./OperacionesBD";
 
-export const initDB = async () => {
-  try {
-    const db = await SQLite.openDatabaseAsync("Horario.db");
-    return db;
-  } catch (error) {
-    console.error("Error al abrir la base de datos:", error);
-  }
-};
+const db = SQLite.openDatabaseSync("Horario.db");
 
 // Inicializa la base de datos
 export const initializeDatabase = async () => {
-  const db = await initDB();
   await db.execAsync(
     `
       CREATE TABLE IF NOT EXISTS "Horas" (
@@ -67,12 +59,12 @@ const calcularDiferenciaHoras = (inicio, fin) => {
 
 export const BorrarHora = async (idHora, idSemana) => {
   const data = await ObtenerDatosUsuario();
-  const db = await initDB();
+   
   try {
     await db.runAsync(`DELETE FROM Horas WHERE id = ?`, [idHora]);
     console.log(`Registro con id ${idHora} eliminado exitosamente`);
     try {
-      const HorasSemana = await db.allAsync(
+      const HorasSemana = await db.getAllAsync(
         `SELECT * FROM Horas WHERE idSemana = ? AND idUsuario = ?`,
         [idSemana, parseInt(data.Codigo, 10)]
       );
@@ -93,7 +85,7 @@ export const BorrarHora = async (idHora, idSemana) => {
 };
 
 export const añadirHoras = async () => {
-  const db = await initDB();
+   
   // Formateo de fechas
   const usuario = await ObtenerDatosUsuario();
   const inicio = new Date(usuario.Inicio);
@@ -126,9 +118,10 @@ export const añadirHoras = async () => {
   }
 
   try {
-    await db.runAsync(
-      "INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);",
+    db.runSync(
+      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);",
       [
+        inicio.toString(),
         inicioFormateado,
         finFormateado,
         total,
@@ -145,7 +138,7 @@ export const añadirHoras = async () => {
 };
 
 export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
-  const db = await initDB();
+   
   // Formateo de fechas
   const inicio = new Date(inicioFormulario);
   const fin = new Date(finFormulario);
@@ -172,9 +165,10 @@ export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
     );
   }
   try {
-    await db.runAsync(
-      "INSERT INTO Horas (Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);",
+    db.runSync(
+      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);",
       [
+        inicioFormulario,
         inicioFormateado,
         finFormateado,
         total,
@@ -183,14 +177,14 @@ export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
         idSem,
       ]
     );
-    console.log("Registro de horas añadido exitosamente");
+    console.log("Registro de horas añadido exitosamente", );
   } catch (error) {
     console.error("Error al añadir el registro de horas:", error);
   }
 };
 
 const RespaldarRegistroEnSupa = async (registro) => {
-  const db = await initDB();
+   
   const isBacked = await añadirHorasSup(
     registro.idUsuario,
     registro.Inicio,
@@ -214,9 +208,9 @@ const RespaldarRegistroEnSupa = async (registro) => {
 };
 
 export const ExportarASupaBD = async () => {
-  const db = await initDB();
+   
   try {
-    const HorasARespaldar = await db.allAsync(
+    const HorasARespaldar = await db.getAllAsync(
       "SELECT * FROM Horas WHERE IsBackedInSupabase = 0"
     );
     for (const registro of HorasARespaldar) {
@@ -228,7 +222,7 @@ export const ExportarASupaBD = async () => {
 };
 
 export const BorrarTSemHoras = async () => {
-  const db = await initDB();
+   
   try {
     await db.runAsync("DELETE FROM Horas");
     await db.runAsync("DELETE FROM Semanas");
@@ -239,7 +233,7 @@ export const BorrarTSemHoras = async () => {
 };
 
 export const ImportarDeSupaBD = async () => {
-  const db = await initDB();
+   
   const Usuario = await ObtenerDatosUsuario();
   const HorasSupa = await obtenerHoras(Usuario.Codigo);
   let idSemana;
@@ -247,15 +241,15 @@ export const ImportarDeSupaBD = async () => {
     const hora = HorasSupa[i];
     idSemana = await ChecarSemana(new Date(hora.DateInicio));
     try {
-      await db.runAsync(
-        `INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?);`,
+      db.runSync(
+        `INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);`,
         [
           hora.DateInicio,
           hora.Inicio,
           hora.Final,
           hora.Total,
           hora.CodigoUsuario,
-          1,
+          parseInt(hora.IsBackedInSupabase, 10),
           idSemana,
         ]
       );
@@ -283,7 +277,7 @@ export const ObtenerFinSemana = async (FRef) => {
 };
 
 export const InsertarSemana = async (InicioS, FinalS) => {
-  const db = await initDB();
+   
   const usuario = await ObtenerDatosUsuario();
   const Inicio = InicioS.toLocaleDateString().toString();
   const Final = FinalS.toLocaleDateString().toString();
@@ -293,14 +287,14 @@ export const InsertarSemana = async (InicioS, FinalS) => {
       [Inicio, Final, parseInt(usuario.Codigo, 10)]
     );
     console.log("Semana añadida exitosamente");
-    return Semana.id;
+    return Semana.lastInsertRowId;
   } catch (error) {
     console.error("Error al añadir la semana:", error);
   }
 };
 
 export const ChecarSemana = async (FRef) => {
-  const db = await initDB();
+   
   const data = await ObtenerDatosUsuario();
   const InicioS = await ObtenerIniSemana(FRef);
   const FinalS = await ObtenerFinSemana(FRef);
@@ -317,6 +311,7 @@ export const ChecarSemana = async (FRef) => {
     if (Semana) {
       return Semana.id;
     } else {
+      console.log("No se encontro la semana");
       const id = await InsertarSemana(InicioS, FinalS);
       return id;
     }
@@ -350,7 +345,7 @@ export const sumarTiempos = (tiempoStrings) => {
 };
 
 export const obtenerHorasSemana = async (idSemana) => {
-  const db = await initDB();
+   
   const User = await ObtenerDatosUsuario();
   try {
     const Horas = await db.getAllAsync(
@@ -365,7 +360,7 @@ export const obtenerHorasSemana = async (idSemana) => {
 
 export const obtenerHorasUsuario = async () => {
   const Usuario = await ObtenerDatosUsuario();
-  const db = await initDB();
+   
   try {
     const Horas = await db.getAllAsync(
       `SELECT * FROM Horas WHERE idUsuario = ?;`,
@@ -379,7 +374,7 @@ export const obtenerHorasUsuario = async () => {
 
 export const obtenerSemanasUsuario = async () => {
   const Usuario = await ObtenerDatosUsuario();
-  const db = await initDB();
+   
   try {
     const Semanas = await db.getAllAsync(
       `SELECT * FROM Semanas WHERE idUsuario = ?;`,

@@ -101,11 +101,13 @@ export default function PaginaTablaSemanas({ navigation }) {
 
   const obtenerHoras = async () => {
     const HorasSemana = await obtenerHorasUsuario();
+    console.log("Horas: ", HorasSemana);
     DefHoras(HorasSemana);
   };
 
   const obtenerSemanas = async () => {
-    const Semanas = await obtenerSemanas();
+    const SemanasBD = await obtenerSemanas();
+    console.log("Semanas: ", SemanasBD);
     DefSemanas(Semanas);
     DefMostrarSemanas(Semanas.length > 0);
   };
