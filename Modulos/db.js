@@ -61,7 +61,7 @@ export const BorrarHora = async (idHora, idSemana) => {
   const data = await ObtenerDatosUsuario();
    
   try {
-    await db.runAsync(`DELETE FROM Horas WHERE id = ?`, [idHora]);
+    db.runSync(`DELETE FROM Horas WHERE id = ?`, [idHora]);
     console.log(`Registro con id ${idHora} eliminado exitosamente`);
     try {
       const HorasSemana = await db.getAllAsync(
@@ -70,7 +70,7 @@ export const BorrarHora = async (idHora, idSemana) => {
       );
       if (HorasSemana.length === 0) {
         try {
-          await db.runAsync(`DELETE FROM Semanas WHERE id = ?`, [idSemana]);
+          db.runSync(`DELETE FROM Semanas WHERE id = ?`, [idSemana]);
           console.log(`Semana con id ${idSemana} eliminada exitosamente`);
         } catch (error) {
           console.error("Error al eliminar la semana: ", error);
@@ -194,7 +194,7 @@ const RespaldarRegistroEnSupa = async (registro) => {
   );
   if (isBacked != 0) {
     try {
-      await db.runAsync(
+      db.runSync(
         `UPDATE Horas SET IsBackedInSupabase = 1 WHERE id = ?`,
         [registro.id]
       );
@@ -224,8 +224,8 @@ export const ExportarASupaBD = async () => {
 export const BorrarTSemHoras = async () => {
    
   try {
-    await db.runAsync("DELETE FROM Horas");
-    await db.runAsync("DELETE FROM Semanas");
+    db.runSync("DELETE FROM Horas");
+    db.runSync("DELETE FROM Semanas");
     console.log("Registros de horas y semanas eliminados exitosamente");
   } catch (error) {
     console.error("Error al borrar los registros:", error);
@@ -282,7 +282,7 @@ export const InsertarSemana = async (InicioS, FinalS) => {
   const Inicio = InicioS.toLocaleDateString().toString();
   const Final = FinalS.toLocaleDateString().toString();
   try {
-    const Semana = await db.runAsync(
+    const Semana = db.runSync(
       "INSERT INTO Semanas (Inicio, Fin, idUsuario) VALUES (?, ?, ?);",
       [Inicio, Final, parseInt(usuario.Codigo, 10)]
     );
