@@ -7,77 +7,77 @@ import {
   Text,
   ImageBackground,
   ScrollView,
-  Alert,
 } from "react-native";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ChecCadPalabrasClave } from "../Modulos/VerificacionCad";
 
 const handleGenericAPIRequest = async (message) => {
-  const API_KEY = "AIzaSyBLWtQ3K4N13T3zewGDv7fZM37NYY0yh80";
   const Verif = ChecCadPalabrasClave(message);
   console.log("El mensaje enviado es: " + message);
 
-  if (!message.trim()) return null; // No hacer nada si el mensaje está vacío
-  else if (Verif == false) return "Mensaje no valido";
+  if (!message.trim()) return null; // Ignorar mensajes vacíos
+ // else if (!Verif) return "Mensaje no válido";
 
-  const genAI = new GoogleGenerativeAI(API_KEY);
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+ 
+  const staticResponses = {
+    "hola": "¡Hola! ¿Cómo puedo ayudarte?",
+    "adios": "Hasta luego, que tengas un buen día.",
+    "ayuda": "Puedo responder preguntas básicas. Intenta preguntar algo específico.",
+    "como estas": "Soy un bot, pero estoy aquí para ayudarte.",
+    "default": "No entiendo tu mensaje, intenta preguntar algo más.",
+  };
 
-  try {
-    const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: message }],
-        },
-      ],
-      generationConfig: {
-        maxOutputTokens: 100,
-      },
-    });
 
-    const result = await chat.sendMessage(message);
-    const response = await result.response;
-    const text = await response.text();
-    console.log("La respuesta es: " + text);
-    return text;
-  } catch (error) {
-    console.error("Error sending chat request:", error);
-    return null;
-  }
+  const lowerMessage = message.toLowerCase();
+  return staticResponses[lowerMessage] || staticResponses["default"];
 };
 
 export default function PaginaAyuda() {
-  const [ChatRequest, DefChatRequest] = useState("");
-  const [ChatMessage, DefChatMessage] = useState("");
+  const [chatHistory, setChatHistory] = useState([]); 
+  const [chatMessage, setChatMessage] = useState("");
 
   const image = require("../assets/fondo.webp");
+
+  const sendMessage = async () => {
+    if (!chatMessage.trim()) return;
+
+    const userMessage = { text: chatMessage, sender: "user" };
+    setChatHistory((prev) => [...prev, userMessage]);
+
+    // Obtener respuesta del bot
+    const botResponse = await handleGenericAPIRequest(chatMessage);
+    const botMessage = { text: botResponse, sender: "bot" };
+    setChatHistory((prev) => [...prev, botMessage]);
+
+    setChatMessage("");
+  };
 
   return (
     <ImageBackground source={image} style={styles.container}>
       <View style={styles.chatContainer}>
         <ScrollView style={styles.scrollView}>
-          <Text style={styles.chatText}>{ChatRequest}</Text>
+          {chatHistory.map((msg, index) => (
+            <View
+              key={index}
+              style={[
+                styles.messageContainer,
+                msg.sender === "user" ? styles.userMessage : styles.botMessage,
+              ]}
+            >
+              <Text style={styles.chatText}>{msg.text}</Text>
+            </View>
+          ))}
         </ScrollView>
       </View>
+
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          onChangeText={(text) => {
-            DefChatMessage(text);
-          }}
-          value={ChatMessage}
-          placeholder="Mensaje"
+          onChangeText={setChatMessage}
+          value={chatMessage}
+          placeholder="Escribe tu mensaje"
         />
-        <Pressable
-          onPress={() => {
-            if (ChatMessage !== "") {
-              DefChatRequest(handleGenericAPIRequest(ChatMessage));
-              DefChatMessage("");
-            }
-          }}
-        >
+        <Pressable onPress={sendMessage}>
           <Ionicons name="paper-plane" size={35} color="black" />
         </Pressable>
       </View>
@@ -100,20 +100,16 @@ const styles = StyleSheet.create({
     width: "90%",
     height: "70%",
     borderRadius: 20,
-    //marginTop: "4%",
     padding: "4%",
-    //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 3,
-    },
+    elevation: 15,
+    shadowColor: "#333333",
+    shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   chatText: {
-    fontSize: 20,
+    fontSize: 16,
+    color: "#000",
   },
   inputContainer: {
     flexDirection: "row",
@@ -135,5 +131,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 18,
     backgroundColor: "white",
+  },
+  messageContainer: {
+    maxWidth: "80%",
+    padding: 10,
+    borderRadius: 10,
+    marginVertical: 5,
+  },
+  userMessage: {
+    alignSelf: "flex-end",
+    backgroundColor: "#DCF8C6",
+  },
+  botMessage: {
+    alignSelf: "flex-start",
+    backgroundColor: "#E5E5EA",
   },
 });

@@ -52,9 +52,9 @@ const TabNavigation = () => {
             iconName = focused ? "list" : "list-outline";
           } else if (route.name === "Ajustes") {
             iconName = focused ? "cog" : "cog-outline";
-          } /*else if (route.name === "Ayuda") {
+          } else if (route.name === "Ayuda") {
             iconName = focused ? "help-circle" : "help-circle-outline";
-          }*/
+          }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "black",
@@ -63,7 +63,7 @@ const TabNavigation = () => {
     >
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="Horas" component={TablaSemHoras} />
-      {/*<Tab.Screen name="Ayuda" component={PaginaAyuda} />*/}
+      <Tab.Screen name="Ayuda" component={PaginaAyuda} />
       <Tab.Screen name="Ajustes" component={TabAjustes} />
     </Tab.Navigator>
   );
