@@ -4,11 +4,11 @@ import {
   Text,
   View,
   TextInput,
-  Dimensions,
   Pressable,
   Alert,
   ScrollView,
   ImageBackground,
+  useWindowDimensions,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import {
@@ -22,9 +22,11 @@ import {
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import { CommonActions } from "@react-navigation/native";
 
-const Scale = Dimensions.get("window").width;
-
 export default function PaginaModUsuario({ navigation }) {
+  const { width, height } = useWindowDimensions();
+  // Factor de escala basado en un ancho base de 375
+  const scaleFactor = width / 375;
+
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
   const [Contraseña, DefContraseña] = useState("");
@@ -37,15 +39,11 @@ export default function PaginaModUsuario({ navigation }) {
   const DefDatosUsuario = async () => {
     const dataL = await ObtenerDatosUsuario();
     const data = await ObtenerDatosUsuarioSupa(dataL.Codigo);
-    if(data) {
-      //console.log("Datos usuario: ", data);
+    if (data) {
       DefNombre(data.Nombre);
       DefCodigo(data.Codigo.toString());
       DeftipoUsuario(data.TipoServidor);
       DefContraseña(data.Contraseña);
-      //const Departamento = await obtenerDepartamento(data.idDepartamento);
-      //const Centro = await obtenerCentro(Departamento.idCentroUniversitario);
-      //console.log(Departamento);
     }
   };
 
@@ -60,118 +58,154 @@ export default function PaginaModUsuario({ navigation }) {
   }, []);
 
   useEffect(() => {
-    if (selectedCentro && selectedCentro != "Selecciona una opción") {
+    if (selectedCentro && selectedCentro !== "Selecciona una opción") {
       const fetchDepartamentos = async () => {
         const data = await obtenerDepartamentos(selectedCentro);
         setDepartamentos(data);
       };
       fetchDepartamentos();
     } else {
-      setDepartamentos([]); // Cambiar null por un array vacío
+      setDepartamentos([]);
     }
-}, [selectedCentro]);
+  }, [selectedCentro]);
 
   const image = require("../assets/Back.png");
 
   return (
-    <ImageBackground source={image} style={styles.background}>
-      <View style={styles.titleContainer}>
-        <Text style={styles.title}>Editar usuario</Text>
+    <ImageBackground
+      source={image}
+      style={[styles.background, { width, height }]}
+      resizeMode="cover"
+    >
+      {/* Contenedor del título */}
+      <View
+        style={[
+          styles.titleContainer,
+          { marginTop: height * 0.25, marginBottom: height * 0.05 },
+        ]}
+      >
+        <Text style={[styles.title, { fontSize: scaleFactor > 1 ? 24 : 20 }]}>
+          Editar usuario
+        </Text>
       </View>
 
-      <ScrollView style={styles.formContainer}>
-        <Text style={styles.subtitle}>Nombre</Text>
+      <ScrollView
+        style={[styles.formContainer, { width: width * 0.84, height: height * 0.55 }]}
+      >
+        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>
+          Nombre
+        </Text>
         <TextInput
-          style={styles.input}
-          onChangeText={(text) => {
-            DefNombre(text);
-          }}
+          style={[styles.input, { fontSize: 16 * scaleFactor }]}
+          onChangeText={(text) => DefNombre(text)}
           value={Nombre}
           placeholder="Nombre"
         />
-        <Text style={styles.subtitle }>Código</Text>
-        <Text style = {{fontSize: 30}}>{codigo}</Text>
-        <Text style={styles.subtitle}>Rol </Text>
-        <View style={{ width: 240, height: 150 }}>
+
+        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>
+          Código
+        </Text>
+        <Text
+          style={{
+            fontSize: 30 * scaleFactor,
+            marginLeft: "4%",
+            color: "black",
+          }}
+        >
+          {codigo}
+        </Text>
+
+        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginBottom: 5 }]}>
+          Rol
+        </Text>
+        {/* Se reduce la altura del contenedor del Picker para Rol */}
+        <View
+          style={{
+            width: 240 * (width / 375),
+            height: 80 * (height / 667), // Reducido de 100 a 80
+          }}
+        >
           <Picker
             selectedValue={tipoUsuario}
-            itemStyle={styles.text}
+            itemStyle={[styles.text, { fontSize: 16 * scaleFactor }]}
             onValueChange={(itemValue) => DeftipoUsuario(itemValue)}
           >
-            <Picker.Item
-              label="Selecciona una opción"
-              value="Selecciona una opción"
-            />
-            <Picker.Item
-              label="Prestador de servicio"
-              value="Prestador de servicio"
-            />
+            <Picker.Item label="Selecciona una opción" value="Selecciona una opción" />
+            <Picker.Item label="Prestador de servicio" value="Prestador de servicio" />
             <Picker.Item label="Practicante" value="Practicante" />
           </Picker>
         </View>
-        <Text style={styles.subtitle}>Centro Universitario</Text>
-        <View style={{ width: 240, height: 150 }}>
+
+        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -40 }]}>
+          Centro Universitario
+        </Text>
+        {/* Reducir también la altura del contenedor del Picker para Centro Universitario */}
+        <View
+          style={{
+            width: 240 * (width / 375),
+            height: 80 * (height / 667), // Reducido de 100 a 80
+          }}
+        >
           <Picker
             selectedValue={selectedCentro}
-            itemStyle={styles.text}
+            itemStyle={[styles.text, { fontSize: 16 * scaleFactor }]}
             onValueChange={(itemValue) => {
               setSelectedCentro(itemValue);
-              setSelectedDepartamento(null); // Reset the Departamento picker
+              setSelectedDepartamento(null);
             }}
           >
-            <Picker.Item
-              label="Selecciona una opción"
-              value="Selecciona una opción"
-            />
+            <Picker.Item label="Selecciona una opción" value="Selecciona una opción" />
             {centros.map((centro) => (
-              <Picker.Item
-                key={centro.id}
-                label={centro.Nombre}
-                value={centro.id}
-              />
+              <Picker.Item key={centro.id} label={centro.Nombre} value={centro.id} />
             ))}
           </Picker>
         </View>
-        {selectedCentro && selectedCentro !== "Selecciona una opción" && departamentos.length > 0 && (
-          <>
-            <Text style={styles.subtitle}>Selecciona un Departamento</Text>
-            <View style={{ width: 240, height: 150 }}>
-              <Picker
-                selectedValue={selectedDepartamento}
-                itemStyle={styles.text}
-                onValueChange={(itemValue) =>
-                  setSelectedDepartamento(itemValue)
-                }
+
+        {selectedCentro &&
+          selectedCentro !== "Selecciona una opción" &&
+          departamentos.length > 0 && (
+            <>
+              <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -40 }]}>
+                Selecciona un Departamento
+              </Text>
+              <View
+                style={{
+                  width: 240 * (width / 375),
+                  height: 80 * (height / 667), // Reducido de 100 a 80
+                }}
               >
-                <Picker.Item
-                  label="Selecciona una opción"
-                  value="Selecciona una opción"
-                />
-                {departamentos.map((departamento) => (
-                  <Picker.Item
-                    key={departamento.id}
-                    label={departamento.NombreDepartamento}
-                    value={departamento.id}
-                  />
-                ))}
-              </Picker>
-            </View>
-          </>
-        )}
-        <Text style={styles.subtitle}>Contraseña </Text>
+                <Picker
+                  selectedValue={selectedDepartamento}
+                  itemStyle={[styles.text, { fontSize: 16 * scaleFactor }]}
+                  onValueChange={(itemValue) => setSelectedDepartamento(itemValue)}
+                >
+                  <Picker.Item label="Selecciona una opción" value="Selecciona una opción" />
+                  {departamentos.map((departamento) => (
+                    <Picker.Item
+                      key={departamento.id}
+                      label={departamento.NombreDepartamento}
+                      value={departamento.id}
+                    />
+                  ))}
+                </Picker>
+              </View>
+            </>
+          )}
+
+        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -40 }]}>
+          Contraseña
+        </Text>
         <TextInput
-          style={styles.input}
+          style={[styles.input, { fontSize: 16 * scaleFactor }]}
           secureTextEntry={true}
-          onChangeText={(text) => {
-            DefContraseña(text);
-          }}
+          onChangeText={(text) => DefContraseña(text)}
           value={Contraseña}
           placeholder="Contraseña"
         />
+
         <Pressable
-          style={styles.btnRegistro}
+          style={[styles.btnRegistro, { marginBottom: height * 0.24 }]}
           onPress={() => {
-            console.log(codigo.length);
             if (
               Nombre !== "" &&
               tipoUsuario !== "" &&
@@ -189,14 +223,16 @@ export default function PaginaModUsuario({ navigation }) {
                 );
                 navigation.goBack();
               } else {
-                Alert.alert("Digite un codigo valido");
+                Alert.alert("Digite un código válido");
               }
             } else {
               Alert.alert("Por favor rellene todos los datos, o cancele");
             }
           }}
         >
-          <Text style={styles.txtBtn}>Modificar</Text>
+          <Text style={[styles.txtBtn, { fontSize: 16 * scaleFactor }]}>
+            Modificar
+          </Text>
         </Pressable>
       </ScrollView>
     </ImageBackground>
@@ -205,13 +241,12 @@ export default function PaginaModUsuario({ navigation }) {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: Scale > 400 ? 24 : 20,
+    fontSize: 24,
     fontWeight: "bold",
-    //marginRight: 30,
     color: "black",
   },
   subtitle: {
-    fontSize: Scale > 400 ? 18 : 14,
+    fontSize: 18,
     marginLeft: "4%",
     color: "black",
   },
@@ -226,15 +261,11 @@ const styles = StyleSheet.create({
     resizeMode: "cover",
   },
   formContainer: {
-    height: "50%",
-    //marginBottom: "20%",
     width: "84%",
   },
   titleContainer: {
     alignItems: "center",
     marginBottom: "10%",
-    marginTop: "55%",
-    //backgroundColor: "green",
   },
   input: {
     height: 40,
@@ -242,38 +273,9 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#C5E0F2",
     borderRadius: 50,
-    //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
-  //Terminan las sombras
-  btnContainer: {
-    alignItems: "center",
-
-    backgroundColor: "yellow",
-    width: "84%",
-    height: "10%",
-  },
-  btnIngresar: {
-    backgroundColor: "#2272A7",
-    height: "20%",
-    width: "32%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: "4%",
-    borderRadius: 10,
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
+    elevation: 15,
+    shadowColor: "#333333",
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
@@ -285,26 +287,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: "24%",
     borderRadius: 10,
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
+    elevation: 15,
+    shadowColor: "#333333",
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-  },
-  separator: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 20,
-    marginTop: "5%",
-    marginBottom: "5%",
-  },
-  line: {
-    height: 1,
-    width: 120,
-    backgroundColor: "black",
   },
 });

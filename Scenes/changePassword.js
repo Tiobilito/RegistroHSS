@@ -1,17 +1,17 @@
+import React, { useState } from "react";
 import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
+  useWindowDimensions,
   TextInput,
   Alert,
   ImageBackground,
   Pressable,
+  SafeAreaView,
 } from "react-native";
-import { useState } from "react";
 import { changePassword, checkUser } from "../Modulos/OperacionesBD";
 
-const Scale = Dimensions.get("window").width;
 const image = require("../assets/Back.png");
 
 export default function ChangePassword({ navigation }) {
@@ -19,6 +19,9 @@ export default function ChangePassword({ navigation }) {
   const [code, setCode] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setnewPassword] = useState("");
+
+  // Obtén las dimensiones actuales de la pantalla
+  const { width, height } = useWindowDimensions();
 
   async function verificationUser() {
     try {
@@ -50,78 +53,72 @@ export default function ChangePassword({ navigation }) {
     }
   }
 
-  return (
-    <ImageBackground source={image} style={styles.imgBackground}>
-      {isVer != true ? (
-        <>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>Cambiar contraseña</Text>
-          </View>
-          <View style={styles.subtitleContainer}>
-            <Text style={styles.subtitle}>Código</Text>
-            <TextInput
-              style={styles.input}
-              value={code}
-              placeholder="Código"
-              onChangeText={setCode}
-            />
-          </View>
+  // Función simple para escalar fuentes (puedes personalizarla)
+  const scaleFont = (size) => (width / 375) * size;
 
-          <Pressable
-            style={styles.btnIngresar}
-            onPress={verificationUser}
-          >
-            <Text style={styles.txtBtn}>Cambiar contraseña</Text>
-          </Pressable>
-        </>
-      ) : (
-        <>
-          <View style={{ width: "80%", gap: 20 }}>
-            <Text style={styles.subtitle}>Escribe la nueva contraseña</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Contraseña"
-              placeholderTextColor="#888"
-              secureTextEntry
-              value={password}
-              onChangeText={setPassword}
-            />
-            <Text style={styles.subtitle}>
-              Escribe nuevamente la contraseña
-            </Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nueva contraseña"
-              placeholderTextColor="#888"
-              secureTextEntry
-              value={newPassword}
-              onChangeText={setnewPassword}
-            />
-          </View>
-          <Pressable style={styles.btnIngresar} onPress={verification}>
-            <Text style={styles.txtBtn}>Cambiar contraseña</Text>
-          </Pressable>
-        </>
-      )}
-    </ImageBackground>
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      <ImageBackground source={image} style={styles.imgBackground}>
+        {!isVer ? (
+          <>
+            <View style={styles.titleContainer}>
+              <Text style={[styles.title, { fontSize: scaleFont(24) }]}>
+                Cambiar contraseña
+              </Text>
+            </View>
+            <View style={styles.subtitleContainer}>
+              <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
+                Código
+              </Text>
+              <TextInput
+                style={styles.input}
+                value={code}
+                placeholder="Código"
+                onChangeText={setCode}
+              />
+            </View>
+
+            <Pressable style={[styles.btnIngresar, { width: "60%" }]} onPress={verificationUser}>
+              <Text style={styles.txtBtn}>Cambiar contraseña</Text>
+            </Pressable>
+          </>
+        ) : (
+          <>
+            <View style={{ width: "80%", marginVertical: 20 }}>
+              <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
+                Escribe la nueva contraseña
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Contraseña"
+                placeholderTextColor="#888"
+                secureTextEntry
+                value={password}
+                onChangeText={setPassword}
+              />
+              <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
+                Escribe nuevamente la contraseña
+              </Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Nueva contraseña"
+                placeholderTextColor="#888"
+                secureTextEntry
+                value={newPassword}
+                onChangeText={setnewPassword}
+              />
+            </View>
+            <Pressable style={[styles.btnIngresar, { width: "60%" }]} onPress={verification}>
+              <Text style={styles.txtBtn}>Cambiar contraseña</Text>
+            </Pressable>
+          </>
+        )}
+      </ImageBackground>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontSize: Scale > 400 ? 24 : 20,
-    fontWeight: "bold",
-    color: "black",
-  },
-  subtitle: {
-    fontSize: Scale > 400 ? 18 : 14,
-    marginLeft: "4%",
-    color: "black",
-  },
-  txtBtn: {
-    color: "white",
-    fontWeight: "bold",
-  },
   imgBackground: {
     flex: 1,
     alignItems: "center",
@@ -130,20 +127,26 @@ const styles = StyleSheet.create({
   },
   titleContainer: {
     alignItems: "center",
-    marginBottom: "10%",
+    marginBottom: "5%",
   },
   subtitleContainer: {
-    alignItems: "flex-start",
-    width: "90%",
+    alignSelf: "stretch",
+    paddingHorizontal: "5%",
+  },
+  title: {
+    fontWeight: "bold",
+    color: "black",
+  },
+  subtitle: {
+    marginBottom: 5,
+    color: "black",
   },
   input: {
-    height: 40,
+    height: 45,
     width: "100%",
-    margin: 12,
-    padding: 10,
+    paddingHorizontal: 10,
     backgroundColor: "#C5E0F2",
     borderRadius: 10,
-    alignSelf: "center",
     elevation: 15,
     shadowColor: "#333333",
     shadowOffset: {
@@ -152,12 +155,11 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    marginBottom: 15,
   },
   btnIngresar: {
     backgroundColor: "#2272A7",
-    height: "8%",
-    width: "40%",
-    marginTop: "8%",
+    paddingVertical: 12,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
@@ -169,5 +171,10 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    marginTop: 20,
+  },
+  txtBtn: {
+    color: "white",
+    fontWeight: "bold",
   },
 });

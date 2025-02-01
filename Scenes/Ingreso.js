@@ -9,6 +9,7 @@ import {
   Dimensions,
   TextInput,
   Alert,
+  useWindowDimensions // <-- Se agregó para obtener dimensiones dinámicas
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/VerificacionUsuario";
@@ -19,6 +20,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
+  const { width, height } = useWindowDimensions(); // <-- Hook para dimensiones dinámicas
   const [Codigo, DefCodigo] = useState("");
   const [Contraseña, DefContraseña] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -87,12 +89,14 @@ export default function PaginaIngreso({ navigation }) {
 
   return (
     <ImageBackground source={image} style={styles.imgBackground}>
-      <View style={styles.formContainer}>
+      {/* Nuevo spacer para bajar los elementos */}
+      <View style={{ height: height * 0.05 }} />
+      <View style={[styles.formContainer, { width: width * 0.8, marginTop: height * 0.05 }]}>
         <View style={styles.titleContainer}>
-          <Text style={styles.title}>Ingresa</Text>
+          <Text style={[styles.title, { fontSize: width > 400 ? 24 : 20 }]}>Ingresa</Text>
         </View>
-        <View style={{ height: "60%" }}>
-          <Text style={styles.subtitle}>Código</Text>
+        <View style={{ height: height * 0.6 }}>
+          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>Código</Text>
           <TextInput
             style={styles.input}
             onChangeText={(text) => {
@@ -101,7 +105,7 @@ export default function PaginaIngreso({ navigation }) {
             keyboardType="numeric"
             value={Codigo}
           />
-          <Text style={styles.subtitle}>Contraseña</Text>
+          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>Contraseña</Text>
           <TextInput
             style={styles.input}
             onChangeText={(text) => {
@@ -113,15 +117,16 @@ export default function PaginaIngreso({ navigation }) {
 
           <View style={styles.btnContainer}>
             <View
+              // Se reduce el height para disminuir el espacio vertical y se iguala a la altura de los botones
               style={{
-                height: "16%",
-                width: "65%",
+                height: height * 0.08, // antes era height * 0.1
+                width: width * 0.65,
                 justifyContent: "space-between",
                 flexDirection: "row",
               }}
             >
               <Pressable
-                style={styles.btnIngresar}
+                style={[styles.btnIngresar, { width: width * 0.25, height: height * 0.06, marginTop: height * 0.02 }]}
                 onPress={() => {
                   if (Codigo != "" && Contraseña != "") {
                     IngresoUsuario();
@@ -135,29 +140,30 @@ export default function PaginaIngreso({ navigation }) {
 
               {biometricAvailable ? (
                 <Pressable
-                  style={{
-                    backgroundColor: "#57A9D9",
-                    justifyContent: "center",
-                    alignContent: "center",
-                    width: "20%",
-                    height: "100%",
-                    borderRadius: 999999,
-                  }}
+                  style={[
+                    {
+                      backgroundColor: "#57A9D9",
+                      justifyContent: "center",
+                      alignItems: "center", // Centra el ícono dentro del botón
+                      borderRadius: 999999,
+                    },
+                    { width: width * 0.2, height: height * 0.06, marginTop: height * 0.02 } // Se iguala la altura a la del botón "Ingresar"
+                  ]}
                   onPress={() => Autentificacion()}
                 >
-                  <Ionicons name="finger-print" size={38} color="black" />
+                  <Ionicons name="finger-print" size={width * 0.1} color="black" />
                 </Pressable>
               ) : null}
-
             </View>
+            
             <View style={styles.separator}>
-              <View style={styles.line} />
+              <View style={[styles.line, { width: width * 0.3 }]} />
               <Text>Ó</Text>
-              <View style={styles.line} />
+              <View style={[styles.line, { width: width * 0.3 }]} />
             </View>
-            <Text style={styles.subtitle}>Si no estas registrado</Text>
+            <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>Si no estas registrado</Text>
             <Pressable
-              style={styles.btnRegistro}
+              style={[styles.btnRegistro, { width: width * 0.3, height: height * 0.06, marginTop: height * 0.02 }]}
               onPress={() => {
                 navigation.navigate("Registro");
               }}
@@ -165,7 +171,7 @@ export default function PaginaIngreso({ navigation }) {
               <Text style={styles.txtBtn}>Registro</Text>
             </Pressable>
             <Pressable
-              style={styles.btnChangePass}
+              style={[styles.btnChangePass, { width: width * 0.7 }]}
               onPress={() => {
                 navigation.navigate("changepassword");
               }}
@@ -176,6 +182,7 @@ export default function PaginaIngreso({ navigation }) {
         </View>
       </View>
     </ImageBackground>
+
   );
 }
 
