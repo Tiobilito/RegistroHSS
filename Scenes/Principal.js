@@ -81,13 +81,13 @@ export default function PaginaIngreso() {
               <Pressable
                 style={styles.btnChrono}
                 onPress={async () => {
-                //  const VLocation = await functionGetLocation(DefUbicacion);
-                 // if (VLocation === true) {
-                 
-                      añadirHoras();
-                      DefMostrarCr(false);
-                  
-                ///  }
+                  //  const VLocation = await functionGetLocation(DefUbicacion);
+                  // if (VLocation === true) {
+
+                  añadirHoras();
+                  DefMostrarCr(false);
+
+                  ///  }
                 }}
               >
                 <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
