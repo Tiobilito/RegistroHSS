@@ -3,160 +3,108 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
   ImageBackground,
   Pressable,
+  Alert,
+  Linking,
 } from "react-native";
 import { añadirHoras } from "../Modulos/db";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
-import { functionGetLocation, validation } from "../Modulos/gps";
-
-const Scale = Dimensions.get("window").width;
+import { functionGetLocation, validation, startBackgroundLocation, stopBackgroundLocation } from "../Modulos/gps";
 
 export default function PaginaIngreso() {
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
   const [Ubicacion, DefUbicacion] = useState(null);
-  let showAll = false;
+
+  useEffect(() => {
+    tomarUsuario();
+  }, []);
 
   const tomarUsuario = async () => {
     let data = await ObtenerDatosUsuario();
     if (data) {
       DefUsuario(data);
-      if (data.Inicio != "null") {
+      if (data.Inicio !== "null") {
         DefFechaInicio(new Date(data.Inicio));
         DefMostrarCr(true);
       }
-    } else {
-      console.log("No hay Usuario");
     }
   };
 
-  if (usuario && Ubicacion) {
-    showAll = true;
-  }
+  const solicitarUbicacion = async () => {
+    const permiso = await functionGetLocation(DefUbicacion);
+    if (!permiso) {
+      Alert.alert(
+        "Permiso necesario",
+        "Debes habilitar la ubicación.",
+        [{ text: "Abrir Configuración", onPress: () => Linking.openSettings() }]
+      );
+      return false;
+    }
+    return true;
+  };
 
-  useEffect(() => {
-    tomarUsuario();
-    functionGetLocation(DefUbicacion);
-  }, []);
+  const iniciarTiempo = async () => {
+    const permisoConcedido = await solicitarUbicacion();
+    if (!permisoConcedido) return;
 
-  const image = require("../assets/fondo.webp");
+    if (await validation(Ubicacion)) {
+      const now = new Date();
+      DefFechaInicio(now);
+      ActualizarInicio(now.toISOString());
+      DefMostrarCr(true);
+
+      // Iniciar seguimiento en background
+      startBackgroundLocation(detenerTiempo);
+    } else {
+      Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
+    }
+  };
+
+  const detenerTiempo = async () => {
+    añadirHoras();
+    DefMostrarCr(false);
+    stopBackgroundLocation(); // Detener la ubicación en background
+  };
 
   return (
-    <ImageBackground source={image} style={styles.container}>
-      <View
-        style={{
-          marginTop: "24%",
-          marginBottom: "12%",
-          height: "10%",
-          width: "90%",
-          gap: 16,
-        }}
-      >
+    <ImageBackground source={require("../assets/fondo.webp")} style={styles.container}>
+      <View style={styles.header}>
         <Text style={styles.title}>Bienvenido</Text>
         <Text style={styles.subtitle}>Registro de horas</Text>
       </View>
-      {showAll ? (
-        <View
-          style={{
-            backgroundColor: "#ffffff",
-            width: "90%",
-            height: "50%",
-            borderRadius: 200,
-          }}
-        >
-          {MostrarCr ? (
-            <View
-              style={{
-                alignItems: "center",
-                height: "100%",
-                justifyContent: "flex-end",
-                gap: 60,
-              }}
-            >
-              <Cronometro startDate={FechaInicio} />
-              <Pressable
-                style={styles.btnChrono}
-                onPress={async () => {
-                  //  const VLocation = await functionGetLocation(DefUbicacion);
-                  // if (VLocation === true) {
-
-                  añadirHoras();
-                  DefMostrarCr(false);
-
-                  ///  }
-                }}
-              >
-                <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
-                  Detener tiempo
-                </Text>
-              </Pressable>
-            </View>
-          ) : (
-            <View
-              style={{
-                alignItems: "center",
-                justifyContent: "flex-end",
-                height: "100%",
-                gap: 60,
-              }}
-            >
-              <Text style={styles.timeText}>00:00:00</Text>
-              <Pressable
-                style={styles.btnChrono}
-                onPress={async () => {
-                  const now = new Date();
-                  const VLocation = await functionGetLocation(DefUbicacion);
-                  if (VLocation === true) {
-                    if (await validation(Ubicacion)) {
-                      DefFechaInicio(now);
-                      ActualizarInicio(now.toISOString());
-                      DefMostrarCr(true);
-                    } else {
-                      Alert.alert("No estas dentro del Departamento :(");
-                    }
-                  }
-                }}
-              >
-                <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
-                  Iniciar tiempo
-                </Text>
-              </Pressable>
-            </View>
-          )}
-        </View>
-      ) : (
-        <Text>Cargando...</Text>
-      )}
+      <View style={styles.timerContainer}>
+        {MostrarCr ? (
+          <View style={styles.timerContent}>
+            <Cronometro startDate={FechaInicio} />
+            <Pressable style={styles.btnChrono} onPress={detenerTiempo}>
+              <Text style={styles.btnText}>Detener tiempo</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={styles.timerContent}>
+            <Text style={styles.timeText}>00:00:00</Text>
+            <Pressable style={styles.btnChrono} onPress={iniciarTiempo}>
+              <Text style={styles.btnText}>Iniciar tiempo</Text>
+            </Pressable>
+          </View>
+        )}
+      </View>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    resizeMode: "cover",
-  },
-  Content: {
-    margin: 50,
-  },
-  Boton: {
-    color: "red",
-  },
-  title: {
-    fontSize: Scale > 400 ? 24 : 20,
-    fontWeight: "bold",
-    color: "black",
-  },
-  subtitle: {
-    fontSize: Scale > 400 ? 24 : 20,
-    fontWeight: "regular",
-    color: "black",
-  },
+  container: { flex: 1, alignItems: "center" },
+  header: { marginTop: "24%", marginBottom: "12%", height: "10%", width: "90%", gap: 16 },
+  title: { fontSize: 24, fontWeight: "bold", color: "black" },
+  subtitle: { fontSize: 24, fontWeight: "regular", color: "black" },
+  timerContainer: { backgroundColor: "#ffffff", width: "90%", height: "50%", borderRadius: 200 },
+  timerContent: { alignItems: "center", height: "100%", justifyContent: "flex-end", gap: 60 },
+  timeText: { fontSize: 48, fontWeight: "bold" },
   btnChrono: {
     backgroundColor: "#2272A7",
     height: "16%",
@@ -165,17 +113,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: "8%",
     borderRadius: 10,
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
   },
-  timeText: {
-    fontSize: 48,
-    fontWeight: "bold",
-  },
+  btnText: { color: "#ffffff", fontWeight: "bold" },
 });
