@@ -4,7 +4,6 @@ import {
   Text,
   View,
   Dimensions,
-  Alert,
   ImageBackground,
   Pressable,
 } from "react-native";
@@ -111,15 +110,15 @@ export default function PaginaIngreso() {
                 onPress={async () => {
                   const now = new Date();
                   const VLocation = await functionGetLocation(DefUbicacion);
-                 // if (VLocation === true) {
-                    //if (await validation(Ubicacion)) {
+                  if (VLocation === true) {
+                    if (await validation(Ubicacion)) {
                       DefFechaInicio(now);
                       ActualizarInicio(now.toISOString());
                       DefMostrarCr(true);
-                  //  } else {
-                   //   Alert.alert("No estas dentro del Departamento :(");
-                   // }
-                 // }
+                    } else {
+                      Alert.alert("No estas dentro del Departamento :(");
+                    }
+                  }
                 }}
               >
                 <Text style={{ color: "#ffffff", fontWeight: "bold" }}>
