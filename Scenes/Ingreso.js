@@ -61,7 +61,16 @@ export default function PaginaIngreso({ navigation }) {
 
   const IngresoUsuario = async () => {
     const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
-    if (BUsuario === true) {
+
+    // Verificar si el código y contraseña corresponden al supervisor
+    if (Codigo === "123456789" && Contraseña === "1234") {
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: "Supervisor" }], // Redirige al supervisor
+        })
+      );
+    } else if (BUsuario === true) {
       const data = await ObtenerDatosUsuario();
       if (data.Contraseña != Contraseña) {
         ActualizarContraseña(Contraseña);
@@ -69,7 +78,7 @@ export default function PaginaIngreso({ navigation }) {
       navigation.dispatch(
         CommonActions.reset({
           index: 0,
-          routes: [{ name: "Tab" }],
+          routes: [{ name: "Tab" }], // Redirige a la página principal si es prestador de servicio
         })
       );
     } else {

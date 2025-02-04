@@ -227,3 +227,31 @@ export async function obtenerHoras(codigo) {
   }
   return data;
 }
+
+// Función para obtener los estudiantes desde la base de datos
+export async function obtenerEstudiantes() {
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .select("*")
+    .eq("TipoServidor", "Practicante"); // Obtener solo los estudiantes (practicantes)
+  
+  if (error) {
+    console.error("Error al obtener estudiantes:", error);
+    return [];
+  }
+  return data;
+}
+
+// Función para actualizar el estado de un estudiante
+export async function actualizarEstadoEstudiante(codigo, estado) {
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .update({ Validado: estado }) // Actualizar el campo 'Validado' con el nuevo estado
+    .eq("Codigo", parseInt(codigo, 10)); // Filtrar por código del estudiante
+
+  if (error) {
+    console.error("Error al actualizar el estado:", error);
+    return false;
+  }
+  return true; // Si todo fue bien, retornar true
+}

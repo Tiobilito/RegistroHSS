@@ -4,6 +4,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { initializeDatabase } from "./Modulos/db";
+import Supervisor from "./Scenes/Supervisor"; // Importamos la pantalla del Supervisor
 
 import PaginaPrincipal from "./Scenes/Principal";
 import PaginaRegistro from "./Scenes/Registro";
@@ -82,6 +83,7 @@ export default function App() {
         <Stack.Screen name="Registro" component={PaginaRegistro} />
         <Stack.Screen name="changepassword" component={changepassword}/>
         <Stack.Screen name="Tab" component={TabNavigation} />
+        <Stack.Screen name="Supervisor" component={Supervisor} />
       </Stack.Navigator>
     </NavigationContainer>
   );
