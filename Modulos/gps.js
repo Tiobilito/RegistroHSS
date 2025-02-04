@@ -9,12 +9,16 @@ export const obtenerUbicacion = async () => {
   try {
     let { status } = await Location.requestForegroundPermissionsAsync();
     if (status !== "granted") {
+      console.log("Permiso de ubicación denegado.");
       return null;
     }
-    return await Location.getCurrentPositionAsync({
+    let location = await Location.getCurrentPositionAsync({
       accuracy: Location.Accuracy.High,
     });
+    console.log("Ubicación obtenida (Foreground):", location);
+    return location;
   } catch (error) {
+    console.error("Error obteniendo la ubicación:", error);
     return null;
   }
 };
@@ -35,7 +39,7 @@ export const validation = async (location) => {
   const lon2 = parseFloat(data.LonDepartamento);
   if (isNaN(lat2) || isNaN(lon2)) return false;
 
-  const R = 6371; // Radio de la Tierra en km
+  const R = 6371;
   const dLat = ((lat2 - latitude) * Math.PI) / 180;
   const dLon = ((lon2 - longitude) * Math.PI) / 180;
   const a =
@@ -45,7 +49,9 @@ export const validation = async (location) => {
       Math.sin(dLon / 2) *
       Math.sin(dLon / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c * 1000; // en metros
+  const distance = R * c * 1000;
+
+  console.log(`Distancia al departamento: ${distance.toFixed(2)}m`);
 
   return distance <= 100;
 };
@@ -53,7 +59,7 @@ export const validation = async (location) => {
 export const startBackgroundLocation = async (stopCronometro) => {
   await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
     accuracy: Location.Accuracy.High,
-    distanceInterval: 10, // Cada 10 metros
+    distanceInterval: 10,
   });
 
   TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data }) => {
@@ -61,8 +67,10 @@ export const startBackgroundLocation = async (stopCronometro) => {
       const { locations } = data;
       if (locations.length > 0) {
         const location = locations[0];
+        console.log("Ubicación obtenida (Background):", location);
         const isInside = await validation(location);
         if (!isInside) {
+          console.log("¡Usuario salió del rango! Deteniendo cronómetro...");
           stopCronometro();
         }
       }
@@ -72,4 +80,5 @@ export const startBackgroundLocation = async (stopCronometro) => {
 
 export const stopBackgroundLocation = async () => {
   await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+  console.log("Seguimiento de ubicación en segundo plano detenido.");
 };
