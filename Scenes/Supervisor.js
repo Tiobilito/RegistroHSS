@@ -189,6 +189,11 @@ const styles = StyleSheet.create({
   },
   filtersContainer: {
     marginBottom: 20,
+    backgroundColor: "#fcfcfc", // Fondo gris claro para los filtros
+    borderRadius: 10, // Bordes redondeados para los filtros
+    padding: 15, // Espaciado interno
+    borderColor: "grey", // Borde negro
+    borderWidth: 0.3, // Grosor del borde
   },
   filterRow: {
     flexDirection: "row",
@@ -199,6 +204,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    padding: 10, // Padding para dar espacio alrededor del filtro
+    borderRadius: 10, // Bordes redondeados para los filtros
   },
   filterText: {
     fontSize: 16,
@@ -211,6 +218,10 @@ const styles = StyleSheet.create({
     justifyContent: "flex-start", // Alinear el texto y el picker a la izquierda
     alignItems: "center", // Asegura que el texto y el picker estén centrados
     marginBottom: 10,
+    backgroundColor: "#fcfcfc", // Fondo gris claro para los filtros
+    borderRadius: 10,
+    borderColor: "grey", // Borde negro
+    borderWidth: 0.3, // Grosor del borde
   },
   text: {
     fontSize: 16, // Nombre más pequeño para que todo se acomode
@@ -218,9 +229,11 @@ const styles = StyleSheet.create({
     width: "40%", // Ajuste para que el nombre ocupe menos espacio
   },
   pickerContainer: {
-    width: "50%", // Hacer el Picker más estrecho
+    width: "55%", // Hacer el Picker más estrecho
     flexDirection: "row",
     alignItems: "center", // Alinear el círculo con el Picker
+    borderRadius: 10, // Bordes redondeados
+    padding: 5, // Padding para el Picker
   },
   picker: {
     height: 50,
