@@ -14,6 +14,7 @@ import PaginaIngreso from "./Scenes/Ingreso";
 import changepassword from "./Scenes/changePassword";
 import PaginaAyuda from "./Scenes/Ayuda";
 import PaginaModUsuario from "./Scenes/ModificarUsuario";
+import PaginaHorario from "./Scenes/Horario";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -77,11 +78,12 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Test">
         <Stack.Screen name="Ingreso" component={PaginaIngreso} />
         <Stack.Screen name="Registro" component={PaginaRegistro} />
         <Stack.Screen name="changepassword" component={changepassword}/>
         <Stack.Screen name="Tab" component={TabNavigation} />
+        <Stack.Screen name="Test" component={PaginaHorario} />
       </Stack.Navigator>
     </NavigationContainer>
   );
