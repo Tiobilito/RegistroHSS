@@ -14,19 +14,24 @@ export const ObtenerDatosUsuario = async () => {
   }
 };
 
-export const GuardarDatosUsuario = async (codigo, contraseña, Dlatitud, Dlongitud) => {
+export const GuardarDatosUsuario = async (
+  codigo,
+  contraseña,
+  Dlatitud,
+  Dlongitud
+) => {
   try {
     const data = {
       Codigo: codigo.toString(),
       Contraseña: contraseña,
       Inicio: "null",
       LatDepartamento: Dlatitud,
-      LonDepartamento: Dlongitud
+      LonDepartamento: Dlongitud,
     };
     const jsonData = JSON.stringify(data);
     await AsyncStorage.setItem("@UserData", jsonData);
     console.log("Datos guardados correctamente: ", jsonData);
-    return codigo
+    return codigo;
   } catch (error) {
     console.error("Error al guardar los datos: ", error);
   }
@@ -35,7 +40,7 @@ export const GuardarDatosUsuario = async (codigo, contraseña, Dlatitud, Dlongit
 export const ActualizarInicio = async (valorInicio) => {
   try {
     const jsonData = await AsyncStorage.getItem("@UserData");
-    console.log("lo que llega a actualizar inicio es",jsonData)
+    console.log("lo que llega a actualizar inicio es", jsonData);
     if (jsonData != null) {
       const userData = JSON.parse(jsonData);
       userData.Inicio = valorInicio;
@@ -91,5 +96,29 @@ export const BorrarDatosUsuario = async () => {
     console.log("Datos borrados correctamente");
   } catch (error) {
     console.error("Error al borrar los datos: ", error);
+  }
+};
+
+export const GuardarHorarioUsuario = async (horario) => {
+  try {
+    const jsonData = JSON.stringify(horario);
+    await AsyncStorage.setItem("@Horario", jsonData);
+    console.log("Horario guardado correctamente");
+  } catch (error) {
+    console.error("Error al guardar el horario: ", error);
+  }
+};
+
+export const ObtenerHorarioUsuario = async () => {
+  try {
+    const jsonData = await AsyncStorage.getItem("@Horario");
+    if (jsonData != null) {
+      return JSON.parse(jsonData);
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error al obtener el horario: ", error);
+    return null;
   }
 };

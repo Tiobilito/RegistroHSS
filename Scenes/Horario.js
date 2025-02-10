@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  Button,
+  Alert,
 } from "react-native";
+import { GuardarHorarioUsuario, ObtenerHorarioUsuario } from "../Modulos/InfoUsuario";
+import { RespaldarHorarioUsuario } from "../Modulos/OperacionesBD";
 
 // Días de la semana
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
@@ -51,6 +55,57 @@ const PaginaHorario = () => {
   // Crear un arreglo de horas desde las 7 hasta las 21 (9:00 PM) inclusive.
   const hours = Array.from({ length: 21 - 7 + 1 }, (_, i) => i + 7);
 
+  // Función para guardar el horario en AsyncStorage
+  const guardarHorario = async () => {
+    try {
+      const horarioExistente = await ObtenerHorarioUsuario();
+      if (horarioExistente) {
+        Alert.alert(
+          "Confirmación",
+          "Ya existe un horario registrado. ¿Desea sobrescribirlo?",
+          [
+            {
+              text: "Cancelar",
+              style: "cancel",
+            },
+            {
+              text: "Sobrescribir",
+              onPress: async () => {
+                await GuardarHorarioUsuario(scheduleData);
+                await RespaldarHorarioUsuario();
+                Alert.alert("Horario guardado y respaldado exitosamente.");
+              },
+            },
+          ]
+        );
+      } else {
+        await GuardarHorarioUsuario(scheduleData);
+        await RespaldarHorarioUsuario();
+        Alert.alert("Horario guardado y respaldado exitosamente.");
+      }
+    } catch (error) {
+      console.error("Error guardando el horario:", error);
+      Alert.alert("Error guardando el horario.");
+    }
+  };
+
+  // Función para cargar el horario desde AsyncStorage
+  const cargarHorario = async () => {
+    try {
+      const horario = await ObtenerHorarioUsuario();
+      if (horario != null) {
+        setScheduleData(horario);
+      }
+    } catch (error) {
+      console.error("Error cargando el horario:", error);
+    }
+  };
+
+  // Cargar el horario al iniciar la ventana
+  useEffect(() => {
+    cargarHorario();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.userName}>{userName}</Text>
@@ -95,6 +150,7 @@ const PaginaHorario = () => {
           </View>
         </ScrollView>
       </ScrollView>
+      <Button title="Guardar Horario" onPress={guardarHorario} />
     </View>
   );
 };

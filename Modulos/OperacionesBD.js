@@ -1,5 +1,10 @@
 import { supabase } from "./supabase";
-import { ObtenerDatosUsuario, ActualizarContraseña, ActualizarLatLong } from "./InfoUsuario";
+import {
+  ObtenerDatosUsuario,
+  ActualizarContraseña,
+  ActualizarLatLong,
+  ObtenerHorarioUsuario,
+} from "./InfoUsuario";
 import { Alert } from "react-native";
 
 export async function AñadeUsuario(
@@ -34,7 +39,7 @@ export async function ModificaUsuario(
   tipoUsuario,
   codigo,
   contraseña,
-  idDepart,
+  idDepart
 ) {
   const { data, error } = await supabase
     .from("Usuarios")
@@ -50,7 +55,7 @@ export async function ModificaUsuario(
     return;
   } else {
     const data = await ObtenerDatosUsuario();
-    if(contraseña != data.Contraseña) {
+    if (contraseña != data.Contraseña) {
       await ActualizarContraseña(contraseña);
     }
     const departamento = await obtenerDepartamento(idDepart);
@@ -226,4 +231,31 @@ export async function obtenerHoras(codigo) {
     return [];
   }
   return data;
+}
+
+// Función para respaldar el horario del usuario en la base de datos
+export async function RespaldarHorarioUsuario() {
+  try {
+    const userData = await ObtenerDatosUsuario();
+    const horario = await ObtenerHorarioUsuario();
+    if (userData && horario) {
+      const { data, error } = await supabase
+        .from("Usuarios")
+        .update({ Horario: horario })
+        .eq("Codigo", parseInt(userData.Codigo, 10));
+      if (error) {
+        console.error("Error al respaldar el horario:", error);
+        Alert.alert("Error al respaldar el horario.");
+      } else {
+        console.log("Horario respaldado correctamente:", data);
+        Alert.alert("Horario respaldado correctamente.");
+      }
+    } else {
+      console.log("No se encontraron datos de usuario o horario.");
+      Alert.alert("No se encontraron datos de usuario o horario.");
+    }
+  } catch (error) {
+    console.error("Error al respaldar el horario:", error);
+    Alert.alert("Error al respaldar el horario.");
+  }
 }
