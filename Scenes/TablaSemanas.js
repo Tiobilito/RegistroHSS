@@ -12,6 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import ModalFormulario from "../Modulos/ModalFormularioHoras";
+import ModalReporte from "../Modulos/ModalReporte";  // Importamos el nuevo modal
 import {
   añadirHoraModal,
   obtenerHorasUsuario,
@@ -21,10 +22,10 @@ import {
 
 export default function PaginaTablaSemanas({ navigation }) {
   const { width, height } = useWindowDimensions();
-  // Definimos un scaleFactor basado en un ancho base de 375
   const scaleFactor = width / 375;
 
   const [modalVisible, DetModalVisible] = useState(false);
+  const [modalReporteVisible, DetModalReporteVisible] = useState(false); // Nuevo estado para el modal de reporte
   const [Horas, DefHoras] = useState([]);
   const [Semanas, DefSemanas] = useState([]);
   const [MostrarSemanas, DefMostrarSemanas] = useState(false);
@@ -39,17 +40,63 @@ export default function PaginaTablaSemanas({ navigation }) {
     day: "",
     month: "",
     year: "",
+    fechaReporte: "",
+    horasReportadas: "",
+    periodoInicio: "",
+    periodoFin: "",
+    descripcion: "",  // Añadimos la propiedad descripcion
   });
 
+  // Función para actualizar la descripción
+  const handleDescripcionChange = (text) => {
+    setFormData({
+      ...formData,
+      descripcion: text,  // Actualizamos la propiedad descripcion
+    });
+  };
   // Función para construir una fecha a partir de los valores del formulario
   const construirFecha = (day, month, year, hours, minutes, seconds) => {
     return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
   };
 
+  // Función para obtener el periodo de las semanas seleccionadas
+  const obtenerPeriodo = () => {
+    if (semanasSeleccionadas.length === 0) return { periodoInicio: "", periodoFin: "" };
+    
+    const semanasSeleccionadasData = Semanas.filter((semana) =>
+      semanasSeleccionadas.includes(semana.id)
+    );
+
+    semanasSeleccionadasData.sort((a, b) => new Date(a.Inicio) - new Date(b.Inicio));
+
+    const periodoInicio = semanasSeleccionadasData[0].Inicio;
+    const periodoFin = semanasSeleccionadasData[semanasSeleccionadasData.length - 1].Fin;
+
+    return { periodoInicio, periodoFin };
+  };
+
+  // Abrir modal para el formulario de horas
   const openModal = () => {
     DetModalVisible(true);
   };
 
+  // Abrir modal para el reporte de semanas seleccionadas
+  const openModalReporte = () => {
+    const { periodoInicio, periodoFin } = obtenerPeriodo();
+    const horasReportadas = calcularTotalSeleccionado();  // Calcula las horas reportadas
+
+    setFormData({
+      ...formData,
+      fechaReporte: new Date().toLocaleDateString(),
+      horasReportadas: horasReportadas,
+      periodoInicio: periodoInicio,
+      periodoFin: periodoFin,
+    });
+
+    DetModalReporteVisible(true);
+  };
+
+  // Cerrar el modal de horas
   const closeModal = () => {
     DetModalVisible(false);
     setFormData({
@@ -63,8 +110,9 @@ export default function PaginaTablaSemanas({ navigation }) {
     });
   };
 
+  // Cerrar y enviar el reporte
   const closeModalAndSent = async () => {
-    DetModalVisible(false);
+    DetModalReporteVisible(false);
     console.log(formData);
     const {
       day,
@@ -77,7 +125,6 @@ export default function PaginaTablaSemanas({ navigation }) {
       exitMinutes,
       exitSeconds,
     } = formData;
-    // Construir las fechas de entrada y salida
     const fechaEntrada = construirFecha(
       day,
       month,
@@ -106,16 +153,16 @@ export default function PaginaTablaSemanas({ navigation }) {
     });
   };
 
+  // Obtener horas de usuario
   const obtenerHoras = async () => {
     const HorasSemana = await obtenerHorasUsuario();
-    console.log("Horas: ", HorasSemana);
     DefHoras(HorasSemana);
   };
 
+  // Obtener semanas de usuario
   const obtenerSemanas = async () => {
     try {
       const SemanasBD = await obtenerSemanasUsuario();
-      console.log("Semanas: ", SemanasBD);
       DefSemanas(SemanasBD);
       DefMostrarSemanas(SemanasBD);
     } catch (e) {
@@ -130,6 +177,7 @@ export default function PaginaTablaSemanas({ navigation }) {
     }, [])
   );
 
+  // Manejar cambios en el checkbox
   const handleCheckboxChange = (idSem) => {
     setSemanasSeleccionadas((prevSeleccionadas) =>
       prevSeleccionadas.includes(idSem)
@@ -138,6 +186,7 @@ export default function PaginaTablaSemanas({ navigation }) {
     );
   };
 
+  // Calcular total de horas seleccionadas
   const calcularTotalSeleccionado = () => {
     const horasSeleccionadas = Horas.filter((hora) =>
       semanasSeleccionadas.includes(hora.idSemana)
@@ -153,7 +202,6 @@ export default function PaginaTablaSemanas({ navigation }) {
       style={[styles.container, { width, height }]}
       resizeMode="cover"
     >
-      {/* Título */}
       <View
         style={{
           width: "90%",
@@ -181,7 +229,6 @@ export default function PaginaTablaSemanas({ navigation }) {
         Horas formato de total HH:MM:SS
       </Text>
 
-      {/* Contenedor de la lista */}
       <View
         style={[
           styles.listContainer,
@@ -191,7 +238,6 @@ export default function PaginaTablaSemanas({ navigation }) {
           },
         ]}
       >
-        {/* Botón Refresh */}
         <Pressable
           style={{
             marginTop: -5,
@@ -217,6 +263,8 @@ export default function PaginaTablaSemanas({ navigation }) {
         >
           Fecha de inicio - Fecha de fin
         </Text>
+
+        {/* Botón para abrir el modal de horas */}
         <Pressable
           style={{
             marginTop: -height * 0.04,
@@ -227,7 +275,23 @@ export default function PaginaTablaSemanas({ navigation }) {
           <Ionicons name="add-circle" size={50 * scaleFactor} />
         </Pressable>
 
-        {/* Modal para el formulario de horas */}
+        {/* Botón para abrir el nuevo modal de reporte */}
+        <Pressable
+          style={{
+            marginTop: height * 0,  // Ajustamos este valor para que esté justo entre los dos botones de arriba y los registros
+            marginLeft: width * 0.35,
+          }}
+          onPress={openModalReporte}
+          disabled={semanasSeleccionadas.length === 0}
+        >
+          <Ionicons
+            name="document-text"
+            size={50 * scaleFactor}
+            color={semanasSeleccionadas.length === 0 ? "gray" : "black"}
+          />
+        </Pressable>
+
+
         <ModalFormulario
           modalVisible={modalVisible}
           closeModal={closeModal}
@@ -236,6 +300,14 @@ export default function PaginaTablaSemanas({ navigation }) {
           setFormData={setFormData}
           handleDateChange={(field, value) => {}}
           handleTimeChange={(field, value) => {}}
+        />
+
+        {/* Modal de reporte */}
+        <ModalReporte
+          modalVisible={modalReporteVisible}
+          closeModal={() => DetModalReporteVisible(false)}
+          closeModalAndSent={closeModalAndSent}
+          formData={formData}
         />
 
         {MostrarSemanas ? (
