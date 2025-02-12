@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
-import { ObtenerDatosUsuario, ActualizarInicio } from "./InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarInicio, BorrarHorarioUsuario } from "./InfoUsuario";
 import NetInfo from "@react-native-community/netinfo";
-import { añadirHorasSup, obtenerHoras } from "./OperacionesBD";
+import { añadirHorasSup, ImportarHorarioDesdeSupa, ObtenerHorarioDesdeSupa, obtenerHoras } from "./OperacionesBD";
 
 const db = SQLite.openDatabaseSync("Horario.db");
 
@@ -233,31 +233,32 @@ export const BorrarTSemHoras = async () => {
 };
 
 export const ImportarDeSupaBD = async () => {
-   
   const Usuario = await ObtenerDatosUsuario();
   const HorasSupa = await obtenerHoras(Usuario.Codigo);
   let idSemana;
   for (let i = 0; i < HorasSupa.length; i++) {
     const hora = HorasSupa[i];
     idSemana = await ChecarSemana(new Date(hora.DateInicio));
-    try {
-      db.runSync(
-        `INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);`,
-        [
-          hora.DateInicio,
-          hora.Inicio,
-          hora.Final,
-          hora.Total,
-          hora.CodigoUsuario,
-          parseInt(hora.IsBackedInSupabase, 10),
-          idSemana,
-        ]
-      );
-      console.log("Registro de horas añadido exitosamente");
-    } catch (error) {
-      console.error("Error al añadir el registro de horas:", error);
-    }
+    db.runSync(
+      `INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+      [
+        hora.DateInicio,
+        hora.Inicio,
+        hora.Final,
+        hora.Total,
+        hora.CodigoUsuario,
+        parseInt(hora.IsBackedInSupabase, 10),
+        idSemana,
+      ]
+    );
+    console.log("Registro de horas añadido exitosamente");
   }
+
+  // Borrar el horario local antes de importar el nuevo horario
+  await BorrarHorarioUsuario();
+
+  // Importar el horario del usuario desde Supabase
+  await ObtenerHorarioDesdeSupa(Usuario.Codigo);
 };
 
 export const ObtenerIniSemana = async (FRef) => {

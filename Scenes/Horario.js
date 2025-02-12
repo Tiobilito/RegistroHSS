@@ -22,9 +22,6 @@ const formatHour = (hour) => {
 };
 
 const PaginaHorario = () => {
-  // Nombre del usuario (ejemplo)
-  const userName = "Juan Pérez";
-
   // Estado de asistencia: cada día contiene un arreglo de horas (números) en las que el usuario asiste.
   // Inicialmente, se crea un objeto con cada día y un arreglo vacío.
   const initialSchedule = days.reduce(
@@ -108,7 +105,7 @@ const PaginaHorario = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.userName}>{userName}</Text>
+      <Text style={styles.Header}>Horario de Asistencia</Text>
       <ScrollView>
         <ScrollView horizontal>
           <View style={styles.grid}>
@@ -161,7 +158,7 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     backgroundColor: "#fff",
   },
-  userName: {
+  Header: {
     fontSize: 20,
     fontWeight: "bold",
     textAlign: "center",
@@ -173,7 +170,7 @@ const styles = StyleSheet.create({
   },
   cell: {
     width: 100,
-    height: 50,
+    height: 100,
     borderWidth: 1,
     borderColor: "#ccc",
     justifyContent: "center",

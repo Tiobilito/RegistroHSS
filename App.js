@@ -56,6 +56,8 @@ const TabNavigation = () => {
             iconName = focused ? "cog" : "cog-outline";
           } else if (route.name === "Ayuda") {
             iconName = focused ? "help-circle" : "help-circle-outline";
+          } else if (route.name === "Horario") {
+            iconName = focused ? "today" : "today-outline";
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -66,6 +68,7 @@ const TabNavigation = () => {
       <Tab.Screen name="Principal" component={PaginaPrincipal} />
       <Tab.Screen name="Horas" component={TablaSemHoras} />
       <Tab.Screen name="Ayuda" component={PaginaAyuda} />
+      <Tab.Screen name="Horario" component={PaginaHorario} />
       <Tab.Screen name="Ajustes" component={TabAjustes} />
     </Tab.Navigator>
   );
@@ -79,12 +82,11 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Test">
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Ingreso" component={PaginaIngreso} />
         <Stack.Screen name="Registro" component={PaginaRegistro} />
         <Stack.Screen name="changepassword" component={changepassword}/>
         <Stack.Screen name="Tab" component={TabNavigation} />
-        <Stack.Screen name="Test" component={PaginaHorario} />
       </Stack.Navigator>
     </NavigationContainer>
   );

@@ -4,6 +4,7 @@ import {
   ActualizarContraseña,
   ActualizarLatLong,
   ObtenerHorarioUsuario,
+  GuardarHorarioUsuario,
 } from "./InfoUsuario";
 import { Alert } from "react-native";
 
@@ -245,17 +246,36 @@ export async function RespaldarHorarioUsuario() {
         .eq("Codigo", parseInt(userData.Codigo, 10));
       if (error) {
         console.error("Error al respaldar el horario:", error);
-        Alert.alert("Error al respaldar el horario.");
       } else {
-        console.log("Horario respaldado correctamente:", data);
+        console.log("Horario respaldado correctamente:");
         Alert.alert("Horario respaldado correctamente.");
       }
     } else {
       console.log("No se encontraron datos de usuario o horario.");
-      Alert.alert("No se encontraron datos de usuario o horario.");
     }
   } catch (error) {
     console.error("Error al respaldar el horario:", error);
     Alert.alert("Error al respaldar el horario.");
+  }
+}
+
+// Función para obtener el horario del usuario desde Supabase
+export async function ObtenerHorarioDesdeSupa(Codigo) {
+  const { data: usuario, error } = await supabase
+    .from("Usuarios")
+    .select("Horario")
+    .eq("Codigo", parseInt(Codigo, 10))
+    .single();
+
+  if (error) {
+    console.error("Error al obtener el horario desde Supabase:", error);
+    return;
+  }
+
+  if (usuario && usuario.Horario) {
+    await GuardarHorarioUsuario(usuario.Horario);
+    console.log("Horario importado y guardado localmente.");
+  } else {
+    console.log("No se encontró horario para el usuario.");
   }
 }

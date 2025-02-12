@@ -14,19 +14,14 @@ export const ObtenerDatosUsuario = async () => {
   }
 };
 
-export const GuardarDatosUsuario = async (
-  codigo,
-  contraseña,
-  Dlatitud,
-  Dlongitud
-) => {
+export const GuardarDatosUsuario = async (codigo, contraseña, Dlatitud, Dlongitud) => {
   try {
     const data = {
       Codigo: codigo.toString(),
       Contraseña: contraseña,
       Inicio: "null",
       LatDepartamento: Dlatitud,
-      LonDepartamento: Dlongitud,
+      LonDepartamento: Dlongitud
     };
     const jsonData = JSON.stringify(data);
     await AsyncStorage.setItem("@UserData", jsonData);
@@ -120,5 +115,14 @@ export const ObtenerHorarioUsuario = async () => {
   } catch (error) {
     console.error("Error al obtener el horario: ", error);
     return null;
+  }
+};
+
+export const BorrarHorarioUsuario = async () => {
+  try {
+    await AsyncStorage.removeItem("@Horario");
+    console.log("Horario borrado correctamente");
+  } catch (error) {
+    console.error("Error al borrar el horario: ", error);
   }
 };
