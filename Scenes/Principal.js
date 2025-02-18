@@ -12,7 +12,12 @@ import {
 import { añadirHoras } from "../Modulos/db";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
-import { functionGetLocation, validation, startBackgroundLocation, stopBackgroundLocation } from "../Modulos/gps";
+import {
+  functionGetLocation,
+  validation,
+  startBackgroundLocation,
+  stopBackgroundLocation,
+} from "../Modulos/gps";
 
 export default function PaginaIngreso() {
   const { width, height } = useWindowDimensions();
@@ -46,11 +51,9 @@ export default function PaginaIngreso() {
   const solicitarUbicacion = async () => {
     const permiso = await functionGetLocation(DefUbicacion);
     if (!permiso) {
-      Alert.alert(
-        "Permiso necesario",
-        "Debes habilitar la ubicación.",
-        [{ text: "Abrir Configuración", onPress: () => Linking.openSettings() }]
-      );
+      Alert.alert("Permiso necesario", "Debes habilitar la ubicación.", [
+        { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
+      ]);
       return false;
     }
     return true;
@@ -80,7 +83,10 @@ export default function PaginaIngreso() {
   };
 
   return (
-    <ImageBackground source={require("../assets/fondo.webp")} style={styles.container}>
+    <ImageBackground
+      source={require("../assets/fondo.webp")}
+      style={styles.container}
+    >
       <View style={styles.header}>
         <Text style={styles.title}>Bienvenido</Text>
         <Text style={styles.subtitle}>Registro de horas</Text>
@@ -108,11 +114,27 @@ export default function PaginaIngreso() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, alignItems: "center" },
-  header: { marginTop: "24%", marginBottom: "12%", height: "10%", width: "90%", gap: 16 },
+  header: {
+    marginTop: "24%",
+    marginBottom: "12%",
+    height: "10%",
+    width: "90%",
+    gap: 16,
+  },
   title: { fontSize: 24, fontWeight: "bold", color: "black" },
   subtitle: { fontSize: 24, fontWeight: "regular", color: "black" },
-  timerContainer: { backgroundColor: "#ffffff", width: "90%", height: "50%", borderRadius: 200 },
-  timerContent: { alignItems: "center", height: "100%", justifyContent: "flex-end", gap: 60 },
+  timerContainer: {
+    backgroundColor: "#ffffff",
+    width: "90%",
+    height: "50%",
+    borderRadius: 200,
+  },
+  timerContent: {
+    alignItems: "center",
+    height: "100%",
+    justifyContent: "flex-end",
+    gap: 60,
+  },
   timeText: { fontSize: 48, fontWeight: "bold" },
   btnChrono: {
     backgroundColor: "#2272A7",
