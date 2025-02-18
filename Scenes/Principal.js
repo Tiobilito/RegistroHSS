@@ -7,6 +7,7 @@ import {
   Pressable,
   Alert,
   Linking,
+  useWindowDimensions,
 } from "react-native";
 import { añadirHoras } from "../Modulos/db";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
@@ -14,6 +15,14 @@ import { Cronometro } from "../Modulos/Cronometro";
 import { functionGetLocation, validation, startBackgroundLocation, stopBackgroundLocation } from "../Modulos/gps";
 
 export default function PaginaIngreso() {
+  const { width, height } = useWindowDimensions();
+  const scaleFactor = width / 375;
+
+  // Definir dimensiones para el botón oval
+  const buttonWidth = 100 * scaleFactor; // Ajusta este valor
+  const buttonHeight = 60 * scaleFactor; // Ajusta este valor
+  const iconSize = buttonHeight * 0.8; // El ícono ocupará el 80% de la altura del botón
+
   const [usuario, DefUsuario] = useState(null);
   const [MostrarCr, DefMostrarCr] = useState(false);
   const [FechaInicio, DefFechaInicio] = useState(new Date());
@@ -110,6 +119,9 @@ const styles = StyleSheet.create({
     height: "16%",
     width: "32%",
     justifyContent: "center",
+  },
+  content: {
+    flex: 1,
     alignItems: "center",
     marginBottom: "8%",
     borderRadius: 10,

@@ -5,9 +5,9 @@ import {
   View,
   FlatList,
   ImageBackground,
-  Scale,
   Pressable,
   Alert,
+  useWindowDimensions,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
@@ -15,16 +15,19 @@ import { BorrarHora, obtenerHorasSemana, sumarTiempos } from "../Modulos/db";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function PaginaTablaHoras({ navigation }) {
+  const { width, height } = useWindowDimensions();
+  const scaleFactor = width / 375; // Ancho base: 375
   const route = useRoute();
   const { idSem } = route.params;
-  const [Horas, DefHoras] = useState([]);
-  const [MostrarHoras, DefMostrarHoras] = useState(false);
+  
+  const [Horas, setHoras] = useState([]);
+  const [MostrarHoras, setMostrarHoras] = useState(false);
 
   const obtenerHoras = async () => {
     const HorasSemana = await obtenerHorasSemana(idSem);
-    console.log("horas semana",HorasSemana)
-    DefHoras(HorasSemana);
-    DefMostrarHoras(HorasSemana);
+    console.log("horas semana", HorasSemana);
+    setHoras(HorasSemana);
+    setMostrarHoras(HorasSemana);
   };
 
   useFocusEffect(
@@ -36,38 +39,87 @@ export default function PaginaTablaHoras({ navigation }) {
   const image = require("../assets/fondo.webp");
 
   return (
-    <ImageBackground source={image} style={styles.container}>
+    <ImageBackground
+      source={image}
+      style={[styles.container, { width, height }]}
+      resizeMode="cover"
+    >
+      {/* Encabezado */}
       <View
         style={{
-          width: "90%",
-          marginTop: "8%",
+          width: width * 0.9,
+          marginTop: height * 0.08,
         }}
       >
-        <Text style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "bold" }}>
+        <Text
+          style={{
+            fontSize: scaleFactor > 1 ? 24 : 20,
+            fontWeight: "bold",
+            color: "white",
+          }}
+        >
           Tabla de horas:
         </Text>
         <Text
-          style={{ fontSize: Scale > 400 ? 24 : 20, fontWeight: "regular" }}
+          style={{
+            fontSize: scaleFactor > 1 ? 24 : 20,
+            fontWeight: "400",
+            color: "white",
+          }}
         >
           Horas formato de total HH:MM:SS
         </Text>
       </View>
-      <View style={styles.listContainer}>
+
+      {/* Contenedor de la lista */}
+      <View
+        style={[
+          styles.listContainer,
+          {
+            width: width * 0.9,
+            height: height * 0.7,
+            marginTop: height * 0.08,
+            padding: width * 0.04,
+          },
+        ]}
+      >
         {MostrarHoras ? (
           <>
             <FlatList
               data={Horas}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <View style={styles.item}>
+                <View
+                  style={[
+                    styles.item,
+                    {
+                      padding: width * 0.03,
+                      marginTop: height * 0.02,
+                    },
+                  ]}
+                >
                   {item.IsBackedInSupabase == 0 ? (
-                    <Ionicons name="cloud-offline" size={30} color="white" />
+                    <Ionicons
+                      name="cloud-offline"
+                      size={30 * scaleFactor}
+                      color="white"
+                    />
                   ) : (
-                    <Ionicons name="cloud" size={30} color="white" />
+                    <Ionicons
+                      name="cloud"
+                      size={30 * scaleFactor}
+                      color="white"
+                    />
                   )}
-                  <Text style={styles.txt}>Inicio: {item.Inicio}</Text>
-                  <Text style={styles.txt}>Final: {item.Final}</Text>
-                  <Text style={styles.txt}>Total: {item.Total}</Text>
+                  <Text style={[styles.txt, { fontSize: 16 * scaleFactor }]}>
+                    Inicio: {item.Inicio}
+                  </Text>
+                  <Text style={[styles.txt, { fontSize: 16 * scaleFactor }]}>
+                    Final: {item.Final}
+                  </Text>
+                  <Text style={[styles.txt, { fontSize: 16 * scaleFactor }]}>
+                    Total: {item.Total}
+                  </Text>
                   <Pressable
                     style={{ padding: 10 }}
                     onPress={() => {
@@ -77,7 +129,8 @@ export default function PaginaTablaHoras({ navigation }) {
                         [
                           {
                             text: "Cancelar",
-                            onPress: () => console.log("Borrado Cancelado"),
+                            onPress: () =>
+                              console.log("Borrado Cancelado"),
                             style: "cancel",
                           },
                           {
@@ -91,22 +144,41 @@ export default function PaginaTablaHoras({ navigation }) {
                       );
                     }}
                   >
-                    <View style={{ marginLeft: 200, marginTop: -65 }}>
-                      <Ionicons name="trash" size={50} color="white" />
+                    <View
+                      style={{
+                        marginLeft: width * 0.5,
+                        marginTop: -height * 0.08,
+                      }}
+                    >
+                      <Ionicons
+                        name="trash"
+                        size={50 * scaleFactor}
+                        color="white"
+                      />
                     </View>
                   </Pressable>
                 </View>
               )}
             />
-            <View style={{ marginTop: 20 }}>
-              <Text style={{ fontSize: 18, fontWeight: "bold", width: "auto" }}>
-                Total acumulado en la semana: ({" "}
-                {sumarTiempos(Horas.map((item) => item.Total))} )
+
+            <View style={{ marginTop: height * 0.02 }}>
+              <Text
+                style={{
+                  fontSize: 18 * scaleFactor,
+                  fontWeight: "bold",
+                  width: "auto",
+                  color: "white",
+                }}
+              >
+                Total acumulado en la semana: (
+                {sumarTiempos(Horas.map((item) => item.Total))})
               </Text>
             </View>
           </>
         ) : (
-          <Text>No hay registros</Text>
+          <Text style={{ color: "white", fontSize: 18 * scaleFactor }}>
+            No hay registros
+          </Text>
         )}
       </View>
     </ImageBackground>
@@ -114,48 +186,33 @@ export default function PaginaTablaHoras({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  txtMain: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  txt: {
-    color: "white",
-  },
   container: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    resizeMode: "cover",
+  },
+  txt: {
+    color: "white",
+  },
+  listContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    // Sombras para Android
+    elevation: 15,
+    // Sombras para iOS
+    shadowColor: "#333333",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
   },
   item: {
     backgroundColor: "#2272A7",
     borderRadius: 20,
-    marginTop: "2%",
-    // //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    padding: 10,
-  },
-  listContainer: {
-    backgroundColor: "#ffffff",
-    width: "90%",
-    height: "70%",
-    borderRadius: 20,
-    marginTop: "8%",
-    padding: "4%",
-    //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
+    // Sombras para Android
+    elevation: 15,
+    // Sombras para iOS
+    shadowColor: "#333333",
+    shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
