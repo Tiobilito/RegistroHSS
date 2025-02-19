@@ -13,12 +13,9 @@ import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import ModalFormulario from "../Modulos/ModalFormularioHoras";
 import ModalReporte from "../Modulos/ModalReporte";  // Importamos el nuevo modal
-import {
-  añadirHoraModal,
-  obtenerHorasUsuario,
-  obtenerSemanasUsuario,
-  sumarTiempos,
-} from "../Modulos/Base de Datos Sqlite/SQLiteIni";
+import { añadirHoraModal, obtenerHorasUsuario } from "../Modulos/Base de Datos Sqlite/Horas";
+import { obtenerSemanasUsuario } from "../Modulos/Base de Datos Sqlite/Semanas";
+import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades";
 
 export default function PaginaTablaSemanas({ navigation }) {
   const { width, height } = useWindowDimensions();

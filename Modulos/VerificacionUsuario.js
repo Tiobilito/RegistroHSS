@@ -1,5 +1,6 @@
 import { supabase } from "./supabase";
-import { BorrarTSemHoras, ExportarASupaBD, ImportarDeSupaBD } from "./Base de Datos Sqlite/SQLiteIni";
+import { BorrarTSemHoras } from "./Base de Datos Sqlite/Semanas";
+import { ExportarASupaBD, ImportarDeSupaBD } from "./Base de Datos Sqlite/Horas";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 

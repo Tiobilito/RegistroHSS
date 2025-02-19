@@ -1,4 +1,4 @@
-import { db } from "./SQLiteIni";
+import { db } from "./SqliteIni";
 import { ObtenerDatosUsuario } from "../InfoUsuario";
 
 export const ObtenerIniSemana = async (FRef) => {

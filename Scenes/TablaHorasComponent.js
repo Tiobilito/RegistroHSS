@@ -10,7 +10,8 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { BorrarHora, sumarTiempos, obtenerHorasSemana } from "../Modulos/Base de Datos Sqlite/SQLiteIni";
+import { BorrarHora, obtenerHorasSemana } from "../Modulos/Base de Datos Sqlite/Horas";
+import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades";
 
 export default function PaginaTablaHorasComponent({ idSem }) {
   const { width, height } = useWindowDimensions();

@@ -9,7 +9,7 @@ import {
   Linking,
   useWindowDimensions,
 } from "react-native";
-import { añadirHoras } from "../Modulos/Base de Datos Sqlite/SQLiteIni";
+import { añadirHoras } from "../Modulos/Base de Datos Sqlite/Horas";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
 import {
