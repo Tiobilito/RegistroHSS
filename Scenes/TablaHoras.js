@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import { useRoute } from "@react-navigation/native";
-import { BorrarHora, obtenerHorasSemana, sumarTiempos } from "../Modulos/Base de Datos Sqlite/db";
+import { BorrarHora, obtenerHorasSemana, sumarTiempos } from "../Modulos/Base de Datos Sqlite/SQLiteIni";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function PaginaTablaHoras({ navigation }) {

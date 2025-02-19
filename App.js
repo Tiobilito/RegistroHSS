@@ -4,7 +4,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { initializeDatabase } from "./Modulos/Base de Datos Sqlite/db";
+import { initializeDatabase } from "./Modulos/Base de Datos Sqlite/SQLiteIni";
 import Supervisor from "./Scenes/Supervisor"; // Importamos la pantalla del Supervisor
 
 import PaginaPrincipal from "./Scenes/Principal";

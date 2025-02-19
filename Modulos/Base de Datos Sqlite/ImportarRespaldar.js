@@ -1,4 +1,4 @@
-import { db } from "./db";
+import { db } from "./SQLiteIni";
 import { añadirHorasSup } from "../OperacionesBD";
 import { ObtenerDatosUsuario } from "./Usuario";
 import { ChecarSemana, BorrarHorarioUsuario } from "./Semanas";

@@ -18,7 +18,7 @@ import {
   obtenerHorasUsuario,
   obtenerSemanasUsuario,
   sumarTiempos,
-} from "../Modulos/Base de Datos Sqlite/db";
+} from "../Modulos/Base de Datos Sqlite/SQLiteIni";
 
 export default function PaginaTablaSemanas({ navigation }) {
   const { width, height } = useWindowDimensions();
