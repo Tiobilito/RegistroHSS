@@ -1,7 +1,7 @@
 import * as SQLite from "expo-sqlite";
-import { ObtenerDatosUsuario, ActualizarInicio, BorrarHorarioUsuario } from "./InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarInicio, BorrarHorarioUsuario } from "../InfoUsuario";
 import NetInfo from "@react-native-community/netinfo";
-import { añadirHorasSup, ImportarHorarioDesdeSupa, ObtenerHorarioDesdeSupa, obtenerHoras } from "./OperacionesBD";
+import { añadirHorasSup, ObtenerHorarioDesdeSupa, obtenerHoras } from "../OperacionesBD";
 
 const db = SQLite.openDatabaseSync("Horario.db");
 
