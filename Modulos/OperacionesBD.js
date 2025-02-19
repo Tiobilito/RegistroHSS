@@ -281,26 +281,19 @@ export async function ObtenerHorarioDesdeSupa(Codigo) {
 }
 
 // Función para obtener todos los estudiantes desde la base de datos
-export async function obtenerEstudiantes() {
+export async function obtenerPrestadores(idDepartamento) {
   const { data, error } = await supabase
     .from("Usuarios")
-    .select("*");  // Seleccionamos todos los campos de todos los registros
-
+    .select("*")
+    .eq("TipoServidor", "Prestador de servicio")
+    .eq("idDepartamento", idDepartamento);
   if (error) {
-    console.error("Error al obtener estudiantes:", error);
-    return [];  // En caso de error, retornamos un array vacío
+    console.error("Error al obtener los aspirantes:", error);
+    return [];
   }
-
-  // Filtrar los estudiantes que tienen un código con exactamente 9 caracteres
-  const estudiantesConCodigoValido = data.filter((estudiante) => {
-    // Verificar que el código tiene 9 caracteres
-    const codigoString = estudiante.Codigo.toString();  // Asegurarse de que es un string
-    return codigoString.length === 9;
-  });
-
-  console.log("Estudiantes obtenidos (con 9 caracteres en el código):", estudiantesConCodigoValido);  // Verifica los datos filtrados
-  return estudiantesConCodigoValido;  // Retorna solo los estudiantes con código de 9 dígitos
+  return data;
 }
+  
 
 
 // Función para actualizar el estado de un estudiante

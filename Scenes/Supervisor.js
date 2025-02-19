@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, FlatList, Alert, TouchableOpacity, ImageBackground } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { obtenerEstudiantes, actualizarEstadoEstudiante } from "../Modulos/OperacionesBD"; // Función para actualizar el estado
+import { obtenerPrestadores, actualizarEstadoEstudiante } from "../Modulos/OperacionesBD"; // Función para actualizar el estado
 
 export default function Supervisor({ navigation }) {
   const [estudiantes, setEstudiantes] = useState([]);
@@ -13,7 +13,7 @@ export default function Supervisor({ navigation }) {
   // Cargar los estudiantes
   useEffect(() => {
     const fetchEstudiantes = async () => {
-      const data = await obtenerEstudiantes(); // Obtener los estudiantes desde la base de datos
+      const data = await obtenerPrestadores(); // Obtener los estudiantes desde la base de datos
       setEstudiantes(data);
       setFilteredEstudiantes(data); // Inicializar la lista filtrada
     };
@@ -59,7 +59,7 @@ export default function Supervisor({ navigation }) {
     if (result) {
       Alert.alert(`Estudiante con código ${codigo} ha sido ${estado}.`);
       // Recargar los estudiantes después de la actualización
-      const updatedEstudiantes = await obtenerEstudiantes();
+      const updatedEstudiantes = await obtenerPrestadores();
       setEstudiantes(updatedEstudiantes);
       setFilteredEstudiantes(updatedEstudiantes); // Actualizar la lista filtrada también
     } else {
