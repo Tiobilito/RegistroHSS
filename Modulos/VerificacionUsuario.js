@@ -36,7 +36,8 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
     .from("Usuarios")
     .select("*")
     .eq("Codigo", parseInt(Codigo, 10))
-    .eq("Contraseña", Contraseña);
+    .eq("Contraseña", Contraseña)
+    .eq("Validado", true);
 
   if (errorUsuario) {
     console.log("Hubo un error: " + errorUsuario);
