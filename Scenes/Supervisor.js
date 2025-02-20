@@ -8,6 +8,7 @@ export default function Supervisor({ navigation }) {
   const [estudiantes, setEstudiantes] = useState([]);
   const [estado, setEstado] = useState(""); // Guardaremos el estado a asignar
   const [filteredEstudiantes, setFilteredEstudiantes] = useState([]); // Lista filtrada de estudiantes
+  const [UserD, setUserD] = useState(null); 
 
   const image = require("../assets/Back.png"); // Ruta de la imagen de fondo
 
@@ -15,7 +16,8 @@ export default function Supervisor({ navigation }) {
   useEffect(() => {
     const fetchEstudiantes = async () => {
       const dataU = await ObtenerDatosUsuario();
-      const data = await obtenerPrestadores(dataU.idDepartamento); 
+      setUserD(dataU);
+      const data = await obtenerPrestadores(UserD.idDepartamento); 
       setEstudiantes(data);
       setFilteredEstudiantes(data); 
     };
@@ -61,7 +63,7 @@ export default function Supervisor({ navigation }) {
     if (result) {
       Alert.alert(`Estudiante con código ${codigo} ha sido ${estado}.`);
       // Recargar los estudiantes después de la actualización
-      const updatedEstudiantes = await obtenerPrestadores();
+      const updatedEstudiantes = await obtenerPrestadores(UserD.idDepartamento);
       setEstudiantes(updatedEstudiantes);
       setFilteredEstudiantes(updatedEstudiantes); // Actualizar la lista filtrada también
     } else {
