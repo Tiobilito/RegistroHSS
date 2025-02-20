@@ -143,7 +143,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    position: "relative", // para posicionar el botón de forma absoluta
+    position: "relative", 
+    marginTop: -80,
   },
   timerDisplay: {
     flex: 1,
