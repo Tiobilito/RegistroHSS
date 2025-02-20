@@ -10,7 +10,7 @@ import {
   Pressable,
   SafeAreaView,
 } from "react-native";
-import { changePassword, checkUser } from "../Modulos/OperacionesBD";
+import { changePassword, checkUser } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 
 const image = require("../assets/Back.png");
 

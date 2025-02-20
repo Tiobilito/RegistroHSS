@@ -1,5 +1,5 @@
 import { db } from "./SQLiteIni";
-import { añadirHorasSup } from "../OperacionesBD";
+import { añadirHorasSup } from "../Operaciones Supabase/HorasSupa";
 import { ObtenerDatosUsuario } from "./Usuario";
 import { ChecarSemana, BorrarHorarioUsuario } from "./Semanas";
 

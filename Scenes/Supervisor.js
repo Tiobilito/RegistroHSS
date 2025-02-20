@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, FlatList, Alert, TouchableOpacity, ImageBackground } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { obtenerPrestadores, actualizarEstadoEstudiante } from "../Modulos/OperacionesBD"; // Función para actualizar el estado
+import { obtenerPrestadores, actualizarEstadoPrestador } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 
 export default function Supervisor({ navigation }) {
   const [estudiantes, setEstudiantes] = useState([]);
@@ -55,7 +55,7 @@ export default function Supervisor({ navigation }) {
     }
 
     // Actualizar estado del estudiante en la base de datos
-    const result = await actualizarEstadoEstudiante(codigo, estadoFinal);
+    const result = await actualizarEstadoPrestador(codigo, estadoFinal);
     if (result) {
       Alert.alert(`Estudiante con código ${codigo} ha sido ${estado}.`);
       // Recargar los estudiantes después de la actualización

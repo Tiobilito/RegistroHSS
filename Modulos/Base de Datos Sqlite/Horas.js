@@ -3,7 +3,7 @@ import { ObtenerDatosUsuario } from "../InfoUsuario";
 import { formatearFechaHora, calcularDiferenciaHoras } from "./Utilidades";
 import { ActualizarInicio, ChecarSemana, ObtenerIniSemana } from "./Semanas";
 import NetInfo from "@react-native-community/netinfo";
-import { añadirHorasSup } from "../OperacionesBD";
+import { añadirHorasSup } from "../Operaciones Supabase/HorasSupa";
 
 export const BorrarHora = async (idHora, idSemana) => {
   const data = await ObtenerDatosUsuario();

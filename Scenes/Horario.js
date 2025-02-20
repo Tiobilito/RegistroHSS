@@ -9,7 +9,7 @@ import {
   Alert,
 } from "react-native";
 import { GuardarHorarioUsuario, ObtenerHorarioUsuario } from "../Modulos/InfoUsuario";
-import { RespaldarHorarioUsuario } from "../Modulos/OperacionesBD";
+import { RespaldarHorarioUsuario } from "../Modulos/Operaciones Supabase/Horario";
 
 // Días de la semana
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
