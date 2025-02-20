@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, FlatList, Alert, TouchableOpacity, ImageBackground } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { obtenerPrestadores, actualizarEstadoPrestador } from "../Modulos/Operaciones Supabase/UsuariosSupa";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function Supervisor({ navigation }) {
   const [estudiantes, setEstudiantes] = useState([]);
@@ -13,9 +14,10 @@ export default function Supervisor({ navigation }) {
   // Cargar los estudiantes
   useEffect(() => {
     const fetchEstudiantes = async () => {
-      const data = await obtenerPrestadores(); // Obtener los estudiantes desde la base de datos
+      const dataU = await ObtenerDatosUsuario();
+      const data = await obtenerPrestadores(dataU.idDepartamento); 
       setEstudiantes(data);
-      setFilteredEstudiantes(data); // Inicializar la lista filtrada
+      setFilteredEstudiantes(data); 
     };
 
     fetchEstudiantes();

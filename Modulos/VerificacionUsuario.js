@@ -9,7 +9,7 @@ const alertLoging = () => {
   return new Promise((resolve) => {
     Alert.alert(
       "Confirmación",
-      "El usuario es diferente al ya registrado, si se logea el todo lo que no este respaldado se borrara, esta seguro de continuar ? (El nuevo usuario no tendra su tiempo iniciado)",
+      "El usuario es diferente al ya registrado, si se logea el todo lo que no este respaldado se borrará, ¿está seguro de continuar? (El nuevo usuario no tendrá su tiempo iniciado)",
       [
         {
           text: "Cancelar",
@@ -44,6 +44,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
   }
   // Verificar si se encontró algún usuario correspondiente a la información obtenida del usuario
   if (usuarios.length > 0) {
+    const tipoServidor = usuarios[0].TipoServidor; // Extraemos el tipo de servidor
     const idDepartamento = usuarios[0].idDepartamento;
     // Buscar el departamento correspondiente al usuario
     const { data: departamentos, error: errorDepartamento } = await supabase
@@ -51,9 +52,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
       .select("Latitud, Longitud")
       .eq("id", idDepartamento);
     if (errorDepartamento) {
-      console.log(
-        "Hubo un error al buscar el departamento: " + errorDepartamento
-      );
+      console.log("Hubo un error al buscar el departamento: " + errorDepartamento);
       return false;
     }
     // Verificar si se encontró algún departamento
@@ -72,7 +71,9 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
               Codigo,
               Contraseña,
               latitud.toString(),
-              longitud.toString()
+              longitud.toString(),
+              tipoServidor,
+              idDepartamento
             );
             await ImportarDeSupaBD();
             return true;
@@ -85,12 +86,13 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
           return true;
         }
       } else {
-        // Si no hay usuario local, guardar los datos del usuario actual
+        // Si no hay usuario local, guardar los datos del usuario actual (incluyendo el TipoServidor)
         await GuardarDatosUsuario(
           Codigo,
           Contraseña,
           latitud.toString(),
-          longitud.toString()
+          longitud.toString(),
+          tipoServidor
         );
         await ImportarDeSupaBD();
         return true;

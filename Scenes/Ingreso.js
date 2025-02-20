@@ -1,28 +1,31 @@
+// Ingreso.js
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
   View,
   ImageBackground,
-  Image,
   Pressable,
   Dimensions,
   TextInput,
   Alert,
-  useWindowDimensions // <-- Se agregó para obtener dimensiones dinámicas
+  useWindowDimensions,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/VerificacionUsuario";
-import { ObtenerDatosUsuario, ActualizarContraseña } from "../Modulos/InfoUsuario";
+import {
+  ObtenerDatosUsuario,
+  ActualizarContraseña,
+} from "../Modulos/InfoUsuario";
 import * as LocalAuthentication from "expo-local-authentication";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaIngreso({ navigation }) {
-  const { width, height } = useWindowDimensions(); // <-- Hook para dimensiones dinámicas
-  const [Codigo, DefCodigo] = useState("");
-  const [Contraseña, DefContraseña] = useState("");
+  const { width, height } = useWindowDimensions();
+  const [Codigo, setCodigo] = useState("");
+  const [Contraseña, setContraseña] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
 
@@ -30,10 +33,9 @@ export default function PaginaIngreso({ navigation }) {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
     const isEnrolled = await LocalAuthentication.isEnrolledAsync();
     const data = await ObtenerDatosUsuario();
-    if(hasHardware && isEnrolled && data) {
+    if (hasHardware && isEnrolled && data) {
       setBiometricAvailable(true);
-    } 
-    else {
+    } else {
       setBiometricAvailable(false);
     }
   };
@@ -42,8 +44,8 @@ export default function PaginaIngreso({ navigation }) {
     const result = await LocalAuthentication.authenticateAsync();
     const data = await ObtenerDatosUsuario();
     if (result.success && data) {
-      DefCodigo(data.Codigo);
-      DefContraseña(data.Contraseña);
+      setCodigo(data.Codigo);
+      setContraseña(data.Contraseña);
       setIsAuthenticated(true);
     }
   }
@@ -60,27 +62,28 @@ export default function PaginaIngreso({ navigation }) {
   }, []);
 
   const IngresoUsuario = async () => {
-    const BUsuario = await EncontrarUsuario(Codigo, Contraseña);
-
-    // Verificar si el código y contraseña corresponden al supervisor
-    if (Codigo === "123456789" && Contraseña === "1234") {
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "Supervisor" }], // Redirige al supervisor
-        })
-      );
-    } else if (BUsuario === true) {
+    const isValid = await EncontrarUsuario(Codigo, Contraseña);
+    if (isValid === true) {
       const data = await ObtenerDatosUsuario();
-      if (data.Contraseña != Contraseña) {
+      if (data.Contraseña !== Contraseña) {
         ActualizarContraseña(Contraseña);
       }
-      navigation.dispatch(
-        CommonActions.reset({
-          index: 0,
-          routes: [{ name: "Tab" }], // Redirige a la página principal si es prestador de servicio
-        })
-      );
+      // Si el usuario es supervisor, redirige a la navegación de supervisores; de lo contrario, al tab normal.
+      if (data.TipoServidor && data.TipoServidor.toLowerCase() === "supervisor") {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Supervisor" }],
+          })
+        );
+      } else {
+        navigation.dispatch(
+          CommonActions.reset({
+            index: 0,
+            routes: [{ name: "Tab" }],
+          })
+        );
+      }
     } else {
       setIsAuthenticated(false);
       Alert.alert("Datos incorrectos");
@@ -90,7 +93,7 @@ export default function PaginaIngreso({ navigation }) {
   const checarUsuario = async () => {
     const data = await ObtenerDatosUsuario();
     if (data) {
-      DefCodigo(data.Codigo);
+      setCodigo(data.Codigo);
     }
   };
 
@@ -98,46 +101,58 @@ export default function PaginaIngreso({ navigation }) {
 
   return (
     <ImageBackground source={image} style={styles.imgBackground}>
-      {/* Nuevo spacer para bajar los elementos */}
       <View style={{ height: height * 0.05 }} />
-      <View style={[styles.formContainer, { width: width * 0.8, marginTop: height * 0.05 }]}>
+      <View
+        style={[
+          styles.formContainer,
+          { width: width * 0.8, marginTop: height * 0.05 },
+        ]}
+      >
         <View style={styles.titleContainer}>
-          <Text style={[styles.title, { fontSize: width > 400 ? 24 : 20 }]}>Ingresa</Text>
+          <Text style={[styles.title, { fontSize: width > 400 ? 24 : 20 }]}>
+            Ingresa
+          </Text>
         </View>
         <View style={{ height: height * 0.6 }}>
-          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>Código</Text>
+          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>
+            Código
+          </Text>
           <TextInput
             style={styles.input}
-            onChangeText={(text) => {
-              DefCodigo(text);
-            }}
+            onChangeText={(text) => setCodigo(text)}
             keyboardType="numeric"
             value={Codigo}
           />
-          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>Contraseña</Text>
+          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>
+            Contraseña
+          </Text>
           <TextInput
             style={styles.input}
-            onChangeText={(text) => {
-              DefContraseña(text);
-            }}
+            onChangeText={(text) => setContraseña(text)}
             value={Contraseña}
             secureTextEntry={true}
           />
 
           <View style={styles.btnContainer}>
             <View
-              // Se reduce el height para disminuir el espacio vertical y se iguala a la altura de los botones
               style={{
-                height: height * 0.08, // antes era height * 0.1
+                height: height * 0.08,
                 width: width * 0.65,
                 justifyContent: "space-between",
                 flexDirection: "row",
               }}
             >
               <Pressable
-                style={[styles.btnIngresar, { width: width * 0.25, height: height * 0.06, marginTop: height * 0.02 }]}
+                style={[
+                  styles.btnIngresar,
+                  {
+                    width: width * 0.25,
+                    height: height * 0.06,
+                    marginTop: height * 0.02,
+                  },
+                ]}
                 onPress={() => {
-                  if (Codigo != "" && Contraseña != "") {
+                  if (Codigo !== "" && Contraseña !== "") {
                     IngresoUsuario();
                   } else {
                     Alert.alert("Por favor completa los 2 campos");
@@ -153,26 +168,43 @@ export default function PaginaIngreso({ navigation }) {
                     {
                       backgroundColor: "#57A9D9",
                       justifyContent: "center",
-                      alignItems: "center", // Centra el ícono dentro del botón
+                      alignItems: "center",
                       borderRadius: 999999,
                     },
-                    { width: width * 0.2, height: height * 0.06, marginTop: height * 0.02 } // Se iguala la altura a la del botón "Ingresar"
+                    {
+                      width: width * 0.2,
+                      height: height * 0.06,
+                      marginTop: height * 0.02,
+                    },
                   ]}
                   onPress={() => Autentificacion()}
                 >
-                  <Ionicons name="finger-print" size={width * 0.1} color="black" />
+                  <Ionicons
+                    name="finger-print"
+                    size={width * 0.1}
+                    color="black"
+                  />
                 </Pressable>
               ) : null}
             </View>
-            
+
             <View style={styles.separator}>
               <View style={[styles.line, { width: width * 0.3 }]} />
               <Text>Ó</Text>
               <View style={[styles.line, { width: width * 0.3 }]} />
             </View>
-            <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>Si no estas registrado</Text>
+            <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>
+              Si no estás registrado
+            </Text>
             <Pressable
-              style={[styles.btnRegistro, { width: width * 0.3, height: height * 0.06, marginTop: height * 0.02 }]}
+              style={[
+                styles.btnRegistro,
+                {
+                  width: width * 0.3,
+                  height: height * 0.06,
+                  marginTop: height * 0.02,
+                },
+              ]}
               onPress={() => {
                 navigation.navigate("Registro");
               }}
@@ -191,7 +223,6 @@ export default function PaginaIngreso({ navigation }) {
         </View>
       </View>
     </ImageBackground>
-
   );
 }
 
@@ -199,7 +230,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: Scale > 400 ? 24 : 20,
     fontWeight: "bold",
-    //marginRight: 30,
     color: "black",
   },
   subtitle: {
@@ -232,9 +262,8 @@ const styles = StyleSheet.create({
     padding: 10,
     backgroundColor: "#C5E0F2",
     borderRadius: 50,
-    //De aqui para abajo son las sombras para los distintos sistemas
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
+    elevation: 15,
+    shadowColor: "#333333",
     shadowOffset: {
       width: 0,
       height: 6,
@@ -242,9 +271,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
-  //Terminan las sombras
   btnContainer: {
-    //backgroundColor: "green",
     alignItems: "center",
     marginTop: "4%",
   },
@@ -255,8 +282,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
+    elevation: 15,
+    shadowColor: "#333333",
     shadowOffset: {
       width: 0,
       height: 6,
@@ -272,8 +299,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10,
     marginTop: "8%",
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
+    elevation: 15,
+    shadowColor: "#333333",
     shadowOffset: {
       width: 0,
       height: 6,
@@ -289,8 +316,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 10,
     marginTop: "8%",
-    elevation: 15, //Android
-    shadowColor: "#333333", //A partir de aqui ios
+    elevation: 15,
+    shadowColor: "#333333",
     shadowOffset: {
       width: 0,
       height: 6,

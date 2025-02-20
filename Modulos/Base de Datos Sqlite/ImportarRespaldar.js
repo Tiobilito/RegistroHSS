@@ -1,6 +1,7 @@
 import { db } from "./SQLiteIni";
-import { añadirHorasSup } from "../Operaciones Supabase/HorasSupa";
-import { ObtenerDatosUsuario } from "./Usuario";
+import { añadirHorasSup, obtenerHoras } from "../Operaciones Supabase/HorasSupa";
+import { ObtenerDatosUsuario } from "../InfoUsuario";
+import { ObtenerHorarioDesdeSupa } from "../Operaciones Supabase/HorarioSupa";
 import { ChecarSemana, BorrarHorarioUsuario } from "./Semanas";
 
 export const RespaldarRegistroEnSupa = async (registro) => {
