@@ -29,6 +29,8 @@ export async function AñadeUsuario(
     if (error) {
       console.log("Hubo un error", error);
       return;
+    } else {
+      Alert.alert("Usuario Registrado Correctamente, solo puede iniciar sesión después de ser validado por el administrador");
     }
   }
 }
