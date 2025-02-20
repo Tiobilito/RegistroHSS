@@ -1,3 +1,4 @@
+// HorarioSupa.js
 import { supabase } from "./supabase";
 import {
   ObtenerDatosUsuario,
@@ -50,4 +51,44 @@ export async function ObtenerHorarioDesdeSupa(Codigo) {
   } else {
     console.log("No se encontró horario para el usuario.");
   }
+}
+
+// Función para obtener y agrupar los horarios de todos los usuarios desde Supabase
+export async function fetchHorarios() {
+  // Se consultan todos los usuarios obteniendo "Nombre" y "Horario"
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .select("Nombre, Horario");
+
+  if (error) {
+    console.error("Error al obtener usuarios:", error);
+    return null;
+  }
+  // Definimos los días de la semana utilizados en la aplicación
+  const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+  // Inicializamos la estructura: para cada día, horas de 7 a 21 con un arreglo vacío
+  const aggregatedData = days.reduce((acc, day) => {
+    const hoursObj = {};
+    for (let hour = 7; hour <= 21; hour++) {
+      hoursObj[hour] = [];
+    }
+    acc[day] = hoursObj;
+    return acc;
+  }, {});
+  // Recorremos cada usuario y agrupamos sus horarios
+  data.forEach((usuario) => {
+    const { Nombre, Horario } = usuario;
+    // Se asume que "Horario" es un objeto con claves: Lunes, Martes, etc.
+    for (let day in Horario) {
+      if (aggregatedData.hasOwnProperty(day)) {
+        Horario[day].forEach((hour) => {
+          // Solo se agregan las horas entre 7 y 21
+          if (hour >= 7 && hour <= 21) {
+            aggregatedData[day][hour].push({ name: Nombre });
+          }
+        });
+      }
+    }
+  });
+  return aggregatedData;
 }
