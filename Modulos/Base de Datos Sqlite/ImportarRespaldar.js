@@ -54,3 +54,16 @@ export const ImportarDeSupaBD = async () => {
   // Importar el horario del usuario desde Supabase
   await ObtenerHorarioDesdeSupa(Usuario.Codigo);
 };
+
+export const ExportarASupaBD = async () => {
+  try {
+    const HorasARespaldar = await db.getAllAsync(
+      "SELECT * FROM Horas WHERE IsBackedInSupabase = 0"
+    );
+    for (const registro of HorasARespaldar) {
+      await RespaldarRegistroEnSupa(registro);
+    }
+  } catch (error) {
+    console.log("Error al obtener horas: ", error);
+  }
+};

@@ -127,19 +127,6 @@ export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
   }
 };
 
-export const ExportarASupaBD = async () => {
-  try {
-    const HorasARespaldar = await db.getAllAsync(
-      "SELECT * FROM Horas WHERE IsBackedInSupabase = 0"
-    );
-    for (const registro of HorasARespaldar) {
-      await RespaldarRegistroEnSupa(registro);
-    }
-  } catch (error) {
-    console.log("Error al obtener horas: ", error);
-  }
-};
-
 export const obtenerHorasSemana = async (idSemana) => {
   const User = await ObtenerDatosUsuario();
   try {

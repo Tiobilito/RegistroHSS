@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Modal, View, Text, Pressable, StyleSheet, TextInput } from "react-native";
-import { supabase } from "./supabase";
+import { supabase } from "./Operaciones Supabase/supabase";
 import { ObtenerDatosUsuario } from "./InfoUsuario";
 
 const formatDate = (date) => {
