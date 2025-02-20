@@ -92,7 +92,7 @@ export default function Supervisor({ navigation }) {
       resizeMode="cover"
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Supervisor</Text>
+        <Text style={styles.title}>Candidatos Servicio</Text>
 
         {/* Subtítulo para los filtros */}
         <Text style={styles.filterSubtitle}>Filtrar por:</Text>
