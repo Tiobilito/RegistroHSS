@@ -1,5 +1,5 @@
-import { db } from "./SqliteIni";
-import { ObtenerDatosUsuario } from "./Usuarios";
+import { db } from "./SQLiteIni";
+import { ObtenerDatosUsuario } from "../InfoUsuario";
 import { formatearFechaHora, calcularDiferenciaHoras } from "./Utilidades";
 import { ActualizarInicio, ChecarSemana, ObtenerIniSemana } from "./Semanas";
 import NetInfo from "@react-native-community/netinfo";
