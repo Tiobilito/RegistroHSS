@@ -46,6 +46,7 @@ export default function PaginaIngreso() {
     const permiso = await functionGetLocation(setUbicacion);
     if (!permiso) {
       Alert.alert("Permiso necesario", "Debes habilitar la ubicación.", [
+        { text: "Cancelar", style: "cancel" },
         { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
       ]);
       return false;
@@ -54,16 +55,13 @@ export default function PaginaIngreso() {
   };
 
   const iniciarTiempo = async () => {
-    const permisoConcedido = await solicitarUbicacion();
-    if (!permisoConcedido) return;
-
-    if (await validation(ubicacion)) {
+    const location = await solicitarUbicacion();
+    if (!location) return;
+    if (await validation(location)) {
       const now = new Date();
       setFechaInicio(now);
       ActualizarInicio(now.toISOString());
       setMostrarCrono(true);
-
-      // Inicia el seguimiento en background
       startBackgroundLocation(detenerTiempo);
     } else {
       Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
@@ -73,7 +71,7 @@ export default function PaginaIngreso() {
   const detenerTiempo = async () => {
     añadirHoras();
     setMostrarCrono(false);
-    stopBackgroundLocation(); // Detener la ubicación en background
+    stopBackgroundLocation(); 
   };
 
   return (
@@ -143,7 +141,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    position: "relative", 
+    position: "relative",
     marginTop: -80,
   },
   timerDisplay: {
