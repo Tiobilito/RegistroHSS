@@ -1,7 +1,7 @@
 import { db } from "./SQLiteIni";
-import { ObtenerDatosUsuario } from "../InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarInicio } from "../InfoUsuario";
 import { formatearFechaHora, calcularDiferenciaHoras } from "./Utilidades";
-import { ActualizarInicio, ChecarSemana, ObtenerIniSemana } from "./Semanas";
+import { ChecarSemana, ObtenerIniSemana } from "./Semanas";
 import NetInfo from "@react-native-community/netinfo";
 import { añadirHorasSup } from "../Operaciones Supabase/HorasSupa";
 

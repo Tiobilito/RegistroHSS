@@ -43,21 +43,21 @@ export default function PaginaIngreso() {
   };
 
   const solicitarUbicacion = async () => {
-    const permiso = await functionGetLocation(setUbicacion);
-    if (!permiso) {
+    const location = await functionGetLocation(setUbicacion);
+    if (!location) {
       Alert.alert("Permiso necesario", "Debes habilitar la ubicación.", [
         { text: "Cancelar", style: "cancel" },
         { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
       ]);
-      return false;
+      return null;
     }
-    return true;
+    return location;
   };
 
   const iniciarTiempo = async () => {
-    const location = await solicitarUbicacion();
-    if (!location) return;
-    if (await validation(location)) {
+    const permiso = await solicitarUbicacion();
+    if (!permiso || !ubicacion) return;
+    if (await validation(ubicacion)) {
       const now = new Date();
       setFechaInicio(now);
       ActualizarInicio(now.toISOString());

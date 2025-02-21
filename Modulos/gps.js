@@ -25,9 +25,9 @@ export const obtenerUbicacion = async () => {
 
 export const functionGetLocation = async (setLocation) => {
   const location = await obtenerUbicacion();
-  if (!location) return false;
+  if (!location) return null;
   setLocation(location);
-  return true;
+  return location;
 };
 
 export const validation = async (location) => {
