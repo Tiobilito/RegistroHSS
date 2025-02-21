@@ -27,7 +27,7 @@ export default function PaginaIngreso() {
   const [mostrarCrono, setMostrarCrono] = useState(false);
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [ubicacion, setUbicacion] = useState(null);
-  const [showIcon, setShowIcon] = useState(new Animated.Value(0)); // Valor para animación
+  const [showIcon, setShowIcon] = useState(new Animated.Value(0)); // Inicializar en 0 para mostrar el ícono "Play"
   const [showAll, setShowAll] = useState(false); // Estado para controlar si mostrar el contenedor principal o "Cargando..."
 
   useEffect(() => {
@@ -46,36 +46,52 @@ export default function PaginaIngreso() {
     setShowAll(true); // Cambiar a true después de que los datos han sido cargados
   };
 
-  const solicitarUbicacion = async () => {
-    const location = await functionGetLocation(setUbicacion);
-    if (!location) {
-      Alert.alert("Permiso necesario", "Debes habilitar la ubicación en segundo plano.", [
-        { text: "Cancelar", style: "cancel" },
-        { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
-      ]);
-      return null;
-    }
-    return location;
-  };
+  // Comentar la función que solicita la ubicación
+  // const solicitarUbicacion = async () => {
+  //   const location = await functionGetLocation(setUbicacion);
+  //   if (!location) {
+  //     Alert.alert("Permiso necesario", "Debes habilitar la ubicación en segundo plano.", [
+  //       { text: "Cancelar", style: "cancel" },
+  //       { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
+  //     ]);
+  //     return null;
+  //   }
+  //   return location;
+  // };
 
   const iniciarTiempo = async () => {
-    const permiso = await solicitarUbicacion();
-    if (!permiso || !ubicacion) return;
-    if (await validation(ubicacion)) {
-      const now = new Date();
-      setFechaInicio(now);
-      ActualizarInicio(now.toISOString());
-      setMostrarCrono(true);
-      startBackgroundLocation(detenerTiempo);
-    } else {
-      Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
-    }
+    // Comentar la validación de ubicación para la prueba
+    // const permiso = await solicitarUbicacion();
+    // if (!permiso || !ubicacion) return;
+    // if (await validation(ubicacion)) {
+    const now = new Date();
+    setFechaInicio(now);
+    ActualizarInicio(now.toISOString());
+    setMostrarCrono(true);
+    startBackgroundLocation(detenerTiempo);
+
+    // Animación para suavizar la transición al mostrar el ícono "Stop"
+    Animated.timing(showIcon, {
+      toValue: 1, // Cambiar a 1 para mostrar el ícono "Stop"
+      duration: 500, // Duración de la animación
+      useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
+    }).start();
+    // } else {
+    //   Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
+    // }
   };
 
   const detenerTiempo = async () => {
     añadirHoras();
     setMostrarCrono(false);
-    stopBackgroundLocation(); 
+    stopBackgroundLocation();
+
+    // Animación para suavizar la transición al mostrar el ícono "Play"
+    Animated.timing(showIcon, {
+      toValue: 0, // Cambiar a 0 para mostrar el ícono "Play"
+      duration: 500, // Duración de la animación
+      useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
+    }).start();
   };
 
   return (
@@ -89,23 +105,48 @@ export default function PaginaIngreso() {
           <Text style={styles.title}>Bienvenido</Text>
           <Text style={styles.subtitle}>Registro de horas</Text>
         </View>
-        <View style={styles.timerContainer}>
-          <View style={styles.timerDisplay}>
-            {mostrarCrono ? (
-              <Cronometro startDate={fechaInicio} />
-            ) : (
-              <Text style={styles.timeText}>00:00:00</Text>
-            )}
+
+        {showAll ? (
+          <View style={styles.timerContainer}>
+            <View style={styles.timerContent}>
+              {mostrarCrono ? (
+                <Cronometro startDate={fechaInicio} />
+              ) : (
+                <Text style={styles.timeText}>00:00:00</Text>
+              )}
+
+              <Pressable
+                style={{
+                  ...styles.btnChrono,
+                  backgroundColor: mostrarCrono ? "#B22222" : "#2272A7", // Rojo cuando detenido, azul cuando en pausa
+                }}
+                onPress={mostrarCrono ? detenerTiempo : iniciarTiempo}
+              >
+                <Animated.View
+                  style={{
+                    opacity: 1, // Cambiar la opacidad para suavizar la transición
+                    transform: [
+                      {
+                        scale: showIcon.interpolate({
+                          inputRange: [0, 1],
+                          outputRange: [1, 1.2], // Agrandar el ícono ligeramente cuando es "Stop"
+                        }),
+                      },
+                    ],
+                  }}
+                >
+                  <Ionicons
+                    name={mostrarCrono ? "stop-circle-outline" : "play-circle-outline"}
+                    size={60}
+                    color="#fff"
+                  />
+                </Animated.View>
+              </Pressable>
+            </View>
           </View>
-          <Pressable
-            style={styles.btnChrono}
-            onPress={mostrarCrono ? detenerTiempo : iniciarTiempo}
-          >
-            <Text style={styles.btnText}>
-              {mostrarCrono ? "Detener tiempo" : "Iniciar tiempo"}
-            </Text>
-          </Pressable>
-        </View>
+        ) : (
+          <Text style={styles.loadingText}>Cargando...</Text>
+        )}
       </View>
     </ImageBackground>
   );
@@ -136,22 +177,25 @@ const styles = StyleSheet.create({
   timerContainer: {
     backgroundColor: "#fff",
     width: "90%",
-    height: "50%",
-    borderRadius: 20,
-    padding: 20,
+    height: "60%",
+    borderRadius: 200, // Haciendo el contenedor ovalado
+    padding: 60,
     alignItems: "center",
-    elevation: 5,
+    elevation: 9,
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     position: "relative",
     marginTop: -80,
+    borderWidth: 3,
+    borderColor: "#2272A7", // Bordes azules suaves
   },
-  timerDisplay: {
-    flex: 1,
-    justifyContent: "center",
+  timerContent: {
     alignItems: "center",
+    justifyContent: "center",
+    gap: 70,  // Espacio entre el cronómetro y el botón
+    marginTop: 40,  // Ajuste para mover el cronómetro y el botón un poco más abajo
   },
   timeText: {
     fontSize: 48,
@@ -159,17 +203,17 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   btnChrono: {
-    backgroundColor: "#2272A7",
-    paddingVertical: 12,
-    paddingHorizontal: 30,
-    borderRadius: 30,
+    justifyContent: "center",
     alignItems: "center",
-    position: "absolute",
-    bottom: 20,
+    borderRadius: 20,  // Asegura que el botón sea redondo
+    padding: 15,
+    borderWidth: 1,
+    borderColor: "#1A4F6C",
   },
-  btnText: {
-    color: "#fff",
-    fontSize: 16,
+  loadingText: {
+    fontSize: 24,
+    color: "#2272A7",
     fontWeight: "bold",
+    marginTop: 100,
   },
 });
