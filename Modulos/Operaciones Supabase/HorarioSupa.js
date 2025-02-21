@@ -54,12 +54,12 @@ export async function ObtenerHorarioDesdeSupa(Codigo) {
 }
 
 // Función para obtener y agrupar los horarios de todos los usuarios desde Supabase
-export async function fetchHorarios() {
+export async function fetchHorarios(idDepartamento) {
   // Se consultan todos los usuarios obteniendo "Nombre" y "Horario"
   const { data, error } = await supabase
     .from("Usuarios")
-    .select("Nombre, Horario");
-
+    .select("Nombre, Horario")
+    .eq("idDepartamento", idDepartamento);
   if (error) {
     console.error("Error al obtener usuarios:", error);
     return null;

@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import ModalInscritos from "../Modulos/ModalInscritosHorario";
 import { fetchHorarios } from "../Modulos/Operaciones Supabase/HorarioSupa";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 // Días de la semana
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
@@ -33,7 +34,8 @@ const PaginaSupervisorHorario = () => {
 
   // Función que carga los horarios desde Supabase usando fetchHorarios
   const loadHorarios = async () => {
-    const data = await fetchHorarios();
+    const Udata = await ObtenerDatosUsuario();
+    const data = await fetchHorarios(Udata.idDepartamento);
     if (data) {
       setScheduleData(data);
     }
