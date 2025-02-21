@@ -30,7 +30,10 @@ export async function AñadeUsuario(
       console.log("Hubo un error", error);
       return;
     } else {
-      Alert.alert("Usuario Registrado Correctamente, solo puede iniciar sesión después de ser validado por el administrador");
+      Alert.alert(
+        "Usuario Registrado Correctamente",
+        "Solo puede iniciar sesión después de ser validado por el administrador"
+      );
     }
   }
 }
@@ -128,11 +131,11 @@ export async function obtenerPrestadores(idDepartamento) {
 export async function actualizarEstadoPrestador(codigo, estado) {
   const { data, error } = await supabase
     .from("Usuarios")
-    .update({ Validado: estado }) 
-    .eq("Codigo", parseInt(codigo, 10)); 
+    .update({ Validado: estado })
+    .eq("Codigo", parseInt(codigo, 10));
   if (error) {
     console.error("Error al actualizar el estado:", error);
     return false;
   }
-  return true; 
+  return true;
 }
