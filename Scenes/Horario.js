@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
-  Button,
   Alert,
 } from "react-native";
 import { GuardarHorarioUsuario, ObtenerHorarioUsuario } from "../Modulos/InfoUsuario";
@@ -22,19 +21,15 @@ const formatHour = (hour) => {
 };
 
 const PaginaHorario = () => {
-  // Estado de asistencia: cada día contiene un arreglo de horas (números) en las que el usuario asiste.
-  // Inicialmente, se crea un objeto con cada día y un arreglo vacío.
   const initialSchedule = days.reduce(
     (acc, day) => ({ ...acc, [day]: [] }),
     {}
   );
   const [scheduleData, setScheduleData] = useState(initialSchedule);
 
-  // Función para alternar (agregar o eliminar) la asistencia en una celda
   const toggleAttendance = (day, hour) => {
     setScheduleData((prev) => {
       const daySchedule = prev[day] || [];
-      // Si la hora ya está registrada, se elimina; de lo contrario, se agrega
       if (daySchedule.includes(hour)) {
         return {
           ...prev,
@@ -49,10 +44,8 @@ const PaginaHorario = () => {
     });
   };
 
-  // Crear un arreglo de horas desde las 7 hasta las 21 (9:00 PM) inclusive.
   const hours = Array.from({ length: 21 - 7 + 1 }, (_, i) => i + 7);
 
-  // Función para guardar el horario en AsyncStorage
   const guardarHorario = async () => {
     try {
       const horarioExistente = await ObtenerHorarioUsuario();
@@ -86,7 +79,6 @@ const PaginaHorario = () => {
     }
   };
 
-  // Función para cargar el horario desde AsyncStorage
   const cargarHorario = async () => {
     try {
       const horario = await ObtenerHorarioUsuario();
@@ -98,7 +90,6 @@ const PaginaHorario = () => {
     }
   };
 
-  // Cargar el horario al iniciar la ventana
   useEffect(() => {
     cargarHorario();
   }, []);
@@ -109,7 +100,6 @@ const PaginaHorario = () => {
       <ScrollView>
         <ScrollView horizontal>
           <View style={styles.grid}>
-            {/* Encabezado: celda vacía para la columna de horas y luego los días */}
             <View style={styles.row}>
               <View style={[styles.cell, styles.headerCell]} />
               {days.map((day) => (
@@ -118,14 +108,11 @@ const PaginaHorario = () => {
                 </View>
               ))}
             </View>
-            {/* Filas de horas */}
             {hours.map((hour) => (
               <View key={hour} style={styles.row}>
-                {/* Primera celda: la hora */}
                 <View style={[styles.cell, styles.hourCell]}>
                   <Text style={styles.hourText}>{formatHour(hour)}</Text>
                 </View>
-                {/* Celdas para cada día */}
                 {days.map((day) => (
                   <TouchableOpacity
                     key={day}
@@ -147,7 +134,9 @@ const PaginaHorario = () => {
           </View>
         </ScrollView>
       </ScrollView>
-      <Button title="Guardar Horario" onPress={guardarHorario} />
+      <TouchableOpacity style={styles.saveButton} onPress={guardarHorario}>
+        <Text style={styles.saveButtonText}>Guardar Horario</Text>
+      </TouchableOpacity>
     </View>
   );
 };
@@ -156,7 +145,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: 50,
-    backgroundColor: "#fff",
+    backgroundColor: "#e6f0fc",
   },
   Header: {
     fontSize: 20,
@@ -194,6 +183,17 @@ const styles = StyleSheet.create({
   },
   attendedText: {
     color: "#fff",
+    fontWeight: "bold",
+  },
+  saveButton: {
+    backgroundColor: "#2272A7",
+    paddingVertical: 15,
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 18,
     fontWeight: "bold",
   },
 });

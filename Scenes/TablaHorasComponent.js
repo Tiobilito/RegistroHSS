@@ -116,11 +116,12 @@ export default function PaginaTablaHorasComponent({ idSem }) {
                     );
                   }}
                 >
-                  {/* Ajustamos el margen para posicionar el ícono de la papelera */}
+                  {/* Ajustamos el margen para posicionar el ícono de la papelera más a la derecha */}
                   <View
                     style={{
-                      marginLeft: width * 0.5,
-                      marginTop: -height * 0.05,
+                      position: "absolute",  // Esto asegura que el ícono se mantenga fijo a la derecha del contenedor
+                      right: 10,  // Mueve el ícono 10 unidades a la derecha
+                      top: height * 0.15,  // Ajustamos el top si es necesario para alinearlo verticalmente
                     }}
                   >
                     <Ionicons
