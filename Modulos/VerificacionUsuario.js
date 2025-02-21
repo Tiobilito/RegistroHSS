@@ -93,7 +93,8 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
           Contraseña,
           latitud.toString(),
           longitud.toString(),
-          tipoServidor
+          tipoServidor,
+          idDepartamento
         );
         await ImportarDeSupaBD();
         return true;
