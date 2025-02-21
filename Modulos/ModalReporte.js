@@ -1,85 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { Modal, View, Text, Pressable, StyleSheet, TextInput } from "react-native";
-import { supabase } from "./supabase";
+import { supabase } from "./Operaciones Supabase/supabase";
+import { ObtenerDatosUsuario } from "./InfoUsuario";
 
-// Función para formatear las fechas en formato 'YYYY-MM-DD'
 const formatDate = (date) => {
   const [day, month, year] = date.split('/');
-  return `${year}-${month}-${day}`; // Devuelve el formato 'YYYY-MM-DD'
+  return `${year}-${month}-${day}`; 
 };
 
 export default function ModalReporte({
   modalVisible,
   closeModal,
   formData,
-  closeModalAndSent,
 }) {
-  const [actividades, setActividades] = useState(formData.actividades || "");  // Inicia con formData.actividades
-  const [codigoUsuario, setCodigoUsuario] = useState(null);
+  const [actividades, setActividades] = useState(formData.actividades || "");
+  const [usuario, setUsuario] = useState(null);
 
-  // Obtener el usuario logueado cuando el componente se monta
   useEffect(() => {
     const getUser = async () => {
-      const user = await supabase.auth.getUser();
-      if (user) {
-        setCodigoUsuario(user.id); // O usa el campo que corresponda a tu caso
-      } else {
-        console.log('No hay usuario logueado');
-      }
+      const user = await ObtenerDatosUsuario();
+      setUsuario(user);
     };
-
     getUser();
   }, []);
 
-  // Función para insertar el reporte en Supabase
+  // Función para insertar el reporte en Supabase sin añadir horas
   const handleEnviarReporte = async () => {
     try {
-      // Verifica que el campo actividades no esté vacío
-      console.log("formData:", formData);
-      console.log("Actividades:", actividades);
-
       if (!actividades) {
         alert("Por favor, completa el campo de actividades.");
         return;
       }
 
-      // Verifica que el código de usuario esté presente
-      if (!codigoUsuario) {
-        alert("El usuario no está autenticado.");
-        return;
-      }
-
-      // Convertimos las fechas al formato correcto (YYYY-MM-DD)
       const { fechaReporte, periodoInicio, periodoFin } = formData;
       const formattedFechaReporte = formatDate(fechaReporte);
       const formattedPeriodoInicio = formatDate(periodoInicio);
       const formattedPeriodoFin = formatDate(periodoFin);
 
-      // Verifica que las fechas estén correctas
-      console.log("formattedFechaReporte:", formattedFechaReporte);
-      console.log("formattedPeriodoInicio:", formattedPeriodoInicio);
-      console.log("formattedPeriodoFin:", formattedPeriodoFin);
-
-      // Insertar en la tabla 'reportes' en Supabase
       const { data, error } = await supabase
-        .from('reportes')
+        .from('Reportes')
         .insert([
           {
-            actividades: actividades,
-            periodoInicio: formattedPeriodoInicio,
-            codigoUsuario: codigoUsuario,  // Asegúrate de que esto se pasa correctamente
-            periodoFin: formattedPeriodoFin,
-            fechaReporte: formattedFechaReporte,
+            Actividades: actividades,
+            PeriodoInicio: formattedPeriodoInicio,
+            CodigoUsuario: usuario.Codigo,
+            PeriodoFin: formattedPeriodoFin,
+            FechaReporte: formattedFechaReporte,
           }
         ]);
 
-      // Verifica si hubo un error en la inserción
       if (error) {
         console.error('Error al insertar el reporte:', error);
-        alert(`Hubo un error al enviar el reporte: ${JSON.stringify(error)}`);  // Mostrar error detallado
+        alert(`Hubo un error al enviar el reporte: ${JSON.stringify(error)}`);
       } else {
         console.log('Reporte enviado con éxito:', data);
-        closeModalAndSent();
+        // Limpiar el campo de actividades y cerrar el modal
+        setActividades("");
+        closeModal();
       }
     } catch (error) {
       console.error('Error inesperado:', error);
@@ -101,8 +78,8 @@ export default function ModalReporte({
             style={styles.textInput}
             multiline
             numberOfLines={4}
-            value={actividades} // Asegúrate de que 'actividades' está correctamente vinculado al estado
-            onChangeText={setActividades} // Actualiza el estado correctamente
+            value={actividades} 
+            onChangeText={setActividades} 
             placeholder="Escribe las actividades realizadas..."
           />
 

@@ -1,21 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, FlatList, Alert, TouchableOpacity, ImageBackground } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { obtenerEstudiantes, actualizarEstadoEstudiante } from "../Modulos/OperacionesBD"; // Función para actualizar el estado
+import { obtenerPrestadores, actualizarEstadoPrestador } from "../Modulos/Operaciones Supabase/UsuariosSupa";
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function Supervisor({ navigation }) {
   const [estudiantes, setEstudiantes] = useState([]);
-  const [estado, setEstado] = useState(""); // Guardaremos el estado a asignar
-  const [filteredEstudiantes, setFilteredEstudiantes] = useState([]); // Lista filtrada de estudiantes
+  const [estado, setEstado] = useState(""); 
+  const [filteredEstudiantes, setFilteredEstudiantes] = useState([]); 
+  const [UserD, setUserD] = useState(null); 
 
   const image = require("../assets/Back.png"); // Ruta de la imagen de fondo
 
   // Cargar los estudiantes
   useEffect(() => {
     const fetchEstudiantes = async () => {
-      const data = await obtenerEstudiantes(); // Obtener los estudiantes desde la base de datos
+      const dataU = await ObtenerDatosUsuario();
+      setUserD(dataU);
+      const data = await obtenerPrestadores(dataU.idDepartamento); 
       setEstudiantes(data);
-      setFilteredEstudiantes(data); // Inicializar la lista filtrada
+      setFilteredEstudiantes(data); 
     };
 
     fetchEstudiantes();
@@ -55,11 +59,11 @@ export default function Supervisor({ navigation }) {
     }
 
     // Actualizar estado del estudiante en la base de datos
-    const result = await actualizarEstadoEstudiante(codigo, estadoFinal);
+    const result = await actualizarEstadoPrestador(codigo, estadoFinal);
     if (result) {
       Alert.alert(`Estudiante con código ${codigo} ha sido ${estado}.`);
       // Recargar los estudiantes después de la actualización
-      const updatedEstudiantes = await obtenerEstudiantes();
+      const updatedEstudiantes = await obtenerPrestadores(UserD.idDepartamento);
       setEstudiantes(updatedEstudiantes);
       setFilteredEstudiantes(updatedEstudiantes); // Actualizar la lista filtrada también
     } else {
@@ -90,7 +94,7 @@ export default function Supervisor({ navigation }) {
       resizeMode="cover"
     >
       <View style={styles.container}>
-        <Text style={styles.title}>Supervisor</Text>
+        <Text style={styles.title}>Candidatos Servicio</Text>
 
         {/* Subtítulo para los filtros */}
         <Text style={styles.filterSubtitle}>Filtrar por:</Text>

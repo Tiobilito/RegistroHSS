@@ -12,12 +12,8 @@ import {
   useWindowDimensions
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import {
-  AñadeUsuario,
-  obtenerCentros,
-  obtenerDepartamentos,
-} from "../Modulos/OperacionesBD";
-import { GuardarDatosUsuario } from "../Modulos/InfoUsuario";
+import { AñadeUsuario } from "../Modulos/Operaciones Supabase/UsuariosSupa";
+import { obtenerCentros, obtenerDepartamentos } from "../Modulos/Operaciones Supabase/Departamentos";
 import { CommonActions } from "@react-navigation/native";
 
 const Scale = Dimensions.get("window").width;

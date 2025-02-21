@@ -8,7 +8,7 @@ import {
   Pressable,
   useWindowDimensions,
 } from "react-native";
-import { EliminarUsuarioHoras } from "../Modulos/OperacionesBD";
+import { EliminarUsuarioHoras } from "../Modulos/Operaciones Supabase/HorasSupa";
 import { BorrarDatosUsuario } from "../Modulos/InfoUsuario";
 import Ionicons from "@expo/vector-icons/Ionicons";
 

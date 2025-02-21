@@ -10,7 +10,7 @@ import {
   useWindowDimensions,
   Animated,
 } from "react-native";
-import { añadirHoras } from "../Modulos/db";
+import { añadirHoras } from "../Modulos/Base de Datos Sqlite/Horas";
 import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
 import {
@@ -22,9 +22,9 @@ import {
 import { Ionicons } from "@expo/vector-icons"; // Importamos Ionicons
 
 export default function PaginaIngreso() {
-  const { width, height } = useWindowDimensions();
-  const scaleFactor = width / 375;
+  const { width } = useWindowDimensions();
 
+<<<<<<< HEAD
   // Definir dimensiones para el botón oval
   const buttonWidth = 110 * scaleFactor;
   const buttonHeight = 65 * scaleFactor;
@@ -36,35 +36,43 @@ export default function PaginaIngreso() {
   const [Ubicacion, DefUbicacion] = useState(null);
   const [showIcon, setShowIcon] = useState(new Animated.Value(0)); // Valor para animación
   const [showAll, setShowAll] = useState(false); // Estado para controlar si mostrar el contenedor principal o "Cargando..."
+=======
+  const [usuario, setUsuario] = useState(null);
+  const [mostrarCrono, setMostrarCrono] = useState(false);
+  const [fechaInicio, setFechaInicio] = useState(new Date());
+  const [ubicacion, setUbicacion] = useState(null);
+>>>>>>> AppReboot
 
   useEffect(() => {
-    tomarUsuario();
+    obtenerUsuario();
   }, []);
 
-  const tomarUsuario = async () => {
+  const obtenerUsuario = async () => {
     let data = await ObtenerDatosUsuario();
     if (data) {
-      DefUsuario(data);
+      setUsuario(data);
       if (data.Inicio !== "null") {
-        DefFechaInicio(new Date(data.Inicio));
-        DefMostrarCr(true);
+        setFechaInicio(new Date(data.Inicio));
+        setMostrarCrono(true);
       }
     }
     setShowAll(true); // Cambiar a true después de que los datos han sido cargados
   };
 
   const solicitarUbicacion = async () => {
-    const permiso = await functionGetLocation(DefUbicacion);
-    if (!permiso) {
-      Alert.alert("Permiso necesario", "Debes habilitar la ubicación.", [
+    const location = await functionGetLocation(setUbicacion);
+    if (!location) {
+      Alert.alert("Permiso necesario", "Debes habilitar la ubicación en segundo plano.", [
+        { text: "Cancelar", style: "cancel" },
         { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
       ]);
-      return false;
+      return null;
     }
-    return true;
+    return location;
   };
 
   const iniciarTiempo = async () => {
+<<<<<<< HEAD
     const now = new Date();
     DefFechaInicio(now);
     ActualizarInicio(now.toISOString());
@@ -76,10 +84,24 @@ export default function PaginaIngreso() {
       duration: 500,  // Transición suave en 500ms
       useNativeDriver: true,
     }).start();
+=======
+    const permiso = await solicitarUbicacion();
+    if (!permiso || !ubicacion) return;
+    if (await validation(ubicacion)) {
+      const now = new Date();
+      setFechaInicio(now);
+      ActualizarInicio(now.toISOString());
+      setMostrarCrono(true);
+      startBackgroundLocation(detenerTiempo);
+    } else {
+      Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
+    }
+>>>>>>> AppReboot
   };
 
   const detenerTiempo = async () => {
     añadirHoras();
+<<<<<<< HEAD
     DefMostrarCr(false);
     stopBackgroundLocation();
 
@@ -89,13 +111,19 @@ export default function PaginaIngreso() {
       duration: 500,  // Transición suave en 500ms
       useNativeDriver: true,
     }).start();
+=======
+    setMostrarCrono(false);
+    stopBackgroundLocation(); 
+>>>>>>> AppReboot
   };
 
   return (
     <ImageBackground
       source={require("../assets/fondo.webp")}
       style={styles.container}
+      resizeMode="cover"
     >
+<<<<<<< HEAD
       <View style={styles.header}>
         <Text style={styles.title}>Bienvenido</Text>
         <Text style={styles.subtitle}>Registro de horas</Text>
@@ -161,19 +189,40 @@ export default function PaginaIngreso() {
       ) : (
         <Text style={styles.loadingText}>Cargando...</Text>  // Mostrar "Cargando..." si 'showAll' es false
       )}
+=======
+      <View style={styles.overlay}>
+        <View style={styles.header}>
+          <Text style={styles.title}>Bienvenido</Text>
+          <Text style={styles.subtitle}>Registro de horas</Text>
+        </View>
+        <View style={styles.timerContainer}>
+          <View style={styles.timerDisplay}>
+            {mostrarCrono ? (
+              <Cronometro startDate={fechaInicio} />
+            ) : (
+              <Text style={styles.timeText}>00:00:00</Text>
+            )}
+          </View>
+          <Pressable
+            style={styles.btnChrono}
+            onPress={mostrarCrono ? detenerTiempo : iniciarTiempo}
+          >
+            <Text style={styles.btnText}>
+              {mostrarCrono ? "Detener tiempo" : "Iniciar tiempo"}
+            </Text>
+          </Pressable>
+        </View>
+      </View>
+>>>>>>> AppReboot
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, alignItems: "center" },
-  header: {
-    marginTop: "24%",
-    marginBottom: "12%",
-    height: "10%",
-    width: "90%",
-    gap: 16,
+  container: {
+    flex: 1,
   },
+<<<<<<< HEAD
   title: { fontSize: 24, fontWeight: "bold", color: "black" },
   subtitle: { fontSize: 24, fontWeight: "regular", color: "black" },
   timerContainer: {
@@ -207,15 +256,72 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   content: {
+=======
+  overlay: {
+>>>>>>> AppReboot
     flex: 1,
     alignItems: "center",
-    marginBottom: "8%",
-    borderRadius: 10,
+    justifyContent: "space-around",
+    paddingVertical: 40,
   },
+  header: {
+    alignItems: "center",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333",
+  },
+  subtitle: {
+    fontSize: 20,
+    color: "#555",
+  },
+  timerContainer: {
+    backgroundColor: "#fff",
+    width: "90%",
+    height: "50%",
+    borderRadius: 20,
+    padding: 20,
+    alignItems: "center",
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    position: "relative",
+    marginTop: -80,
+  },
+  timerDisplay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  timeText: {
+    fontSize: 48,
+    fontWeight: "bold",
+    marginBottom: 20,
+  },
+  btnChrono: {
+    backgroundColor: "#2272A7",
+    paddingVertical: 12,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    alignItems: "center",
+    position: "absolute",
+    bottom: 20,
+  },
+  btnText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+<<<<<<< HEAD
   loadingText: {  // Estilo para el texto de "Cargando..."
     fontSize: 24,
     color: "#2272A7", 
     fontWeight: "bold",
     marginTop: 100,  // Añadir margen superior para centrarlo
   },
+=======
+>>>>>>> AppReboot
 });

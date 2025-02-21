@@ -7,9 +7,16 @@ const LOCATION_TASK_NAME = "background-location-task";
 
 export const obtenerUbicacion = async () => {
   try {
-    let { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== "granted") {
-      console.log("Permiso de ubicación denegado.");
+    // Solicitar permiso en primer plano
+    let { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+    if (foregroundStatus !== "granted") {
+      console.log("Permiso de ubicación en primer plano denegado.");
+      return null;
+    }
+    // Solicitar permiso en segundo plano
+    let { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+    if (backgroundStatus !== "granted") {
+      console.log("Permiso de ubicación en segundo plano denegado.");
       return null;
     }
     let location = await Location.getCurrentPositionAsync({
@@ -25,9 +32,9 @@ export const obtenerUbicacion = async () => {
 
 export const functionGetLocation = async (setLocation) => {
   const location = await obtenerUbicacion();
-  if (!location) return false;
+  if (!location) return null;
   setLocation(location);
-  return true;
+  return location;
 };
 
 export const validation = async (location) => {

@@ -11,16 +11,11 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import {
-  ModificaUsuario,
-  obtenerCentro,
-  obtenerCentros,
-  ObtenerDatosUsuarioSupa,
-  obtenerDepartamento,
-  obtenerDepartamentos,
-} from "../Modulos/OperacionesBD";
+import { ModificaUsuario, ObtenerDatosUsuarioSupa } from "../Modulos/Operaciones Supabase/UsuariosSupa";
+import { obtenerDepartamentos, obtenerCentros } from "../Modulos/Operaciones Supabase/Departamentos";
+
+
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
-import { CommonActions } from "@react-navigation/native";
 
 export default function PaginaModUsuario({ navigation }) {
   const { width, height } = useWindowDimensions();
