@@ -6,8 +6,8 @@ import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function Supervisor({ navigation }) {
   const [estudiantes, setEstudiantes] = useState([]);
-  const [estado, setEstado] = useState(""); // Guardaremos el estado a asignar
-  const [filteredEstudiantes, setFilteredEstudiantes] = useState([]); // Lista filtrada de estudiantes
+  const [estado, setEstado] = useState(""); 
+  const [filteredEstudiantes, setFilteredEstudiantes] = useState([]); 
   const [UserD, setUserD] = useState(null); 
 
   const image = require("../assets/Back.png"); // Ruta de la imagen de fondo
@@ -17,7 +17,7 @@ export default function Supervisor({ navigation }) {
     const fetchEstudiantes = async () => {
       const dataU = await ObtenerDatosUsuario();
       setUserD(dataU);
-      const data = await obtenerPrestadores(UserD.idDepartamento); 
+      const data = await obtenerPrestadores(dataU.idDepartamento); 
       setEstudiantes(data);
       setFilteredEstudiantes(data); 
     };

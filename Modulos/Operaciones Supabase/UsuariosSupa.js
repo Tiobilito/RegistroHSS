@@ -116,7 +116,6 @@ export async function obtenerPrestadores(idDepartamento) {
   const { data, error } = await supabase
     .from("Usuarios")
     .select("*")
-    .eq("TipoServidor", "Prestador de servicio")
     .eq("idDepartamento", idDepartamento);
   if (error) {
     console.error("Error al obtener los aspirantes:", error);
