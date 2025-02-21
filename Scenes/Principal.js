@@ -45,7 +45,7 @@ export default function PaginaIngreso() {
   const solicitarUbicacion = async () => {
     const location = await functionGetLocation(setUbicacion);
     if (!location) {
-      Alert.alert("Permiso necesario", "Debes habilitar la ubicación.", [
+      Alert.alert("Permiso necesario", "Debes habilitar la ubicación en segundo plano.", [
         { text: "Cancelar", style: "cancel" },
         { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
       ]);
