@@ -17,6 +17,8 @@ import PaginaAyuda from "./Scenes/Ayuda";
 import PaginaModUsuario from "./Scenes/ModificarUsuario";
 import PaginaHorario from "./Scenes/Horario";
 import PaginaSupervisorHorario from "./Scenes/SupervisorHorario";
+import PaginaSupervisorReportes from "./Scenes/Reportes";
+import PaginaSupervisorAjustes from "./Scenes/SupervisorAjustes";
 
 const Tab = createBottomTabNavigator();
 const TabSupervisor = createBottomTabNavigator();
@@ -103,7 +105,12 @@ const SupervisorNavigation = () => {
             iconName = focused ? "people" : "people-outline";
           } else if (route.name === "Horario") {
             iconName = focused ? "today" : "today-outline";
+          } else if (route.name === "Reportes") {
+            iconName = focused ? "reader" : "reader-outline";
+          } else if (route.name === "SupervisorAjustes") {
+            iconName = focused ? "cog" : "cog-outline";
           }
+
           return <Ionicons name={iconName} size={size} color={color} />;
         },
         tabBarActiveTintColor: "black",
@@ -114,6 +121,14 @@ const SupervisorNavigation = () => {
       <TabSupervisor.Screen
         name="Horario"
         component={PaginaSupervisorHorario}
+      />
+      <TabSupervisor.Screen
+        name="Reportes"
+        component={PaginaSupervisorReportes} // Aquí se usan los reportes
+      />
+      <TabSupervisor.Screen
+        name="SupervisorAjustes"
+        component={PaginaSupervisorAjustes} // Aquí se usan los reportes
       />
     </TabSupervisor.Navigator>
   );
