@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -22,24 +22,22 @@ const formatHour = (hour) => {
 };
 
 const PaginaHorario = () => {
-  // Estado de asistencia: cada día contiene un arreglo de horas (números) en las que el usuario asiste.
-  // Inicialmente, se crea un objeto con cada día y un arreglo vacío.
+  // Estado inicial del horario: cada día con un arreglo de horas vacíos
   const initialSchedule = days.reduce(
     (acc, day) => ({ ...acc, [day]: [] }),
     {}
   );
   const [scheduleData, setScheduleData] = useState(initialSchedule);
 
+  // Ref para sincronizar el scroll horizontal de la grilla con el encabezado
+  const headerScrollRef = useRef(null);
+
   // Función para alternar (agregar o eliminar) la asistencia en una celda
   const toggleAttendance = (day, hour) => {
     setScheduleData((prev) => {
       const daySchedule = prev[day] || [];
-      // Si la hora ya está registrada, se elimina; de lo contrario, se agrega
       if (daySchedule.includes(hour)) {
-        return {
-          ...prev,
-          [day]: daySchedule.filter((h) => h !== hour),
-        };
+        return { ...prev, [day]: daySchedule.filter((h) => h !== hour) };
       } else {
         return {
           ...prev,
@@ -49,10 +47,10 @@ const PaginaHorario = () => {
     });
   };
 
-  // Crear un arreglo de horas desde las 7 hasta las 21 (9:00 PM) inclusive.
+  // Arreglo de horas desde las 7 hasta las 21 (9:00 PM) inclusive
   const hours = Array.from({ length: 21 - 7 + 1 }, (_, i) => i + 7);
 
-  // Función para guardar el horario en AsyncStorage
+  // Función para guardar el horario
   const guardarHorario = async () => {
     try {
       const horarioExistente = await ObtenerHorarioUsuario();
@@ -86,7 +84,7 @@ const PaginaHorario = () => {
     }
   };
 
-  // Función para cargar el horario desde AsyncStorage
+  // Función para cargar el horario guardado
   const cargarHorario = async () => {
     try {
       const horario = await ObtenerHorarioUsuario();
@@ -98,55 +96,82 @@ const PaginaHorario = () => {
     }
   };
 
-  // Cargar el horario al iniciar la ventana
   useEffect(() => {
     cargarHorario();
   }, []);
 
+  // Sincroniza el scroll horizontal de la grilla con el encabezado de días
+  const onGridHorizontalScroll = (e) => {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    if (headerScrollRef.current) {
+      headerScrollRef.current.scrollTo({ x: offsetX, animated: false });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.Header}>Horario de Asistencia</Text>
-      <ScrollView>
-        <ScrollView horizontal>
-          <View style={styles.grid}>
-            {/* Encabezado: celda vacía para la columna de horas y luego los días */}
-            <View style={styles.row}>
-              <View style={[styles.cell, styles.headerCell]} />
-              {days.map((day) => (
-                <View key={day} style={[styles.cell, styles.headerCell]}>
-                  <Text style={styles.headerText}>{day}</Text>
+      <View style={styles.scheduleContainer}>
+        {/* Encabezado fijo: días */}
+        <View style={styles.headerRow}>
+          <View style={styles.topLeftCell} />
+          <ScrollView
+            horizontal
+            ref={headerScrollRef}
+            scrollEnabled={false}
+            showsHorizontalScrollIndicator={false}
+          >
+            {days.map((day) => (
+              <View key={day} style={[styles.cell, styles.headerCell]}>
+                <Text style={styles.headerText}>{day}</Text>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
+        {/* Cuerpo con scroll vertical */}
+        <ScrollView style={styles.bodyScrollView}>
+          <View style={styles.bodyRow}>
+            {/* Columna fija: horas */}
+            <View style={styles.leftColumn}>
+              {hours.map((hour) => (
+                <View key={hour} style={[styles.cell, styles.hourCell]}>
+                  <Text style={styles.hourText}>{formatHour(hour)}</Text>
                 </View>
               ))}
             </View>
-            {/* Filas de horas */}
-            {hours.map((hour) => (
-              <View key={hour} style={styles.row}>
-                {/* Primera celda: la hora */}
-                <View style={[styles.cell, styles.hourCell]}>
-                  <Text style={styles.hourText}>{formatHour(hour)}</Text>
-                </View>
-                {/* Celdas para cada día */}
-                {days.map((day) => (
-                  <TouchableOpacity
-                    key={day}
-                    style={[
-                      styles.cell,
-                      scheduleData[day].includes(hour)
-                        ? styles.attendedCell
-                        : styles.emptyCell,
-                    ]}
-                    onPress={() => toggleAttendance(day, hour)}
-                  >
-                    {scheduleData[day].includes(hour) && (
-                      <Text style={styles.attendedText}>Asistir</Text>
-                    )}
-                  </TouchableOpacity>
+            {/* Grilla de asistencia: scroll horizontal y vertical */}
+            <ScrollView
+              horizontal
+              onScroll={onGridHorizontalScroll}
+              scrollEventThrottle={16}
+              showsHorizontalScrollIndicator={true}
+            >
+              <View>
+                {hours.map((hour) => (
+                  <View key={hour} style={styles.row}>
+                    {days.map((day) => (
+                      <TouchableOpacity
+                        key={day}
+                        style={[
+                          styles.cell,
+                          scheduleData[day].includes(hour)
+                            ? styles.attendedCell
+                            : styles.emptyCell,
+                        ]}
+                        onPress={() => toggleAttendance(day, hour)}
+                      >
+                        {scheduleData[day].includes(hour) && (
+                          <Text style={styles.attendedText}>Asistir</Text>
+                        )}
+                      </TouchableOpacity>
+                    ))}
+                  </View>
                 ))}
               </View>
-            ))}
+            </ScrollView>
           </View>
         </ScrollView>
-      </ScrollView>
+      </View>
       <Button title="Guardar Horario" onPress={guardarHorario} />
     </View>
   );
@@ -164,13 +189,35 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  grid: {},
+  scheduleContainer: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  headerRow: {
+    flexDirection: "row",
+  },
+  topLeftCell: {
+    width: 70,
+    height: 70,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    backgroundColor: "#f0f0f0",
+  },
+  bodyScrollView: {
+    flex: 1,
+  },
+  bodyRow: {
+    flexDirection: "row",
+  },
+  leftColumn: {
+    // La columna de horas se mantiene fija
+  },
   row: {
     flexDirection: "row",
   },
   cell: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderWidth: 1,
     borderColor: "#ccc",
     justifyContent: "center",

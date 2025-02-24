@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -21,9 +21,9 @@ const formatHour = (hour) => {
 };
 
 const PaginaSupervisorHorario = () => {
-  // Estado para almacenar la grilla de horarios obtenida desde Supabase
+  // Estado para almacenar la grilla de horarios (por día/hora) obtenida desde Supabase
   const [scheduleData, setScheduleData] = useState(null);
-  // Estado para controlar la visibilidad del modal
+  // Estado para controlar la visibilidad del modal de inscritos
   const [modalVisible, setModalVisible] = useState(false);
   // Estado para la celda seleccionada (día, hora y lista de inscritos)
   const [selectedCellData, setSelectedCellData] = useState({
@@ -31,6 +31,9 @@ const PaginaSupervisorHorario = () => {
     hour: 0,
     persons: [],
   });
+
+  // Ref para sincronizar el scroll horizontal entre la grilla y el encabezado (días)
+  const headerScrollRef = useRef(null);
 
   // Función que carga los horarios desde Supabase usando fetchHorarios
   const loadHorarios = async () => {
@@ -57,57 +60,89 @@ const PaginaSupervisorHorario = () => {
   // Arreglo de horas de 7 a 21
   const hours = Array.from({ length: 21 - 7 + 1 }, (_, i) => i + 7);
 
+  // Sincroniza el scroll horizontal de la grilla con el encabezado
+  const onGridHorizontalScroll = (e) => {
+    const offsetX = e.nativeEvent.contentOffset.x;
+    if (headerScrollRef.current) {
+      headerScrollRef.current.scrollTo({ x: offsetX, animated: false });
+    }
+  };
+
+  if (!scheduleData) {
+    return <Text style={styles.loadingText}>Cargando datos...</Text>;
+  }
+
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Horario de Inscripciones</Text>
-      {scheduleData ? (
-        <ScrollView>
-          <ScrollView horizontal>
-            <View style={styles.grid}>
-              {/* Encabezado de la grilla */}
-              <View style={styles.row}>
-                <View style={[styles.cell, styles.headerCell]} />
-                {days.map((day) => (
-                  <View key={day} style={[styles.cell, styles.headerCell]}>
-                    <Text style={styles.headerText}>{day}</Text>
-                  </View>
-                ))}
+      <Text style={styles.header}>Horario Prestadores</Text>
+      <View style={styles.scheduleContainer}>
+        {/* Encabezado fijo: fila de días */}
+        <View style={styles.headerRow}>
+          <View style={styles.topLeftCell} />
+          <ScrollView
+            horizontal
+            ref={headerScrollRef}
+            scrollEnabled={false}
+            showsHorizontalScrollIndicator={false}
+          >
+            {days.map((day) => (
+              <View key={day} style={[styles.cell, styles.headerCell]}>
+                <Text style={styles.headerText}>{day}</Text>
               </View>
-              {/* Filas de horas */}
+            ))}
+          </ScrollView>
+        </View>
+        {/* Cuerpo: scroll vertical que incluye la columna fija de horas y la grilla */}
+        <ScrollView style={styles.bodyScrollView}>
+          <View style={styles.bodyRow}>
+            {/* Columna fija: horas */}
+            <View style={styles.leftColumn}>
               {hours.map((hour) => (
-                <View key={hour} style={styles.row}>
-                  <View style={[styles.cell, styles.hourCell]}>
-                    <Text style={styles.hourText}>{formatHour(hour)}</Text>
-                  </View>
-                  {days.map((day) => {
-                    const cellData = scheduleData[day][hour];
-                    const isRegistered = cellData && cellData.length > 0;
-                    return (
-                      <TouchableOpacity
-                        key={day}
-                        style={[
-                          styles.cell,
-                          isRegistered ? styles.registeredCell : styles.emptyCell,
-                        ]}
-                        onPress={() => handleCellPress(day, hour)}
-                        disabled={!isRegistered}
-                      >
-                        {isRegistered && (
-                          <Text style={styles.registeredText}>
-                            {cellData.length} inscritos
-                          </Text>
-                        )}
-                      </TouchableOpacity>
-                    );
-                  })}
+                <View key={hour} style={[styles.cell, styles.hourCell]}>
+                  <Text style={styles.hourText}>{formatHour(hour)}</Text>
                 </View>
               ))}
             </View>
-          </ScrollView>
+            {/* Grilla de celdas: scroll horizontal */}
+            <ScrollView
+              horizontal
+              onScroll={onGridHorizontalScroll}
+              scrollEventThrottle={16}
+              showsHorizontalScrollIndicator={true}
+            >
+              <View>
+                {hours.map((hour) => (
+                  <View key={hour} style={styles.row}>
+                    {days.map((day) => {
+                      const cellData = scheduleData[day][hour];
+                      const isRegistered = cellData && cellData.length > 0;
+                      return (
+                        <TouchableOpacity
+                          key={day}
+                          style={[
+                            styles.cell,
+                            isRegistered
+                              ? styles.registeredCell
+                              : styles.emptyCell,
+                          ]}
+                          onPress={() => handleCellPress(day, hour)}
+                          disabled={!isRegistered}
+                        >
+                          {isRegistered && (
+                            <Text style={styles.registeredText}>
+                              {cellData.length} inscritos
+                            </Text>
+                          )}
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
         </ScrollView>
-      ) : (
-        <Text style={styles.loadingText}>Cargando datos...</Text>
-      )}
+      </View>
       <ModalInscritos
         visible={modalVisible}
         day={selectedCellData.day}
@@ -132,13 +167,39 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginBottom: 20,
   },
-  grid: {},
+  scheduleContainer: {
+    flex: 1,
+    marginHorizontal: 10,
+    borderWidth: 1,
+    borderColor: "#ccc",
+  },
+  headerRow: {
+    flexDirection: "row",
+    backgroundColor: "#f0f0f0",
+  },
+  topLeftCell: {
+    width: 70,
+    height: 70,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    backgroundColor: "#f0f0f0",
+  },
+  bodyScrollView: {
+    flex: 1,
+  },
+  bodyRow: {
+    flexDirection: "row",
+  },
+  leftColumn: {
+    // La columna de horas se desplaza verticalmente junto con la grilla,
+    // quedando fija en el eje horizontal.
+  },
   row: {
     flexDirection: "row",
   },
   cell: {
-    width: 100,
-    height: 100,
+    width: 70,
+    height: 70,
     borderWidth: 1,
     borderColor: "#ccc",
     justifyContent: "center",
