@@ -82,11 +82,6 @@ export default function Supervisor({ navigation }) {
     }
   };
 
-  const handleLogout = () => {
-    // Aquí puedes borrar los datos de sesión o realizar cualquier acción de cierre de sesión
-    navigation.navigate('Ingreso'); // Redirigir a la pantalla de Ingreso
-  };
-
   return (
     <ImageBackground
       source={image}
@@ -154,11 +149,6 @@ export default function Supervisor({ navigation }) {
             </View>
           )}
         />
-
-        {/* Cerrar sesión */}
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutText}>Cerrar sesión</Text>
-        </TouchableOpacity>
       </View>
     </ImageBackground>
   );
@@ -250,18 +240,5 @@ const styles = StyleSheet.create({
     width: 20, // Aumento el tamaño del círculo de estado
     height: 20,
     borderRadius: 15,
-  },
-  logoutButton: {
-    marginTop: 20,
-    backgroundColor: "#2272A7",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    width: "100%", // Hacer el botón más ancho
-  },
-  logoutText: {
-    fontSize: 20,
-    color: "#fff",
-    fontWeight: "bold",
   },
 });
