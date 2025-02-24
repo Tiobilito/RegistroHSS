@@ -1,6 +1,9 @@
 import { supabase } from "./Operaciones Supabase/supabase";
 import { BorrarTSemHoras } from "./Base de Datos Sqlite/Semanas";
-import { ExportarASupaBD, ImportarDeSupaBD } from "./Base de Datos Sqlite/ImportarRespaldar";
+import {
+  ExportarASupaBD,
+  ImportarDeSupaBD,
+} from "./Base de Datos Sqlite/ImportarRespaldar";
 import { GuardarDatosUsuario, ObtenerDatosUsuario } from "./InfoUsuario";
 import { Alert } from "react-native";
 
@@ -31,40 +34,53 @@ const alertLoging = () => {
 };
 
 export async function EncontrarUsuario(Codigo, Contraseña) {
-  // Buscar el usuario en la tabla Usuarios
+  // Buscar el usuario en la tabla Usuarios sin filtrar por Validado
   const { data: usuarios, error: errorUsuario } = await supabase
     .from("Usuarios")
     .select("*")
     .eq("Codigo", parseInt(Codigo, 10))
-    .eq("Contraseña", Contraseña)
-    .eq("Validado", true);
+    .eq("Contraseña", Contraseña);
 
   if (errorUsuario) {
     console.log("Hubo un error: " + errorUsuario);
     return false;
   }
-  // Verificar si se encontró algún usuario correspondiente a la información obtenida del usuario
+
+  // Verificar si se encontró algún usuario
   if (usuarios.length > 0) {
-    const tipoServidor = usuarios[0].TipoServidor; // Extraemos el tipo de servidor
-    const idDepartamento = usuarios[0].idDepartamento;
+    const usuarioEncontrado = usuarios[0];
+
+    // Comprobar si el usuario está validado
+    if (!usuarioEncontrado.Validado) {
+      console.log("El usuario existe pero no está validado");
+      return "not_validated";
+    }
+
+    const tipoServidor = usuarioEncontrado.TipoServidor;
+    const idDepartamento = usuarioEncontrado.idDepartamento;
+
     // Buscar el departamento correspondiente al usuario
     const { data: departamentos, error: errorDepartamento } = await supabase
       .from("Departamento")
       .select("Latitud, Longitud")
       .eq("id", idDepartamento);
+
     if (errorDepartamento) {
-      console.log("Hubo un error al buscar el departamento: " + errorDepartamento);
+      console.log(
+        "Hubo un error al buscar el departamento: " + errorDepartamento
+      );
       return false;
     }
-    // Verificar si se encontró algún departamento
+
     if (departamentos.length > 0) {
       const latitud = departamentos[0].Latitud;
       const longitud = departamentos[0].Longitud;
+
       // Verificar si hay un usuario registrado localmente en la app o no
-      const data = await ObtenerDatosUsuario();
-      if (data) {
+      const dataLocal = await ObtenerDatosUsuario();
+      if (dataLocal) {
         // Si el usuario local no coincide con el código, solicitar confirmación y actualizar datos
-        if (data.Codigo != Codigo) {
+        if (dataLocal.Codigo != Codigo) {
           const result = await alertLoging();
           if (result) {
             await BorrarTSemHoras();
@@ -82,7 +98,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
             return false;
           }
         } else {
-          // Si el usuario local coincide con el código, retornar true
+          // Si el usuario local coincide con el código, exportar datos y retornar true
           await ExportarASupaBD();
           return true;
         }
@@ -104,7 +120,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
       return false;
     }
   } else {
-    console.log("El usuario no existe");
+    console.log("El usuario no existe o las credenciales son incorrectas");
     return false;
   }
 }

@@ -1,4 +1,3 @@
-// Ingreso.js
 import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
@@ -8,7 +7,8 @@ import {
   Pressable,
   Dimensions,
   TextInput,
-  Alert,
+  Modal,
+  ActivityIndicator,
   useWindowDimensions,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
@@ -28,6 +28,9 @@ export default function PaginaIngreso({ navigation }) {
   const [Contraseña, setContraseña] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [biometricAvailable, setBiometricAvailable] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorModalVisible, setErrorModalVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const checkBiometricSupport = async () => {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
@@ -54,6 +57,7 @@ export default function PaginaIngreso({ navigation }) {
     if (isAuthenticated) {
       IngresoUsuario();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [Codigo, Contraseña, isAuthenticated]);
 
   useEffect(() => {
@@ -62,14 +66,19 @@ export default function PaginaIngreso({ navigation }) {
   }, []);
 
   const IngresoUsuario = async () => {
-    const isValid = await EncontrarUsuario(Codigo, Contraseña);
-    if (isValid === true) {
+    setIsLoading(true);
+    const result = await EncontrarUsuario(Codigo, Contraseña);
+    setIsLoading(false);
+    if (result === true) {
       const data = await ObtenerDatosUsuario();
       if (data.Contraseña !== Contraseña) {
         ActualizarContraseña(Contraseña);
       }
       // Si el usuario es supervisor, redirige a la navegación de supervisores; de lo contrario, al tab normal.
-      if (data.TipoServidor && data.TipoServidor.toLowerCase() === "supervisor") {
+      if (
+        data.TipoServidor &&
+        data.TipoServidor.toLowerCase() === "supervisor"
+      ) {
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -84,9 +93,12 @@ export default function PaginaIngreso({ navigation }) {
           })
         );
       }
+    } else if (result === "not_validated") {
+      setErrorMessage("El usuario no está validado.");
+      setErrorModalVisible(true);
     } else {
-      setIsAuthenticated(false);
-      Alert.alert("Datos incorrectos");
+      setErrorMessage("Datos incorrectos.");
+      setErrorModalVisible(true);
     }
   };
 
@@ -155,7 +167,8 @@ export default function PaginaIngreso({ navigation }) {
                   if (Codigo !== "" && Contraseña !== "") {
                     IngresoUsuario();
                   } else {
-                    Alert.alert("Por favor completa los 2 campos");
+                    setErrorMessage("Por favor completa los 2 campos");
+                    setErrorModalVisible(true);
                   }
                 }}
               >
@@ -169,7 +182,7 @@ export default function PaginaIngreso({ navigation }) {
                       backgroundColor: "#57A9D9",
                       justifyContent: "center",
                       alignItems: "center",
-                      borderRadius: 999999,
+                      borderRadius: 9999,
                     },
                     {
                       width: width * 0.2,
@@ -193,7 +206,9 @@ export default function PaginaIngreso({ navigation }) {
               <Text>Ó</Text>
               <View style={[styles.line, { width: width * 0.3 }]} />
             </View>
-            <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>
+            <Text
+              style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}
+            >
               Si no estás registrado
             </Text>
             <Pressable
@@ -222,6 +237,35 @@ export default function PaginaIngreso({ navigation }) {
           </View>
         </View>
       </View>
+
+      {/* Modal de carga */}
+      <Modal transparent={true} animationType="fade" visible={isLoading}>
+        <View style={styles.modalBackground}>
+          <View style={styles.activityIndicatorWrapper}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text style={{ marginTop: 10 }}>Cargando...</Text>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Modal de error */}
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={errorModalVisible}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.errorModalWrapper}>
+            <Text style={styles.errorText}>{errorMessage}</Text>
+            <Pressable
+              style={styles.errorButton}
+              onPress={() => setErrorModalVisible(false)}
+            >
+              <Text style={styles.errorButtonText}>Aceptar</Text>
+            </Pressable>
+          </View>
+        </View>
+      </Modal>
     </ImageBackground>
   );
 }
@@ -277,8 +321,6 @@ const styles = StyleSheet.create({
   },
   btnIngresar: {
     backgroundColor: "#2272A7",
-    height: "100%",
-    width: 109,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
@@ -293,8 +335,6 @@ const styles = StyleSheet.create({
   },
   btnRegistro: {
     backgroundColor: "#2272A7",
-    height: "16%",
-    width: 109,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
@@ -310,8 +350,6 @@ const styles = StyleSheet.create({
   },
   btnChangePass: {
     backgroundColor: "#2272A7",
-    height: "16%",
-    width: "70%",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 10,
@@ -335,7 +373,43 @@ const styles = StyleSheet.create({
   },
   line: {
     height: 1,
-    width: 120,
     backgroundColor: "black",
+  },
+  modalBackground: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.4)",
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: "#FFFFFF",
+    height: 120,
+    width: 120,
+    borderRadius: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  errorModalWrapper: {
+    backgroundColor: "#FFFFFF",
+    padding: 20,
+    marginHorizontal: 30,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  errorButton: {
+    backgroundColor: "#2272A7",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+  },
+  errorButtonText: {
+    color: "white",
+    fontWeight: "bold",
   },
 });
