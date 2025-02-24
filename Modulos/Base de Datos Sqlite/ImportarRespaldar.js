@@ -1,8 +1,8 @@
 import { db } from "./SQLiteIni";
 import { añadirHorasSup, obtenerHoras } from "../Operaciones Supabase/HorasSupa";
-import { ObtenerDatosUsuario } from "../InfoUsuario";
+import { ObtenerDatosUsuario, BorrarHorarioUsuario } from "../InfoUsuario";
 import { ObtenerHorarioDesdeSupa } from "../Operaciones Supabase/HorarioSupa";
-import { ChecarSemana, BorrarHorarioUsuario } from "./Semanas";
+import { ChecarSemana } from "./Semanas";
 
 export const RespaldarRegistroEnSupa = async (registro) => {
   const isBacked = await añadirHorasSup(

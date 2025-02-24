@@ -67,40 +67,44 @@ export default function PaginaIngreso({ navigation }) {
 
   const IngresoUsuario = async () => {
     setIsLoading(true);
-    const result = await EncontrarUsuario(Codigo, Contraseña);
-    setIsLoading(false);
-    if (result === true) {
-      const data = await ObtenerDatosUsuario();
-      if (data.Contraseña !== Contraseña) {
-        ActualizarContraseña(Contraseña);
-      }
-      // Si el usuario es supervisor, redirige a la navegación de supervisores; de lo contrario, al tab normal.
-      if (
-        data.TipoServidor &&
-        data.TipoServidor.toLowerCase() === "supervisor"
-      ) {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: "Supervisor" }],
-          })
-        );
+    try {
+      const result = await EncontrarUsuario(Codigo, Contraseña);
+      if (result === true) {
+        const data = await ObtenerDatosUsuario();
+        if (data.Contraseña !== Contraseña) {
+          await ActualizarContraseña(Contraseña);
+        }
+        if (data.TipoServidor && data.TipoServidor.toLowerCase() === "supervisor") {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "Supervisor" }],
+            })
+          );
+        } else {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 0,
+              routes: [{ name: "Tab" }],
+            })
+          );
+        }
+      } else if (result === "not_validated") {
+        setErrorMessage("El usuario no está validado.");
+        setErrorModalVisible(true);
       } else {
-        navigation.dispatch(
-          CommonActions.reset({
-            index: 0,
-            routes: [{ name: "Tab" }],
-          })
-        );
+        setErrorMessage("Datos incorrectos.");
+        setErrorModalVisible(true);
       }
-    } else if (result === "not_validated") {
-      setErrorMessage("El usuario no está validado.");
+    } catch (error) {
+      console.error("Error en la autenticación:", error);
+      setErrorMessage("Ocurrió un error, inténtalo de nuevo.");
       setErrorModalVisible(true);
-    } else {
-      setErrorMessage("Datos incorrectos.");
-      setErrorModalVisible(true);
+    } finally {
+      // Se asegura de desactivar el modal en cualquier caso
+      setIsLoading(false);
     }
-  };
+  };  
 
   const checarUsuario = async () => {
     const data = await ObtenerDatosUsuario();
