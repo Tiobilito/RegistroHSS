@@ -46,39 +46,44 @@ export default function PaginaIngreso() {
     setShowAll(true); // Cambiar a true después de que los datos han sido cargados
   };
 
-  // Comentar la función que solicita la ubicación
-  // const solicitarUbicacion = async () => {
-  //   const location = await functionGetLocation(setUbicacion);
-  //   if (!location) {
-  //     Alert.alert("Permiso necesario", "Debes habilitar la ubicación en segundo plano.", [
-  //       { text: "Cancelar", style: "cancel" },
-  //       { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
-  //     ]);
-  //     return null;
-  //   }
-  //   return location;
-  // };
+  const solicitarUbicacion = async () => {
+    const location = await functionGetLocation(setUbicacion);
+    if (!location) {
+      Alert.alert(
+        "Permiso necesario",
+        "Debes habilitar la ubicación en segundo plano.",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Abrir Configuración",
+            onPress: () => Linking.openSettings(),
+          },
+        ]
+      );
+      return null;
+    }
+    return location;
+  };
 
   const iniciarTiempo = async () => {
-    // Comentar la validación de ubicación para la prueba
-    // const permiso = await solicitarUbicacion();
-    // if (!permiso || !ubicacion) return;
-    // if (await validation(ubicacion)) {
-    const now = new Date();
-    setFechaInicio(now);
-    ActualizarInicio(now.toISOString());
-    setMostrarCrono(true);
-    startBackgroundLocation(detenerTiempo);
+    const permiso = await solicitarUbicacion();
+    if (!permiso || !ubicacion) return;
+    if (await validation(ubicacion)) {
+      const now = new Date();
+      setFechaInicio(now);
+      ActualizarInicio(now.toISOString());
+      setMostrarCrono(true);
+      startBackgroundLocation(detenerTiempo);
 
-    // Animación para suavizar la transición al mostrar el ícono "Stop"
-    Animated.timing(showIcon, {
-      toValue: 1, // Cambiar a 1 para mostrar el ícono "Stop"
-      duration: 500, // Duración de la animación
-      useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
-    }).start();
-    // } else {
-    //   Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
-    // }
+      // Animación para suavizar la transición al mostrar el ícono "Stop"
+      Animated.timing(showIcon, {
+        toValue: 1, // Cambiar a 1 para mostrar el ícono "Stop"
+        duration: 500, // Duración de la animación
+        useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
+      }).start();
+    } else {
+      Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
+    }
   };
 
   const detenerTiempo = async () => {
@@ -136,7 +141,11 @@ export default function PaginaIngreso() {
                   }}
                 >
                   <Ionicons
-                    name={mostrarCrono ? "stop-circle-outline" : "play-circle-outline"}
+                    name={
+                      mostrarCrono
+                        ? "stop-circle-outline"
+                        : "play-circle-outline"
+                    }
                     size={60}
                     color="#fff"
                   />
@@ -194,8 +203,8 @@ const styles = StyleSheet.create({
   timerContent: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 70,  // Espacio entre el cronómetro y el botón
-    marginTop: 40,  // Ajuste para mover el cronómetro y el botón un poco más abajo
+    gap: 70, // Espacio entre el cronómetro y el botón
+    marginTop: 40, // Ajuste para mover el cronómetro y el botón un poco más abajo
   },
   timeText: {
     fontSize: 48,
@@ -205,7 +214,7 @@ const styles = StyleSheet.create({
   btnChrono: {
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 20,  // Asegura que el botón sea redondo
+    borderRadius: 20, // Asegura que el botón sea redondo
     padding: 15,
     borderWidth: 1,
     borderColor: "#1A4F6C",

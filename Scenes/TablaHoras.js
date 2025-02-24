@@ -55,8 +55,7 @@ export default function PaginaTablaHoras({ navigation }) {
         <Text
           style={{
             fontSize: scaleFactor > 1 ? 24 : 20,
-            fontWeight: "bold",
-            color: "white",
+            fontWeight: "bold"
           }}
         >
           Tabla de horas:
@@ -64,8 +63,7 @@ export default function PaginaTablaHoras({ navigation }) {
         <Text
           style={{
             fontSize: scaleFactor > 1 ? 24 : 20,
-            fontWeight: "400",
-            color: "white",
+            fontWeight: "400"
           }}
         >
           Horas formato de total HH:MM:SS
@@ -167,8 +165,7 @@ export default function PaginaTablaHoras({ navigation }) {
                 style={{
                   fontSize: 18 * scaleFactor,
                   fontWeight: "bold",
-                  width: "auto",
-                  color: "white",
+                  width: "auto"
                 }}
               >
                 Total acumulado en la semana: (
