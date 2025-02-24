@@ -74,7 +74,10 @@ export default function PaginaIngreso({ navigation }) {
         if (data.Contraseña !== Contraseña) {
           await ActualizarContraseña(Contraseña);
         }
-        if (data.TipoServidor && data.TipoServidor.toLowerCase() === "supervisor") {
+        if (
+          data.TipoServidor &&
+          data.TipoServidor.toLowerCase() === "supervisor"
+        ) {
           navigation.dispatch(
             CommonActions.reset({
               index: 0,
@@ -104,7 +107,7 @@ export default function PaginaIngreso({ navigation }) {
       // Se asegura de desactivar el modal en cualquier caso
       setIsLoading(false);
     }
-  };  
+  };
 
   const checarUsuario = async () => {
     const data = await ObtenerDatosUsuario();
@@ -125,12 +128,12 @@ export default function PaginaIngreso({ navigation }) {
         ]}
       >
         <View style={styles.titleContainer}>
-          <Text style={[styles.title, { fontSize: width > 400 ? 24 : 20 }]}>
+          <Text style={[styles.title]}>
             Ingresa
           </Text>
         </View>
         <View style={{ height: height * 0.6 }}>
-          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>
+          <Text style={[styles.subtitle]}>
             Código
           </Text>
           <TextInput
@@ -139,7 +142,7 @@ export default function PaginaIngreso({ navigation }) {
             keyboardType="numeric"
             value={Codigo}
           />
-          <Text style={[styles.subtitle, { fontSize: width > 400 ? 18 : 14 }]}>
+          <Text style={[styles.subtitle]}>
             Contraseña
           </Text>
           <TextInput
@@ -215,26 +218,31 @@ export default function PaginaIngreso({ navigation }) {
             >
               Si no estás registrado
             </Text>
+
             <Pressable
               style={[
                 styles.btnRegistro,
                 {
-                  width: width * 0.3,
+                  width: width * 0.7,
                   height: height * 0.06,
                   marginTop: height * 0.02,
                 },
               ]}
-              onPress={() => {
-                navigation.navigate("Registro");
-              }}
+              onPress={() => navigation.navigate("Registro")}
             >
               <Text style={styles.txtBtn}>Registro</Text>
             </Pressable>
+
             <Pressable
-              style={[styles.btnChangePass, { width: width * 0.7 }]}
-              onPress={() => {
-                navigation.navigate("changepassword");
-              }}
+              style={[
+                styles.btnChangePass,
+                {
+                  width: width * 0.7,
+                  height: height * 0.06,
+                  marginTop: height * 0.02,
+                },
+              ]}
+              onPress={() => navigation.navigate("changepassword")}
             >
               <Text style={styles.txtBtn}>Recuperar contraseña</Text>
             </Pressable>
@@ -276,7 +284,7 @@ export default function PaginaIngreso({ navigation }) {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: Scale > 400 ? 24 : 20,
+    fontSize: Scale*0.08,
     fontWeight: "bold",
     color: "black",
   },
@@ -288,6 +296,7 @@ const styles = StyleSheet.create({
   txtBtn: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16, 
   },
   imgBackground: {
     flex: 1,
