@@ -11,7 +11,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import ollama from "ollama";
 
 const handleGenericAPIRequest = async (message) => {
   console.log("El mensaje enviado es: " + message);
