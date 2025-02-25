@@ -42,10 +42,11 @@ export default function PaginaIngreso() {
     obtenerHorasAcumuladas(); // Obtener las horas acumuladas al cargar la página
   }, []);
 
-  // Función para convertir HH:MM:SS a segundos
-  const convertirAHorasEnSegundos = (horaString) => {
-    const [horas, minutos, segundos] = horaString.split(":").map(Number);
-    return horas * 3600 + minutos * 60 + segundos;  // Convertir a segundos
+  // Función para convertir segundos a formato HH:MM
+  const convertirAHorasMinutos = (segundos) => {
+    const horas = Math.floor(segundos / 3600); // Obtener las horas completas
+    const minutos = Math.floor((segundos % 3600) / 60); // Obtener los minutos restantes
+    return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`; // Formatear a HH:MM
   };
 
   // Función para obtener las horas acumuladas desde la base de datos
@@ -211,7 +212,7 @@ export default function PaginaIngreso() {
           rotation={0}  // Rotar el gráfico para que comience desde la parte superior
           style={styles.progressCircle}
         >
-          {(fill) => <Text style={styles.progressText}>{`${(totalHorasAcumuladas / 3600).toFixed(2)} / ${totalHoras}`}</Text>}
+          {(fill) => <Text style={styles.progressText}>{`${convertirAHorasMinutos(totalHorasAcumuladas)} / ${totalHoras}`}</Text>}
         </AnimatedCircularProgress>
       </View>
     </ImageBackground>
