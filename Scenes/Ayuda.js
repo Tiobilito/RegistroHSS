@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   TextInput,
@@ -9,6 +9,8 @@ import {
   ScrollView,
   useWindowDimensions,
   ActivityIndicator,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
@@ -48,13 +50,12 @@ export default function PaginaAyuda() {
   const [chatHistory, setChatHistory] = useState([]);
   const [chatMessage, setChatMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
+  const scrollViewRef = useRef();
   const image = require("../assets/fondo.webp");
 
   const sendMessage = async () => {
     if (!chatMessage.trim() || isLoading) return;
 
-    // Mensaje del usuario
     const userMessage = { text: chatMessage, sender: "user" };
     setChatHistory((prev) => [...prev, userMessage]);
     setChatMessage("");
@@ -69,87 +70,104 @@ export default function PaginaAyuda() {
     }
   };
 
+  useEffect(() => {
+    if (chatHistory.length > 0) {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }
+  }, [chatHistory]);
+
   return (
     <ImageBackground
       source={image}
       style={[styles.container, { width, height }]}
       resizeMode="cover"
     >
-      {/* Contenedor del chat */}
-      <View
-        style={[
-          styles.chatContainer,
-          {
-            width: width * 0.9,
-            height: height * 0.7,
-            padding: width * 0.04,
-            marginTop: height * 0.05,
-          },
-        ]}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.flexContainer}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
       >
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={{ paddingBottom: 20 }}
-        >
-          {chatHistory.map((msg, index) => (
-            <View
-              key={index}
-              style={[
-                styles.messageContainer,
-                msg.sender === "user" ? styles.userMessage : styles.botMessage,
-              ]}
-            >
-              <Text style={[styles.chatText, { fontSize: 16 * scaleFactor }]}>
-                {msg.text}
-              </Text>
-            </View>
-          ))}
-          {isLoading && (
-            <View style={[styles.messageContainer, styles.botMessage]}>
-              <ActivityIndicator size="small" color="#666" />
-            </View>
-          )}
-        </ScrollView>
-      </View>
-
-      {/* Contenedor del input */}
-      <View
-        style={[
-          styles.inputContainer,
-          {
-            padding: 10,
-            marginHorizontal: width * 0.05,
-            bottom: height * 0.02,
-          },
-        ]}
-      >
-        <TextInput
+        {/* Contenedor del chat */}
+        <View
           style={[
-            styles.input,
+            styles.chatContainer,
             {
-              height: 40 * scaleFactor,
-              fontSize: 16 * scaleFactor,
-              marginRight: 10,
+              width: width * 0.9,
+              marginTop: height * 0.05,
+              flex: 1,
             },
           ]}
-          onChangeText={setChatMessage}
-          value={chatMessage}
-          placeholder="Escribe tu mensaje"
-          placeholderTextColor="#999"
-          editable={!isLoading}
-        />
-        <Pressable onPress={sendMessage} disabled={isLoading}>
-          {isLoading ? (
-            <ActivityIndicator size={35 * scaleFactor} color="#666" />
-          ) : (
-            <Ionicons
-              name="paper-plane"
-              size={35 * scaleFactor}
-              color={chatMessage.trim() ? "#2196F3" : "#999"}
-            />
-          )}
-        </Pressable>
-      </View>
+        >
+          <ScrollView
+            ref={scrollViewRef}
+            style={styles.scrollView}
+            contentContainerStyle={{ paddingBottom: 100 }}
+            keyboardDismissMode="interactive"
+            onContentSizeChange={() =>
+              scrollViewRef.current?.scrollToEnd({ animated: true })
+            }
+          >
+            {chatHistory.map((msg, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.messageContainer,
+                  msg.sender === "user"
+                    ? styles.userMessage
+                    : styles.botMessage,
+                ]}
+              >
+                <Text style={[styles.chatText, { fontSize: 16 * scaleFactor }]}>
+                  {msg.text}
+                </Text>
+              </View>
+            ))}
+            {isLoading && (
+              <View style={[styles.messageContainer, styles.botMessage]}>
+                <ActivityIndicator size="small" color="#666" />
+              </View>
+            )}
+          </ScrollView>
+        </View>
+
+        {/* Contenedor del input */}
+        <View
+          style={[
+            styles.inputContainer,
+            {
+              marginHorizontal: width * 0.05,
+              marginBottom: Platform.OS === "ios" ? 25 : 15,
+            },
+          ]}
+        >
+          <TextInput
+            style={[
+              styles.input,
+              {
+                height: 40 * scaleFactor,
+                fontSize: 16 * scaleFactor,
+                marginRight: 10,
+              },
+            ]}
+            onChangeText={setChatMessage}
+            value={chatMessage}
+            placeholder="Escribe tu mensaje"
+            placeholderTextColor="#999"
+            editable={!isLoading}
+          />
+          <Pressable onPress={sendMessage} disabled={isLoading}>
+            {isLoading ? (
+              <ActivityIndicator size={35 * scaleFactor} color="#666" />
+            ) : (
+              <Ionicons
+                name="paper-plane"
+                size={35 * scaleFactor}
+                color={chatMessage.trim() ? "#2196F3" : "#999"}
+              />
+            )}
+          </Pressable>
+        </View>
+      </KeyboardAvoidingView>
     </ImageBackground>
   );
 }
@@ -157,11 +175,10 @@ export default function PaginaAyuda() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
   },
-  scrollView: {
+  flexContainer: {
     flex: 1,
+    alignItems: "center",
   },
   chatContainer: {
     backgroundColor: "#ffffff",
@@ -171,17 +188,25 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-  },
-  chatText: {
-    color: "#000",
+    marginBottom: 15,
   },
   inputContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "white",
     borderRadius: 25,
-    position: "absolute",
-    width: "90%",
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  chatText: {
+    color: "#000",
   },
   input: {
     flex: 1,

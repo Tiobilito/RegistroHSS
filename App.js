@@ -60,6 +60,7 @@ const TabNavigation = () => {
       initialRouteName="Principal"
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === "Principal") {
@@ -94,6 +95,7 @@ const SupervisorNavigation = () => {
       initialRouteName="Principal"
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarHideOnKeyboard: true,
         tabBarIcon: ({ focused, color, size }) => {
           let iconName;
           if (route.name === "Principal") {
