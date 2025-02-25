@@ -11,9 +11,9 @@ import {
 import { useFocusEffect } from "@react-navigation/native";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
-import ModalFormulario from "../Modulos/ModalFormularioHoras";
-import ModalReporte from "../Modulos/ModalReporte";  // Modal de reporte
-import ModalTablaHoras from "../Modulos/ModalTablaHoras"; // Modal de tabla de horas
+import ModalFormulario from "../Modulos/Modales/ModalFormularioHoras";
+import ModalReporte from "../Modulos/Modales/ModalReporte";
+import ModalTablaHoras from "../Modulos/Modales/ModalTablaHoras";
 import { añadirHoraModal, obtenerHorasUsuario } from "../Modulos/Base de Datos Sqlite/Horas";
 import { obtenerSemanasUsuario } from "../Modulos/Base de Datos Sqlite/Semanas";
 import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades";

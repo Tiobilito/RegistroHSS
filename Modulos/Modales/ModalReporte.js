@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, View, Text, Pressable, StyleSheet, TextInput } from "react-native";
-import { supabase } from "./Operaciones Supabase/supabase";
-import { ObtenerDatosUsuario } from "./InfoUsuario";
+import { supabase } from "../Operaciones Supabase/supabase";
+import { ObtenerDatosUsuario } from "../InfoUsuario";
 
 const formatDate = (date) => {
   const [day, month, year] = date.split('/');

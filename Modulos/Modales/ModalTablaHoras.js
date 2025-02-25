@@ -10,8 +10,8 @@ import {
   useWindowDimensions,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { obtenerHorasSemana, BorrarHora } from "../Modulos/Base de Datos Sqlite/Horas";
-import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades";
+import { obtenerHorasSemana, BorrarHora } from "../Base de Datos Sqlite/Horas";
+import { sumarTiempos } from "../Base de Datos Sqlite/Utilidades";
 
 export default function ModalTablaHoras({
   modalVisible,

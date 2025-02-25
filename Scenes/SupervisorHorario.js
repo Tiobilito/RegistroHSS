@@ -6,7 +6,7 @@ import {
   ScrollView,
   StyleSheet,
 } from "react-native";
-import ModalInscritos from "../Modulos/ModalInscritosHorario";
+import ModalInscritos from "../Modulos/Modales/ModalInscritosHorario";
 import { fetchHorarios } from "../Modulos/Operaciones Supabase/HorarioSupa";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
