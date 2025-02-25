@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, FlatList, TouchableOpacity, ImageBackground, Mo
 import { Ionicons } from "react-native-vector-icons"; // Importamos los iconos
 
 import { obtenerReportes } from "../Modulos/Operaciones Supabase/ReportesSupa"; // Aquí debes agregar tu función para obtener los reportes
+import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 const scaleFactor = 1; // Ajusta este valor de acuerdo a tu escala, si es necesario
 
@@ -16,7 +17,8 @@ export default function Reportes({ navigation }) {
   // Cargar los reportes
   useEffect(() => {
     const fetchReportes = async () => {
-      const data = await obtenerReportes(); // Obtener todos los reportes, sin filtrar por el estudiante logueado
+      const Udata = await ObtenerDatosUsuario();
+      const data = await obtenerReportes(Udata.idDepartamento); 
       setReportes(data);
     };
 
