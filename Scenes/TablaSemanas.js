@@ -12,7 +12,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import ModalFormulario from "../Modulos/ModalFormularioHoras";
-import ModalReporte from "../Modulos/ModalReporte";  // Importamos el nuevo modal
+import ModalReporte from "../Modulos/ModalReporte";  // Modal de reporte
+import ModalTablaHoras from "../Modulos/ModalTablaHoras"; // Modal de tabla de horas
 import { añadirHoraModal, obtenerHorasUsuario } from "../Modulos/Base de Datos Sqlite/Horas";
 import { obtenerSemanasUsuario } from "../Modulos/Base de Datos Sqlite/Semanas";
 import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades";
@@ -21,8 +22,9 @@ export default function PaginaTablaSemanas({ navigation }) {
   const { width, height } = useWindowDimensions();
   const scaleFactor = width / 375;
 
+  // Estados para modales y datos
   const [modalVisible, DetModalVisible] = useState(false);
-  const [modalReporteVisible, DetModalReporteVisible] = useState(false); // Nuevo estado para el modal de reporte
+  const [modalReporteVisible, DetModalReporteVisible] = useState(false);
   const [Horas, DefHoras] = useState([]);
   const [Semanas, DefSemanas] = useState([]);
   const [MostrarSemanas, DefMostrarSemanas] = useState(false);
@@ -41,16 +43,21 @@ export default function PaginaTablaSemanas({ navigation }) {
     horasReportadas: "",
     periodoInicio: "",
     periodoFin: "",
-    descripcion: "",  // Añadimos la propiedad descripcion
+    descripcion: "",
   });
+
+  // Estados para el modal de tabla de horas
+  const [modalHorasVisible, setModalHorasVisible] = useState(false);
+  const [selectedIdSem, setSelectedIdSem] = useState(null);
 
   // Función para actualizar la descripción
   const handleDescripcionChange = (text) => {
     setFormData({
       ...formData,
-      descripcion: text,  // Actualizamos la propiedad descripcion
+      descripcion: text,
     });
   };
+
   // Función para construir una fecha a partir de los valores del formulario
   const construirFecha = (day, month, year, hours, minutes, seconds) => {
     return new Date(`${year}-${month}-${day}T${hours}:${minutes}:${seconds}`);
@@ -58,16 +65,20 @@ export default function PaginaTablaSemanas({ navigation }) {
 
   // Función para obtener el periodo de las semanas seleccionadas
   const obtenerPeriodo = () => {
-    if (semanasSeleccionadas.length === 0) return { periodoInicio: "", periodoFin: "" };
-    
+    if (semanasSeleccionadas.length === 0)
+      return { periodoInicio: "", periodoFin: "" };
+
     const semanasSeleccionadasData = Semanas.filter((semana) =>
       semanasSeleccionadas.includes(semana.id)
     );
 
-    semanasSeleccionadasData.sort((a, b) => new Date(a.Inicio) - new Date(b.Inicio));
+    semanasSeleccionadasData.sort(
+      (a, b) => new Date(a.Inicio) - new Date(b.Inicio)
+    );
 
     const periodoInicio = semanasSeleccionadasData[0].Inicio;
-    const periodoFin = semanasSeleccionadasData[semanasSeleccionadasData.length - 1].Fin;
+    const periodoFin =
+      semanasSeleccionadasData[semanasSeleccionadasData.length - 1].Fin;
 
     return { periodoInicio, periodoFin };
   };
@@ -80,7 +91,7 @@ export default function PaginaTablaSemanas({ navigation }) {
   // Abrir modal para el reporte de semanas seleccionadas
   const openModalReporte = () => {
     const { periodoInicio, periodoFin } = obtenerPeriodo();
-    const horasReportadas = calcularTotalSeleccionado();  // Calcula las horas reportadas
+    const horasReportadas = calcularTotalSeleccionado(); // Calcula las horas reportadas
 
     setFormData({
       ...formData,
@@ -93,7 +104,7 @@ export default function PaginaTablaSemanas({ navigation }) {
     DetModalReporteVisible(true);
   };
 
-  // Cerrar el modal de horas
+  // Cerrar el modal de horas (formulario)
   const closeModal = () => {
     DetModalVisible(false);
     setFormData({
@@ -229,10 +240,7 @@ export default function PaginaTablaSemanas({ navigation }) {
       <View
         style={[
           styles.listContainer,
-          {
-            padding: width * 0.04,
-            marginTop: height * 0.08,
-          },
+          { padding: width * 0.04, marginTop: height * 0.08 },
         ]}
       >
         <Pressable
@@ -246,9 +254,7 @@ export default function PaginaTablaSemanas({ navigation }) {
           <Ionicons
             name="refresh-circle"
             size={50 * scaleFactor}
-            color={
-              semanasSeleccionadas.length === 0 ? "gray" : "black"
-            }
+            color={semanasSeleccionadas.length === 0 ? "gray" : "black"}
           />
         </Pressable>
         <Text
@@ -261,7 +267,7 @@ export default function PaginaTablaSemanas({ navigation }) {
           Fecha de inicio - Fecha de fin
         </Text>
 
-        {/* Botón para abrir el modal de horas */}
+        {/* Botón para abrir el modal de horas (formulario) */}
         <Pressable
           style={{
             marginTop: -height * 0.04,
@@ -272,10 +278,10 @@ export default function PaginaTablaSemanas({ navigation }) {
           <Ionicons name="add-circle" size={50 * scaleFactor} />
         </Pressable>
 
-        {/* Botón para abrir el nuevo modal de reporte */}
+        {/* Botón para abrir el modal de reporte */}
         <Pressable
           style={{
-            marginTop: height * 0,  // Ajustamos este valor para que esté justo entre los dos botones de arriba y los registros
+            marginTop: 0,
             marginLeft: width * 0.35,
           }}
           onPress={openModalReporte}
@@ -288,7 +294,6 @@ export default function PaginaTablaSemanas({ navigation }) {
           />
         </Pressable>
 
-
         <ModalFormulario
           modalVisible={modalVisible}
           closeModal={closeModal}
@@ -299,7 +304,6 @@ export default function PaginaTablaSemanas({ navigation }) {
           handleTimeChange={(field, value) => {}}
         />
 
-        {/* Modal de reporte */}
         <ModalReporte
           modalVisible={modalReporteVisible}
           closeModal={() => DetModalReporteVisible(false)}
@@ -307,6 +311,7 @@ export default function PaginaTablaSemanas({ navigation }) {
           formData={formData}
         />
 
+        {/* Listado de semanas */}
         {MostrarSemanas ? (
           <>
             <View style={{ marginBottom: height * 0.02 }} />
@@ -325,11 +330,11 @@ export default function PaginaTablaSemanas({ navigation }) {
                       borderRadius: 10,
                     }}
                   />
+                  {/* Al presionar sobre la semana se abre el modal de horas */}
                   <Pressable
                     onPress={() => {
-                      navigation.navigate("TablaHoras", {
-                        idSem: item.id,
-                      });
+                      setSelectedIdSem(item.id);
+                      setModalHorasVisible(true);
                     }}
                   >
                     <Text style={styles.txt}>
@@ -347,8 +352,7 @@ export default function PaginaTablaSemanas({ navigation }) {
                   fontWeight: "bold",
                 }}
               >
-                Total acumulado: ({" "}
-                {sumarTiempos(Horas.map((item) => item.Total))} )
+                Total acumulado: ( {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>
               <Text
                 style={{
@@ -357,8 +361,7 @@ export default function PaginaTablaSemanas({ navigation }) {
                   marginTop: height * 0.01,
                 }}
               >
-                Total de horas seleccionadas: ({" "}
-                {calcularTotalSeleccionado()} )
+                Total de horas seleccionadas: ( {calcularTotalSeleccionado()} )
               </Text>
             </View>
           </>
@@ -366,6 +369,12 @@ export default function PaginaTablaSemanas({ navigation }) {
           <Text style={{ fontSize: 18 * scaleFactor }}>No hay registros</Text>
         )}
       </View>
+      {/* Modal de tabla de horas: lista las horas registradas de la semana seleccionada */}
+      <ModalTablaHoras
+        modalVisible={modalHorasVisible}
+        closeModal={() => setModalHorasVisible(false)}
+        idSem={selectedIdSem}
+      />
     </ImageBackground>
   );
 }

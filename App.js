@@ -8,7 +8,6 @@ import Supervisor from "./Scenes/Supervisor"; // Pantalla del Supervisor
 
 import PaginaPrincipal from "./Scenes/Principal";
 import PaginaRegistro from "./Scenes/Registro";
-import PaginaTablaHoras from "./Scenes/TablaHoras";
 import PaginaTablaSemanas from "./Scenes/TablaSemanas";
 import PaginaAjustes from "./Scenes/Ajustes";
 import PaginaIngreso from "./Scenes/Ingreso";
@@ -35,10 +34,6 @@ const TablaSemHoras = () => {
       <TablaSemanasHoras.Screen
         name="TablaSemanas"
         component={PaginaTablaSemanas}
-      />
-      <TablaSemanasHoras.Screen
-        name="TablaHoras"
-        component={PaginaTablaHoras}
       />
     </TablaSemanasHoras.Navigator>
   );
