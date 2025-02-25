@@ -35,6 +35,7 @@ export default function PaginaIngreso() {
   const [totalHorasAcumuladas, setTotalHorasAcumuladas] = useState(0); // Estado para almacenar las horas acumuladas
   const [progress, setProgress] = useState(new Animated.Value(0)); // Usar Animated.Value para el valor de la barra circular
   const totalHoras = 480; // Total de horas para la barra de progreso
+  const [actualFill, setActualFill] = useState(0); // Inicializa el fill a 0
 
   useEffect(() => {
     obtenerUsuario();
@@ -50,7 +51,6 @@ export default function PaginaIngreso() {
   // Función para obtener las horas acumuladas desde la base de datos
   const obtenerHorasAcumuladas = async () => {
     const horas = await obtenerHorasUsuario(); // Obtener todas las horas
-    console.log("Horas del usuario:", horas); // Verificar las horas obtenidas
     if (horas && horas.length > 0) {
       const totalHorasSegundos = sumarTiempos(horas.map((hora) => hora.Total)); // Sumar todas las horas
       const totalSegundos = convertirAHorasEnSegundos(totalHorasSegundos); // Convertir a segundos
@@ -71,11 +71,14 @@ export default function PaginaIngreso() {
     }).start();
   };
 
-  // Calcular el color progresivo (de rojo a verde)
-  const colorProgress = progress.interpolate({
-    inputRange: [0, 100],
-    outputRange: ['#FF0000', '#00FF00'], // Rojo a verde
-  });
+  useEffect(() => {
+    // Actualiza el valor de fill a medida que el progreso cambia
+    const interval = setInterval(() => {
+      setActualFill(progress.__getValue()); // Extrae el valor numérico de la animación
+    }, 16); // Actualiza aproximadamente cada frame (60fps)
+
+    return () => clearInterval(interval); // Limpiar intervalo cuando el componente se desmonte
+  }, [progress]);
 
   const obtenerUsuario = async () => {
     let data = await ObtenerDatosUsuario();
@@ -200,14 +203,14 @@ export default function PaginaIngreso() {
       {/* Contenedor del gráfico circular en la parte inferior de la pantalla */}
       <View style={styles.progressContainer}>
         <AnimatedCircularProgress
-          size={140}  // Tamaño reducido para que sea más pequeño
-          width={15}  // Grosor del borde
-          fill={progress}  // Usamos el valor de estado progress para la animación
-          tintColor={colorProgress}  // Color progresivo de rojo a verde
+          size={140}
+          width={15}
+          fill={actualFill}  // Ahora `actualFill` tiene un valor numérico
+          tintColor="#00FF00"  // Color verde fijo para la barra de progreso
           backgroundColor="#e0e0e0"
+          rotation={0}  // Rotar el gráfico para que comience desde la parte superior
           style={styles.progressCircle}
         >
-          {/* Mostrar el texto con máximo 2 decimales para horas acumuladas */}
           {(fill) => <Text style={styles.progressText}>{`${(totalHorasAcumuladas / 3600).toFixed(2)} / ${totalHoras}`}</Text>}
         </AnimatedCircularProgress>
       </View>
@@ -223,11 +226,11 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "space-around",
-    paddingVertical: 20,  // Reducir paddingVertical para subir más los elementos
+    paddingVertical: 20,
   },
   header: {
     alignItems: "center",
-    marginTop: -80,  // Subir el encabezado
+    marginTop: -80,
   },
   title: {
     fontSize: 28,
@@ -242,7 +245,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     width: "90%",
     height: "60%",
-    borderRadius: 200, // Haciendo el contenedor ovalado
+    borderRadius: 200,
     padding: 60,
     alignItems: "center",
     elevation: 9,
@@ -251,16 +254,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     position: "relative",
-    marginTop: -230,  // Subir más el contenedor del cronómetro
+    marginTop: -230,
     borderWidth: 3,
-    borderColor: "#2272A7", // Bordes azules suaves
-    overflow: 'visible',  // Esto permite que el círculo de progreso sea visible fuera del contenedor
+    borderColor: "#2272A7",
+    overflow: 'visible',
   },
   timerContent: {
     alignItems: "center",
     justifyContent: "center",
-    gap: 70, // Espacio entre el cronómetro y el botón
-    marginTop: 40, // Ajuste para mover el cronómetro y el botón un poco más abajo
+    gap: 70,
+    marginTop: 40,
   },
   timeText: {
     fontSize: 48,
@@ -270,7 +273,7 @@ const styles = StyleSheet.create({
   btnChrono: {
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 20, // Asegura que el botón sea redondo
+    borderRadius: 20,
     padding: 15,
     borderWidth: 1,
     borderColor: "#1A4F6C",
@@ -283,15 +286,13 @@ const styles = StyleSheet.create({
   },
   progressContainer: {
     position: "absolute",
-    bottom: 0,   // Colocado en la parte inferior
-    left: 20,    // Alineado a la izquierda
-    width: "100%", // Asegura que ocupe todo el ancho
-    alignItems: "flex-start", // Alinea el círculo a la izquierda
-    paddingBottom: 20, // Espacio adicional desde el borde inferior
+    bottom: 0,
+    left: 20,
+    width: "100%",
+    alignItems: "flex-start",
+    paddingBottom: 20,
   },
-  progressCircle: {
-    // Sin cambios, ya que es gestionado por progressContainer
-  },
+  progressCircle: {},
   progressText: {
     fontSize: 18,
     color: "black",
