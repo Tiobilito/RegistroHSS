@@ -18,7 +18,7 @@ const handleGenericAPIRequest = async (message) => {
   if (!message.trim()) return null;
 
   try {
-    const response = await fetch("http://10.0.2.2:11434api/generate", {
+    const response = await fetch("https://02b6-187-212-185-22.ngrok-free.app/api/generate", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
