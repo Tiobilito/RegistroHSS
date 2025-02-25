@@ -14,7 +14,10 @@ import { Ionicons } from "@expo/vector-icons";
 import ModalFormulario from "../Modulos/Modales/ModalFormularioHoras";
 import ModalReporte from "../Modulos/Modales/ModalReporte";
 import ModalTablaHoras from "../Modulos/Modales/ModalTablaHoras";
-import { añadirHoraModal, obtenerHorasUsuario } from "../Modulos/Base de Datos Sqlite/Horas";
+import {
+  añadirHoraModal,
+  obtenerHorasUsuario,
+} from "../Modulos/Base de Datos Sqlite/Horas";
 import { obtenerSemanasUsuario } from "../Modulos/Base de Datos Sqlite/Semanas";
 import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades";
 
@@ -319,7 +322,12 @@ export default function PaginaTablaSemanas({ navigation }) {
               data={Semanas}
               keyExtractor={(item) => item.id.toString()}
               renderItem={({ item }) => (
-                <View style={styles.item}>
+                <View
+                  style={[
+                    styles.item,
+                    { flexDirection: "row", alignItems: "center" },
+                  ]}
+                >
                   <Checkbox
                     value={semanasSeleccionadas.includes(item.id)}
                     onValueChange={() => handleCheckboxChange(item.id)}
@@ -330,17 +338,16 @@ export default function PaginaTablaSemanas({ navigation }) {
                       borderRadius: 10,
                     }}
                   />
-                  {/* Al presionar sobre la semana se abre el modal de horas */}
+                  <Text style={[styles.txt, { flex: 1, marginLeft: 10 }]}>
+                    {item.Inicio} - {item.Fin}
+                  </Text>
                   <Pressable
                     onPress={() => {
                       setSelectedIdSem(item.id);
                       setModalHorasVisible(true);
                     }}
                   >
-                    <Text style={styles.txt}>
-                      {"    "}
-                      {item.Inicio} - {item.Fin}
-                    </Text>
+                    <Ionicons name="list-circle" size={35} color="white" />
                   </Pressable>
                 </View>
               )}
@@ -352,7 +359,8 @@ export default function PaginaTablaSemanas({ navigation }) {
                   fontWeight: "bold",
                 }}
               >
-                Total acumulado: ( {sumarTiempos(Horas.map((item) => item.Total))} )
+                Total acumulado: ({" "}
+                {sumarTiempos(Horas.map((item) => item.Total))} )
               </Text>
               <Text
                 style={{
