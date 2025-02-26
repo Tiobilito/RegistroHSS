@@ -52,15 +52,30 @@ export default function PaginaIngreso() {
   // Función para obtener las horas acumuladas desde la base de datos
   const obtenerHorasAcumuladas = async () => {
     const horas = await obtenerHorasUsuario(); // Obtener todas las horas
+    console.log("Horas obtenidas:", horas);  // Verificar qué se está obteniendo
+
     if (horas && horas.length > 0) {
-      const totalHorasSegundos = sumarTiempos(horas.map((hora) => hora.Total)); // Sumar todas las horas
-      const totalSegundos = convertirAHorasEnSegundos(totalHorasSegundos); // Convertir a segundos
+      const totalHorasSegundos = horas.reduce((acc, hora) => {
+        // Verificar si la propiedad 'Total' es válida y no contiene valores inválidos
+        if (hora.Total && hora.Total.includes(":")) {
+          const [h, m, s] = hora.Total.split(":").map(Number); // Convertir "HH:MM:SS" a [h, m, s]
+          if (!isNaN(h) && !isNaN(m) && !isNaN(s)) {
+            return acc + (h * 3600 + m * 60 + s); // Convertir todo a segundos
+          }
+        }
+        return acc; // Si la hora es inválida, la ignoramos y no sumamos
+      }, 0);
+
+      const totalSegundos = totalHorasSegundos; // Ya es total en segundos
       setTotalHorasAcumuladas(totalSegundos); // Actualizar el estado con las horas acumuladas en segundos
+      console.log("Horas acumuladas en segundos:", totalSegundos);  // Verificar el total de segundos
       animateProgress(totalSegundos); // Animar el progreso
     } else {
       console.log("No se encontraron horas en la base de datos.");
     }
   };
+
+  
 
   // Función para animar la barra circular
   const animateProgress = (totalSegundosAcumulados) => {
@@ -72,14 +87,19 @@ export default function PaginaIngreso() {
     }).start();
   };
 
+  // Actualizar directamente el valor de `actualFill` sin usar setInterval
   useEffect(() => {
-    // Actualiza el valor de fill a medida que el progreso cambia
-    const interval = setInterval(() => {
-      setActualFill(progress.__getValue()); // Extrae el valor numérico de la animación
-    }, 16); // Actualiza aproximadamente cada frame (60fps)
+    // Sincroniza el valor de `actualFill` con el progreso
+    progress.addListener(({ value }) => {
+      setActualFill(value);
+    });
 
-    return () => clearInterval(interval); // Limpiar intervalo cuando el componente se desmonte
-  }, [progress]);
+    // Limpiar listener cuando el componente se desmonte
+    return () => {
+      progress.removeAllListeners();
+    };
+  }, []);
+
 
   const obtenerUsuario = async () => {
     let data = await ObtenerDatosUsuario();
