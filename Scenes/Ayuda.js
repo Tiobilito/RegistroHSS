@@ -19,6 +19,10 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 const handleGenericAPIRequest = async (message, apiUrl) => {
   console.log("El mensaje enviado es: " + message);
 
+  if(!apiUrl) {
+    return "¡Ups! Parece que no has configurado la URL. Por favor, configúrala para poder continuar.";
+  }
+
   if (!message.trim()) return null;
 
   try {
