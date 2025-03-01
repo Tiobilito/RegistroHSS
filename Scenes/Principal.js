@@ -233,7 +233,7 @@ export default function PaginaIngreso() {
           rotation={0}  // Rotar el gráfico para que comience desde la parte superior
           style={styles.progressCircle}
         >
-          {(fill) => <Text style={styles.progressText}>{`${Math.round(fill)}%`}</Text>}
+          {(fill) => <Text style={styles.progressText}>{`${fill.toFixed(2)}%`}</Text>}
         </AnimatedCircularProgress>
       </View>
     </ImageBackground>
