@@ -79,7 +79,7 @@ export default function PaginaIngreso() {
 
   // Función para animar la barra circular
   const animateProgress = (totalSegundosAcumulados) => {
-    const fillPercentage = (totalSegundosAcumulados / (totalHoras * 3600)) * 100; // Dividir por el total de segundos
+    const fillPercentage = Math.min((totalSegundosAcumulados / (totalHoras * 3600)) * 100, 100); // Limitar el porcentaje a un máximo de 100
     Animated.timing(progress, {
       toValue: fillPercentage,  // Animar el progreso
       duration: 1000,  // Duración de la animación
@@ -114,6 +114,7 @@ export default function PaginaIngreso() {
   };
 
   const solicitarUbicacion = async () => {
+    /*
     const location = await functionGetLocation(setUbicacion);
     if (!location) {
       Alert.alert(
@@ -129,13 +130,13 @@ export default function PaginaIngreso() {
       );
       return null;
     }
-    return location;
+    return location;*/
   };
 
   const iniciarTiempo = async () => {
     const permiso = await solicitarUbicacion();
-    if (!permiso || !ubicacion) return;
-    if (await validation(ubicacion)) {
+    //if (!permiso || !ubicacion) return;
+    //if (await validation(ubicacion)) {
       const now = new Date();
       setFechaInicio(now);
       ActualizarInicio(now.toISOString());
@@ -148,9 +149,9 @@ export default function PaginaIngreso() {
         duration: 500, // Duración de la animación
         useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
       }).start();
-    } else {
-      Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
-    }
+    //} //else {
+      //Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
+    //}
   };
 
   const detenerTiempo = async () => {
