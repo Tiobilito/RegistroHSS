@@ -232,7 +232,7 @@ export default function PaginaIngreso() {
           rotation={0}  // Rotar el gráfico para que comience desde la parte superior
           style={styles.progressCircle}
         >
-          {(fill) => <Text style={styles.progressText}>{`${convertirAHorasMinutos(totalHorasAcumuladas)} / ${totalHoras}`}</Text>}
+          {(fill) => <Text style={styles.progressText}>{`${Math.round(fill)}%`}</Text>}
         </AnimatedCircularProgress>
       </View>
     </ImageBackground>
