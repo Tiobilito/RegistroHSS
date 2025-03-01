@@ -22,7 +22,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.tiobilito.RegistroHSS",
+      "package": "com.toldkier.RegistroHSS",
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
@@ -37,7 +37,7 @@
         "projectId": "e23a6528-5f41-4d6c-bee6-10f5a0c439e1"
       }
     },
-    "owner": "tiobilito",
+    "owner": "toldkier",
     "plugins": [
       "expo-secure-store",
       "expo-sqlite"
