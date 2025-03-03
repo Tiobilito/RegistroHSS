@@ -1,22 +1,25 @@
 import { db } from "./SQLiteIni";
-import { añadirHorasSup, obtenerHoras } from "../Operaciones Supabase/HorasSupa";
+import {
+  añadirHorasSup,
+  obtenerHoras,
+} from "../Operaciones Supabase/HorasSupa";
 import { ObtenerDatosUsuario, BorrarHorarioUsuario } from "../InfoUsuario";
 import { ObtenerHorarioDesdeSupa } from "../Operaciones Supabase/HorarioSupa";
 import { ChecarSemana } from "./Semanas";
 
 export const RespaldarRegistroEnSupa = async (registro) => {
-  const isBacked = await añadirHorasSup(
+  const idSupabase = await añadirHorasSup(
     registro.idUsuario,
     registro.Inicio,
     registro.Final,
     registro.Total,
     registro.DInicio
   );
-  if (isBacked != 0) {
+  if (idSupabase != null) {
     try {
       db.runSync(
-        `UPDATE Horas SET IsBackedInSupabase = 1 WHERE id = ?`,
-        [registro.id]
+        `UPDATE Horas SET IsBackedInSupabase = 1, idSupabase = ? WHERE id = ?`,
+        [idSupabase, registro.id]
       );
       console.log("El registro se actualizo");
     } catch (error) {
@@ -35,14 +38,14 @@ export const ImportarDeSupaBD = async () => {
     const hora = HorasSupa[i];
     idSemana = await ChecarSemana(new Date(hora.DateInicio));
     db.runSync(
-      `INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);`,
+      `INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, idSupabase, idSemana, IsBackedInSupabase) VALUES (?, ?, ?, ?, ?, ?, ?, 1);`,
       [
         hora.DateInicio,
         hora.Inicio,
         hora.Final,
         hora.Total,
         hora.CodigoUsuario,
-        parseInt(hora.IsBackedInSupabase, 10),
+        parseInt(hora.id, 10),
         idSemana,
       ]
     );
