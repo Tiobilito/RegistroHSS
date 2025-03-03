@@ -19,14 +19,12 @@ import {
   startBackgroundLocation,
   stopBackgroundLocation,
 } from "../Modulos/gps";
-import { Ionicons } from "@expo/vector-icons"; // Importamos Ionicons
-import { AnimatedCircularProgress } from 'react-native-circular-progress'; // Importar CircularProgress
-import { obtenerHorasUsuario } from "../Modulos/Base de Datos Sqlite/Horas"; // Asegúrate de importar esta función correctamente
-import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades"; // Importar la función sumarTiempos para obtener las horas acumuladas
+import { Ionicons } from "@expo/vector-icons";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { obtenerHorasAcumuladas } from "../Modulos/Base de Datos Sqlite/Horas";
 
 export default function PaginaIngreso() {
   const { width } = useWindowDimensions();
-  const [usuario, setUsuario] = useState(null);
   const [mostrarCrono, setMostrarCrono] = useState(false);
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [ubicacion, setUbicacion] = useState(null);
@@ -39,50 +37,25 @@ export default function PaginaIngreso() {
 
   useEffect(() => {
     obtenerUsuario();
-    obtenerHorasAcumuladas(); // Obtener las horas acumuladas al cargar la página
+    obtenerTotalHoras(); 
   }, []);
 
-  // Función para convertir segundos a formato HH:MM
-  const convertirAHorasMinutos = (segundos) => {
-    const horas = Math.floor(segundos / 3600); // Obtener las horas completas
-    const minutos = Math.floor((segundos % 3600) / 60); // Obtener los minutos restantes
-    return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`; // Formatear a HH:MM
-  };
-
   // Función para obtener las horas acumuladas desde la base de datos
-  const obtenerHorasAcumuladas = async () => {
-    const horas = await obtenerHorasUsuario(); // Obtener todas las horas
-    console.log("Horas obtenidas:", horas);  // Verificar qué se está obteniendo
-
-    if (horas && horas.length > 0) {
-      const totalHorasSegundos = horas.reduce((acc, hora) => {
-        // Verificar si la propiedad 'Total' es válida y no contiene valores inválidos
-        if (hora.Total && hora.Total.includes(":")) {
-          const [h, m, s] = hora.Total.split(":").map(Number); // Convertir "HH:MM:SS" a [h, m, s]
-          if (!isNaN(h) && !isNaN(m) && !isNaN(s)) {
-            return acc + (h * 3600 + m * 60 + s); // Convertir todo a segundos
-          }
-        }
-        return acc; // Si la hora es inválida, la ignoramos y no sumamos
-      }, 0);
-
-      const totalSegundos = totalHorasSegundos; // Ya es total en segundos
-      setTotalHorasAcumuladas(totalSegundos); // Actualizar el estado con las horas acumuladas en segundos
-      console.log("Horas acumuladas en segundos:", totalSegundos);  // Verificar el total de segundos
-      animateProgress(totalSegundos); // Animar el progreso
-    } else {
-      console.log("No se encontraron horas en la base de datos.");
-    }
+  const obtenerTotalHoras = async () => {
+    const Total = await obtenerHorasAcumuladas();
+    setTotalHorasAcumuladas(Total);
+    animateProgress(totalHorasAcumuladas);
   };
-
-  
 
   // Función para animar la barra circular
   const animateProgress = (totalSegundosAcumulados) => {
-    const fillPercentage = Math.min((totalSegundosAcumulados / (totalHoras * 3600)) * 100, 100); // Limitar el porcentaje a un máximo de 100
+    const fillPercentage = Math.min(
+      (totalSegundosAcumulados / (totalHoras * 3600)) * 100,
+      100
+    ); // Limitar el porcentaje a un máximo de 100
     Animated.timing(progress, {
-      toValue: fillPercentage,  // Animar el progreso
-      duration: 1000,  // Duración de la animación
+      toValue: fillPercentage, // Animar el progreso
+      duration: 1000, // Duración de la animación
       useNativeDriver: false,
     }).start();
   };
@@ -100,11 +73,9 @@ export default function PaginaIngreso() {
     };
   }, []);
 
-
   const obtenerUsuario = async () => {
     let data = await ObtenerDatosUsuario();
     if (data) {
-      setUsuario(data);
       if (data.Inicio !== "null") {
         setFechaInicio(new Date(data.Inicio));
         setMostrarCrono(true);
@@ -208,7 +179,11 @@ export default function PaginaIngreso() {
                   }}
                 >
                   <Ionicons
-                    name={mostrarCrono ? "stop-circle-outline" : "play-circle-outline"}
+                    name={
+                      mostrarCrono
+                        ? "stop-circle-outline"
+                        : "play-circle-outline"
+                    }
                     size={60}
                     color="#fff"
                   />
@@ -226,13 +201,15 @@ export default function PaginaIngreso() {
         <AnimatedCircularProgress
           size={140}
           width={15}
-          fill={actualFill}  // Ahora `actualFill` tiene un valor numérico
-          tintColor="#00FF00"  // Color verde fijo para la barra de progreso
+          fill={actualFill} // Ahora `actualFill` tiene un valor numérico
+          tintColor="#00FF00" // Color verde fijo para la barra de progreso
           backgroundColor="#e0e0e0"
-          rotation={0}  // Rotar el gráfico para que comience desde la parte superior
+          rotation={0} // Rotar el gráfico para que comience desde la parte superior
           style={styles.progressCircle}
         >
-          {(fill) => <Text style={styles.progressText}>{`${fill.toFixed(2)}%`}</Text>}
+          {(fill) => (
+            <Text style={styles.progressText}>{`${fill.toFixed(2)}%`}</Text>
+          )}
         </AnimatedCircularProgress>
       </View>
     </ImageBackground>
@@ -278,7 +255,7 @@ const styles = StyleSheet.create({
     marginTop: -230,
     borderWidth: 3,
     borderColor: "#2272A7",
-    overflow: 'visible',
+    overflow: "visible",
   },
   timerContent: {
     alignItems: "center",
