@@ -12,6 +12,7 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { obtenerHorasSemana, BorrarHora } from "../Base de Datos Sqlite/Horas";
 import { sumarTiempos } from "../Base de Datos Sqlite/Utilidades";
+import { BorrarHoraSupa } from "../Operaciones Supabase/HorasSupa";
 
 export default function ModalTablaHoras({
   modalVisible,
@@ -43,7 +44,7 @@ export default function ModalTablaHoras({
           text: "Borrar",
           onPress: () => {
             BorrarHora(id, idSemana);
-            // Actualizar el listado tras borrar
+            BorrarHoraSupa(idSupabase);
             cargarHoras();
           },
           style: "destructive",
