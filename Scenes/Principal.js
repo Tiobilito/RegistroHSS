@@ -37,14 +37,14 @@ export default function PaginaIngreso() {
 
   useEffect(() => {
     obtenerUsuario();
-    obtenerTotalHoras(); 
+    obtenerTotalHoras();
   }, []);
 
   // Función para obtener las horas acumuladas desde la base de datos
   const obtenerTotalHoras = async () => {
     const Total = await obtenerHorasAcumuladas();
     setTotalHorasAcumuladas(Total);
-    animateProgress(totalHorasAcumuladas);
+    animateProgress(Total); // Pasar el valor actualizado a animateProgress
   };
 
   // Función para animar la barra circular
@@ -286,11 +286,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 0,
     left: 20,
-    width: "100%",
+    width: "40%",
+    height: "21%",
+    borderRadius: 200,
     alignItems: "flex-start",
-    paddingBottom: 20,
+    backgroundColor: "white",
+    marginBottom: "1%",
   },
-  progressCircle: {},
+  progressCircle: {
+    left: "1%",
+    bottom: "-3%",
+  },
   progressText: {
     fontSize: 18,
     color: "black",
