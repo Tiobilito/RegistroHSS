@@ -30,7 +30,6 @@ export default function PaginaIngreso() {
   const [ubicacion, setUbicacion] = useState(null);
   const [showIcon, setShowIcon] = useState(new Animated.Value(0)); // Inicializar en 0 para mostrar el ícono "Play"
   const [showAll, setShowAll] = useState(false); // Estado para controlar si mostrar el contenedor principal o "Cargando..."
-  const [totalHorasAcumuladas, setTotalHorasAcumuladas] = useState(0); // Estado para almacenar las horas acumuladas
   const [progress, setProgress] = useState(new Animated.Value(0)); // Usar Animated.Value para el valor de la barra circular
   const totalHoras = 480; // Total de horas para la barra de progreso
   const [actualFill, setActualFill] = useState(0); // Inicializa el fill a 0
@@ -43,7 +42,6 @@ export default function PaginaIngreso() {
   // Función para obtener las horas acumuladas desde la base de datos
   const obtenerTotalHoras = async () => {
     const Total = await obtenerHorasAcumuladas();
-    setTotalHorasAcumuladas(Total);
     animateProgress(Total); // Pasar el valor actualizado a animateProgress
   };
 
