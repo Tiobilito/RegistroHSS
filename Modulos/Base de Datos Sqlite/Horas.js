@@ -152,3 +152,23 @@ export const obtenerHorasUsuario = async () => {
     console.error("Error al obtener las horas:", error);
   }
 }
+
+// Función para obtener las horas acumuladas desde la base de datos
+export const obtenerHorasAcumuladas = async () => {
+  const horas = await obtenerHorasUsuario(); 
+  if (horas && horas.length > 0) {
+    const totalHorasSegundos = horas.reduce((acc, hora) => {
+      // Verificar si la propiedad 'Total' es válida y no contiene valores inválidos
+      if (hora.Total && hora.Total.includes(":")) {
+        const [h, m, s] = hora.Total.split(":").map(Number); // Convertir "HH:MM:SS" a [h, m, s]
+        if (!isNaN(h) && !isNaN(m) && !isNaN(s)) {
+          return acc + (h * 3600 + m * 60 + s); // Convertir todo a segundos
+        }
+      }
+      return acc; 
+    }, 0);
+    return totalHorasSegundos;
+  } else {
+    console.log("No se encontraron horas en la base de datos.");
+  }
+};
