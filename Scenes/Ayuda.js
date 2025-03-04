@@ -126,7 +126,7 @@ export default function PaginaAyuda() {
               styles.chatContainer,
               {
                 width: width * 0.9,
-                marginTop: height * 0.10,
+                marginTop: height * 0.1,
                 flex: 1,
               },
             ]}
