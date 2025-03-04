@@ -16,26 +16,22 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const handleGenericAPIRequest = async (message, apiUrl) => {
-  console.log("El mensaje enviado es: " + message);
-
-  if(!apiUrl) {
-    return "¡Ups! Parece que no has configurado la URL. Por favor, configúrala para poder continuar.";
-  }
-
-  if (!message.trim()) return null;
+// Función que envía la petición al endpoint /api/chat
+const sendChatRequest = async (messages, apiUrl) => {
+  // Se construye el payload con el historial completo
+  const payload = {
+    model: "RegistroChat",
+    messages: messages,
+    stream: false,
+  };
 
   try {
-    const response = await fetch(apiUrl + "/api/generate", {
+    const response = await fetch(apiUrl + "/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "RegistroChat",
-        prompt: message,
-        stream: false,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
@@ -43,7 +39,9 @@ const handleGenericAPIRequest = async (message, apiUrl) => {
     }
 
     const data = await response.json();
-    return data.response;
+    // Se asume que la respuesta viene en data.response o en data.message.content
+    // Dependiendo de la implementación del backend, ajusta lo siguiente:
+    return data.response || (data.message && data.message.content) || "";
   } catch (error) {
     console.error("Error en la solicitud:", error);
     return "¡Ups! Parece que hay problemas de conexión. Inténtalo de nuevo más tarde.";
@@ -57,7 +55,10 @@ export default function PaginaAyuda() {
   const [chatMessage, setChatMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef();
-  const [url, setUrl] = useState(""); // URL que se usará en el fetch
+  const [url, setUrl] = useState("");
+  // Contexto que se enviará únicamente en el primer mensaje.
+  const PROMPT_PREFIXES_Ilab =
+    "Plaza IlabTDI (departamento de servicio social al que el prestador se inscribió): IlabTDI es un departamento orientado a desarrollar proyectos prácticos, además de orientar a nuestros prestadores a experimentar el ámbito laboral mediante nuestras metodologías de desarrollo, así como fomentar las soft skills para formar equipos. ";
 
   // Estados para el modal de configuración de URL
   const [modalVisible, setModalVisible] = useState(false);
@@ -66,14 +67,28 @@ export default function PaginaAyuda() {
   const sendMessage = async () => {
     if (!chatMessage.trim() || isLoading) return;
 
-    const userMessage = { text: chatMessage, sender: "user" };
-    setChatHistory((prev) => [...prev, userMessage]);
+    // Almacena en el historial solo el mensaje del usuario (sin el prefijo)
+    const newUserMessage = { role: "user", content: chatMessage };
+    const updatedHistory = [...chatHistory, newUserMessage];
+    setChatHistory(updatedHistory);
+
+    // Prepara el mensaje que se enviará al backend, agregando el contexto si es el primer mensaje
+    const messageForBackend =
+      chatHistory.length === 0
+        ? PROMPT_PREFIXES_Ilab + chatMessage
+        : chatMessage;
+    // Se arma el arreglo de mensajes para enviar, sin modificar el que se muestra en el chat
+    const messagesToSend = [
+      ...chatHistory,
+      { role: "user", content: messageForBackend },
+    ];
+
     setChatMessage("");
 
     try {
       setIsLoading(true);
-      const botResponse = await handleGenericAPIRequest(chatMessage, url);
-      const botMessage = { text: botResponse, sender: "bot" };
+      const botResponse = await sendChatRequest(messagesToSend, url);
+      const botMessage = { role: "assistant", content: botResponse };
       setChatHistory((prev) => [...prev, botMessage]);
     } finally {
       setIsLoading(false);
@@ -104,11 +119,7 @@ export default function PaginaAyuda() {
               style={styles.configButton}
               onPress={() => setModalVisible(true)}
             >
-              <Ionicons
-                name="settings"
-                size={24 * scaleFactor}
-                color="#FFF"
-              />
+              <Ionicons name="settings" size={24 * scaleFactor} color="#FFF" />
               <Text style={styles.configButtonText}>Configurar URL</Text>
             </Pressable>
           </View>
@@ -119,7 +130,7 @@ export default function PaginaAyuda() {
               styles.chatContainer,
               {
                 width: width * 0.9,
-                marginTop: height * 0.10,
+                marginTop: height * 0.1,
                 flex: 1,
               },
             ]}
@@ -138,25 +149,20 @@ export default function PaginaAyuda() {
                   key={index}
                   style={[
                     styles.messageContainer,
-                    msg.sender === "user"
+                    msg.role === "user"
                       ? styles.userMessage
                       : styles.botMessage,
                   ]}
                 >
                   <Text
-                    style={[
-                      styles.chatText,
-                      { fontSize: 16 * scaleFactor },
-                    ]}
+                    style={[styles.chatText, { fontSize: 16 * scaleFactor }]}
                   >
-                    {msg.text}
+                    {msg.content}
                   </Text>
                 </View>
               ))}
               {isLoading && (
-                <View
-                  style={[styles.messageContainer, styles.botMessage]}
-                >
+                <View style={[styles.messageContainer, styles.botMessage]}>
                   <ActivityIndicator size="small" color="#666" />
                 </View>
               )}
@@ -190,10 +196,7 @@ export default function PaginaAyuda() {
             />
             <Pressable onPress={sendMessage} disabled={isLoading}>
               {isLoading ? (
-                <ActivityIndicator
-                  size={35 * scaleFactor}
-                  color="#666"
-                />
+                <ActivityIndicator size={35 * scaleFactor} color="#666" />
               ) : (
                 <Ionicons
                   name="paper-plane"
@@ -229,9 +232,7 @@ export default function PaginaAyuda() {
                       setModalVisible(false);
                     }}
                   >
-                    <Text style={styles.modalButtonText}>
-                      Guardar
-                    </Text>
+                    <Text style={styles.modalButtonText}>Guardar</Text>
                   </Pressable>
                   <Pressable
                     style={styles.modalButton}
@@ -240,9 +241,7 @@ export default function PaginaAyuda() {
                       setModalVisible(false);
                     }}
                   >
-                    <Text style={styles.modalButtonText}>
-                      Cancelar
-                    </Text>
+                    <Text style={styles.modalButtonText}>Cancelar</Text>
                   </Pressable>
                 </View>
               </View>
@@ -264,7 +263,7 @@ const styles = StyleSheet.create({
   },
   configButtonContainer: {
     position: "absolute",
-    top: 10, // Ajusta este valor según sea necesario
+    top: 10,
     right: 20,
     zIndex: 10,
   },
@@ -275,7 +274,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 20,
-  marginTop: "10%",
+    marginTop: "10%",
   },
   configButtonText: {
     color: "#FFF",
