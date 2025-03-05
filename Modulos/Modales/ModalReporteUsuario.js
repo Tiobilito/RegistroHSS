@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
 
 export default function ModalReporteUsuario({ visible, closeModal, reportes }) {
-console.log("Reportes en el modal:", reportes); // Verifica si los reportes están llegando al modal
+//console.log("Reportes en el modal:", reportes); // Verifica si los reportes están llegando al modal
   return (
     <Modal
       visible={visible}
