@@ -114,7 +114,6 @@ export default function PaginaIngreso() {
   };
 
   const solicitarUbicacion = async () => {
-    /*
     const location = await functionGetLocation(setUbicacion);
     if (!location) {
       Alert.alert(
@@ -130,13 +129,13 @@ export default function PaginaIngreso() {
       );
       return null;
     }
-    return location;*/
+    return location;
   };
 
   const iniciarTiempo = async () => {
     const permiso = await solicitarUbicacion();
-    //if (!permiso || !ubicacion) return;
-    //if (await validation(ubicacion)) {
+    if (!permiso || !ubicacion) return;
+    if (await validation(ubicacion)) {
       const now = new Date();
       setFechaInicio(now);
       ActualizarInicio(now.toISOString());
@@ -149,9 +148,9 @@ export default function PaginaIngreso() {
         duration: 500, // Duración de la animación
         useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
       }).start();
-    //} //else {
-      //Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
-    //}
+    } else {
+      Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
+    }
   };
 
   const detenerTiempo = async () => {

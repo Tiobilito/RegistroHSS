@@ -15,6 +15,15 @@ const ModalFormulario = ({
   formData,
   setFormData,
 }) => {
+
+  const handleCloseModalAndSent = () => {
+    const dataToSend = {
+      ...formData,
+      validada: false,
+    };
+    console.log("Datos a enviar:", dataToSend);
+  };
+  
   const handleDateChange = (field, value) => {
     // Permitir que el valor sea vacío o parcial y no forzar la validación inmediata.
     if (value === "" || value === "0" || value === "00") {
@@ -193,7 +202,7 @@ const ModalFormulario = ({
               <Text style={styles.buttonText}>Cancelar</Text>
             </Pressable>
             <View style={{ marginHorizontal: 10 }} />
-            <Pressable onPress={closeModalAndSent} style={styles.button}>
+            <Pressable onPress={handleCloseModalAndSent} style={styles.button}>
               <Text style={styles.buttonText}>Aceptar</Text>
             </Pressable>
           </View>
