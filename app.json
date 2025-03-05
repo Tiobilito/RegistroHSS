@@ -40,7 +40,11 @@
     "owner": "toldkier",
     "plugins": [
       "expo-secure-store",
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-location",
+      {
+        "locationAlwaysAndWhenInUsePermission": "Allow RegistroHSS to use your location."
+      }
     ]
   }
 }

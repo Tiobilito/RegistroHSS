@@ -2,19 +2,22 @@ import { Alert } from "react-native";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
 import { ObtenerDatosUsuario } from "./InfoUsuario";
+import NetInfo from "@react-native-community/netinfo";
 
 const LOCATION_TASK_NAME = "background-location-task";
 
 export const obtenerUbicacion = async () => {
   try {
     // Solicitar permiso en primer plano
-    let { status: foregroundStatus } = await Location.requestForegroundPermissionsAsync();
+    let { status: foregroundStatus } =
+      await Location.requestForegroundPermissionsAsync();
     if (foregroundStatus !== "granted") {
       console.log("Permiso de ubicación en primer plano denegado.");
       return null;
     }
     // Solicitar permiso en segundo plano
-    let { status: backgroundStatus } = await Location.requestBackgroundPermissionsAsync();
+    let { status: backgroundStatus } =
+      await Location.requestBackgroundPermissionsAsync();
     if (backgroundStatus !== "granted") {
       console.log("Permiso de ubicación en segundo plano denegado.");
       return null;
@@ -66,7 +69,7 @@ export const validation = async (location) => {
 export const startBackgroundLocation = async (stopCronometro) => {
   await Location.startLocationUpdatesAsync(LOCATION_TASK_NAME, {
     accuracy: Location.Accuracy.High,
-    distanceInterval: 10,
+    timeInterval: 30000, // 30 segundos
   });
 
   TaskManager.defineTask(LOCATION_TASK_NAME, async ({ data }) => {
@@ -75,10 +78,12 @@ export const startBackgroundLocation = async (stopCronometro) => {
       if (locations.length > 0) {
         const location = locations[0];
         console.log("Ubicación obtenida (Background):", location);
+        await activateActivity();
         const isInside = await validation(location);
         if (!isInside) {
+          await deactivateActivity();
           console.log("¡Usuario salió del rango! Deteniendo cronómetro...");
-          stopCronometro();
+          await stopCronometro();
         }
       }
     }
@@ -88,4 +93,34 @@ export const startBackgroundLocation = async (stopCronometro) => {
 export const stopBackgroundLocation = async () => {
   await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
   console.log("Seguimiento de ubicación en segundo plano detenido.");
+};
+
+export const activateActivity = async () => {
+  const data = await ObtenerDatosUsuario();
+  const { isConnected } = await NetInfo.fetch();
+  if (isConnected) {
+    try {
+      await fetch(`https://localhost:5000/activity/${data.Codigo}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.log("Error reportando actividad:", error);
+    }
+  }
+};
+
+export const deactivateActivity = async () => {
+  const data = await ObtenerDatosUsuario();
+  const { isConnected } = await NetInfo.fetch();
+  if (isConnected) {
+    try {
+      await fetch(`https://localhost:5000/deactivate/${data.Codigo}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+    } catch (error) {
+      console.log("Error desactivando usuario:", error);
+    }
+  }
 };
