@@ -74,7 +74,7 @@ export async function BorrarHoraSupa(id) {
   const { data, error } = await supabase.from("Horas").delete().eq("id", id);
   if (error) {
     console.error("Error al borrar la hora:", error);
-    return null;
+  } else {
+    console.log("Hora borrada:", data);
   }
-  return data;
 }

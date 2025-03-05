@@ -64,7 +64,7 @@ export const añadirHoras = async () => {
   }
   try {
     db.runSync(
-      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana, idSupabase) VALUES (?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana, idSupabase) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
       [
         inicio.toString(),
         inicioFormateado,
@@ -111,15 +111,16 @@ export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
   }
   try {
     db.runSync(
-      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana, idSupabase) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
       [
         inicioFormulario,
         inicioFormateado,
         finFormateado,
         total,
         parseInt(usuario.Codigo, 10),
-        idSupabase,
+        idSupabase ? 1 : 0,
         idSem,
+        idSupabase ? idSupabase : null,
       ]
     );
     console.log("Registro de horas añadido exitosamente");
