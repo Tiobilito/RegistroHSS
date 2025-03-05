@@ -41,10 +41,7 @@
     "plugins": [
       "expo-secure-store",
       "expo-sqlite",
-      "expo-location",
-      {
-        "locationAlwaysAndWhenInUsePermission": "Allow RegistroHSS to use your location."
-      }
+      "expo-location"
     ]
   }
 }
