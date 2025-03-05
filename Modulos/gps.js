@@ -92,6 +92,7 @@ export const startBackgroundLocation = async (stopCronometro) => {
 
 export const stopBackgroundLocation = async () => {
   await Location.stopLocationUpdatesAsync(LOCATION_TASK_NAME);
+  await deactivateActivity();
   console.log("Seguimiento de ubicación en segundo plano detenido.");
 };
 
@@ -99,8 +100,9 @@ export const activateActivity = async () => {
   const data = await ObtenerDatosUsuario();
   const { isConnected } = await NetInfo.fetch();
   if (isConnected) {
+    console.log("Activando Status...");
     try {
-      await fetch(`https://localhost:5000/activity/${data.Codigo}`, {
+      await fetch(`http://10.214.110.80:8000/activity/${data.Codigo}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
@@ -114,8 +116,9 @@ export const deactivateActivity = async () => {
   const data = await ObtenerDatosUsuario();
   const { isConnected } = await NetInfo.fetch();
   if (isConnected) {
+    console.log("Desactivando Status...");
     try {
-      await fetch(`https://localhost:5000/deactivate/${data.Codigo}`, {
+      await fetch(`http://10.214.110.80:8000/deactivate/${data.Codigo}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
