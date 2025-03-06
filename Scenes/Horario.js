@@ -7,6 +7,8 @@ import {
   StyleSheet,
   Button,
   Alert,
+  useWindowDimensions,
+  ImageBackground
 } from "react-native";
 import { GuardarHorarioUsuario, ObtenerHorarioUsuario } from "../Modulos/InfoUsuario";
 import { RespaldarHorarioUsuario } from "../Modulos/Operaciones Supabase/HorarioSupa";
@@ -22,6 +24,7 @@ const formatHour = (hour) => {
 };
 
 const PaginaHorario = () => {
+  const { width, height } = useWindowDimensions();
   // Estado inicial del horario: cada día con un arreglo de horas vacíos
   const initialSchedule = days.reduce(
     (acc, day) => ({ ...acc, [day]: [] }),
@@ -109,7 +112,11 @@ const PaginaHorario = () => {
   };
 
   return (
-    <View style={styles.container}>
+    <ImageBackground
+      source={require("../assets/fondo.webp")}
+      style={[styles.container, { width, height }]}
+      resizeMode="cover"
+    >
       <Text style={styles.Header}>Horario de Asistencia</Text>
       <View style={styles.scheduleContainer}>
         {/* Encabezado fijo: días */}
@@ -173,7 +180,7 @@ const PaginaHorario = () => {
         </ScrollView>
       </View>
       <Button title="Guardar Horario" onPress={guardarHorario} />
-    </View>
+    </ImageBackground>
   );
 };
 

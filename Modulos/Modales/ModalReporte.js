@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, View, Text, Pressable, StyleSheet, TextInput } from "react-native";
-import { supabase } from "../Operaciones Supabase/supabase";
 import { ObtenerDatosUsuario } from "../InfoUsuario";
+import { insertarReporte } from "../Operaciones Supabase/ReportesSupa";
 
 const formatDate = (date) => {
   const [day, month, year] = date.split('/');
@@ -15,6 +15,7 @@ export default function ModalReporte({
 }) {
   const [actividades, setActividades] = useState(formData.actividades || "");
   const [usuario, setUsuario] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const getUser = async () => {
@@ -24,11 +25,14 @@ export default function ModalReporte({
     getUser();
   }, []);
 
-  // Función para insertar el reporte en Supabase sin añadir horas
   const handleEnviarReporte = async () => {
+    if (isSubmitting) return; // Evitar múltiples envíos
+    setIsSubmitting(true);
+
     try {
       if (!actividades) {
         alert("Por favor, completa el campo de actividades.");
+        setIsSubmitting(false);
         return;
       }
 
@@ -37,30 +41,22 @@ export default function ModalReporte({
       const formattedPeriodoInicio = formatDate(periodoInicio);
       const formattedPeriodoFin = formatDate(periodoFin);
 
-      const { data, error } = await supabase
-        .from('Reportes')
-        .insert([
-          {
-            Actividades: actividades,
-            PeriodoInicio: formattedPeriodoInicio,
-            CodigoUsuario: usuario.Codigo,
-            PeriodoFin: formattedPeriodoFin,
-            FechaReporte: formattedFechaReporte,
-          }
-        ]);
+      const nuevoReporte = {
+        Actividades: actividades,
+        PeriodoInicio: formattedPeriodoInicio,
+        CodigoUsuario: usuario.Codigo,
+        PeriodoFin: formattedPeriodoFin,
+        FechaReporte: formattedFechaReporte,
+      };
 
-      if (error) {
-        console.error('Error al insertar el reporte:', error);
-        alert(`Hubo un error al enviar el reporte: ${JSON.stringify(error)}`);
-      } else {
-        console.log('Reporte enviado con éxito:', data);
-        // Limpiar el campo de actividades y cerrar el modal
-        setActividades("");
-        closeModal();
-      }
+      await insertarReporte(nuevoReporte);
+      // Limpiar el campo de actividades y cerrar el modal
+      setActividades("");
+      closeModal();
     } catch (error) {
-      console.error('Error inesperado:', error);
-      alert('Hubo un error al enviar el reporte');
+      alert(`Hubo un error al enviar el reporte: ${JSON.stringify(error)}`);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -83,8 +79,8 @@ export default function ModalReporte({
             placeholder="Escribe las actividades realizadas..."
           />
 
-          <Pressable onPress={handleEnviarReporte} style={styles.button}>
-            <Text style={styles.buttonText}>Enviar Reporte</Text>
+          <Pressable onPress={handleEnviarReporte} style={styles.button} disabled={isSubmitting}>
+            <Text style={styles.buttonText}>{ isSubmitting ? "Enviando..." : "Enviar Reporte" }</Text>
           </Pressable>
           <Pressable onPress={closeModal} style={styles.button}>
             <Text style={styles.buttonText}>Cancelar</Text>

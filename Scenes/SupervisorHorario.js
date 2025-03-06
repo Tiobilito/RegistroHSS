@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   ScrollView,
   StyleSheet,
+  ImageBackground,
+  useWindowDimensions,
 } from "react-native";
 import ModalInscritos from "../Modulos/Modales/ModalInscritosHorario";
 import ModalUsuariosActivos from "../Modulos/Modales/ModalUsuariosActivos";
@@ -23,6 +25,7 @@ const formatHour = (hour) => {
 };
 
 const PaginaSupervisorHorario = () => {
+  const { width, height } = useWindowDimensions();
   // Estado para almacenar la grilla de horarios
   const [scheduleData, setScheduleData] = useState(null);
   // Estado para controlar la visibilidad del modal de inscritos
@@ -38,6 +41,7 @@ const PaginaSupervisorHorario = () => {
   const [activeUsersModalVisible, setActiveUsersModalVisible] = useState(false);
 
   const headerScrollRef = useRef(null);
+
 
   // Función que carga los horarios desde Supabase
   const loadHorarios = async () => {
@@ -61,11 +65,11 @@ const PaginaSupervisorHorario = () => {
     // Cargar datos iniciales
     loadHorarios();
     loadActiveUsers();
-    
+
     // Configurar actualizaciones periódicas
     const horariosInterval = setInterval(loadHorarios, 30000);
     const usuariosInterval = setInterval(loadActiveUsers, 30000);
-    
+
     return () => {
       clearInterval(horariosInterval);
       clearInterval(usuariosInterval);
@@ -91,22 +95,19 @@ const PaginaSupervisorHorario = () => {
 
   // Componente para el botón de usuarios activos
   const ActiveUsersButton = () => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.activeUsersButton}
       onPress={() => setActiveUsersModalVisible(true)}
     >
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.usersContainer}
       >
         {activeUsers.map((user, index) => (
-          <View 
-            key={user.Codigo} 
-            style={[
-              styles.userCircle,
-              { marginLeft: index !== 0 ? -10 : 0 }
-            ]}
+          <View
+            key={user.Codigo}
+            style={[styles.userCircle, { marginLeft: index !== 0 ? -10 : 0 }]}
           >
             <Text style={styles.userInitial}>
               {user.Nombre.charAt(0).toUpperCase()}
@@ -122,97 +123,102 @@ const PaginaSupervisorHorario = () => {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Horario Prestadores</Text>
-      <View style={styles.scheduleContainer}>
-        {/* Encabezado fijo: fila de días */}
-        <View style={styles.headerRow}>
-          <View style={styles.topLeftCell} />
-          <ScrollView
-            horizontal
-            ref={headerScrollRef}
-            scrollEnabled={false}
-            showsHorizontalScrollIndicator={false}
-          >
-            {days.map((day) => (
-              <View key={day} style={[styles.cell, styles.headerCell]}>
-                <Text style={styles.headerText}>{day}</Text>
-              </View>
-            ))}
-          </ScrollView>
-        </View>
-        
-        {/* Cuerpo: scroll vertical */}
-        <ScrollView style={styles.bodyScrollView}>
-          <View style={styles.bodyRow}>
-            {/* Columna fija: horas */}
-            <View style={styles.leftColumn}>
-              {hours.map((hour) => (
-                <View key={hour} style={[styles.cell, styles.hourCell]}>
-                  <Text style={styles.hourText}>{formatHour(hour)}</Text>
-                </View>
-              ))}
-            </View>
-            
-            {/* Grilla de celdas */}
+    <ImageBackground
+      source={require("../assets/fondo.webp")}
+      style={[styles.container, { width, height }]}
+      resizeMode="cover"
+    >
+   
+        <Text style={styles.header}>Horario Prestadores</Text>
+        <View style={styles.scheduleContainer}>
+          {/* Encabezado fijo: fila de días */}
+          <View style={styles.headerRow}>
+            <View style={styles.topLeftCell} />
             <ScrollView
               horizontal
-              onScroll={onGridHorizontalScroll}
-              scrollEventThrottle={16}
-              showsHorizontalScrollIndicator={true}
+              ref={headerScrollRef}
+              scrollEnabled={false}
+              showsHorizontalScrollIndicator={false}
             >
-              <View>
+              {days.map((day) => (
+                <View key={day} style={[styles.cell, styles.headerCell]}>
+                  <Text style={styles.headerText}>{day}</Text>
+                </View>
+              ))}
+            </ScrollView>
+          </View>
+
+          {/* Cuerpo: scroll vertical */}
+          <ScrollView style={styles.bodyScrollView}>
+            <View style={styles.bodyRow}>
+              {/* Columna fija: horas */}
+              <View style={styles.leftColumn}>
                 {hours.map((hour) => (
-                  <View key={hour} style={styles.row}>
-                    {days.map((day) => {
-                      const cellData = scheduleData[day][hour];
-                      const isRegistered = cellData && cellData.length > 0;
-                      return (
-                        <TouchableOpacity
-                          key={day}
-                          style={[
-                            styles.cell,
-                            isRegistered
-                              ? styles.registeredCell
-                              : styles.emptyCell,
-                          ]}
-                          onPress={() => handleCellPress(day, hour)}
-                          disabled={!isRegistered}
-                        >
-                          {isRegistered && (
-                            <Text style={styles.registeredText}>
-                              {cellData.length} inscritos
-                            </Text>
-                          )}
-                        </TouchableOpacity>
-                      );
-                    })}
+                  <View key={hour} style={[styles.cell, styles.hourCell]}>
+                    <Text style={styles.hourText}>{formatHour(hour)}</Text>
                   </View>
                 ))}
               </View>
-            </ScrollView>
-          </View>
-        </ScrollView>
-      </View>
-      
-      {/* Botón de usuarios activos */}
-      <ActiveUsersButton />
-      
-      {/* Modales */}
-      <ModalInscritos
-        visible={modalVisible}
-        day={selectedCellData.day}
-        hour={selectedCellData.hour}
-        persons={selectedCellData.persons}
-        onClose={() => setModalVisible(false)}
-      />
-      
-      <ModalUsuariosActivos
-        visible={activeUsersModalVisible}
-        users={activeUsers}
-        onClose={() => setActiveUsersModalVisible(false)}
-      />
-    </View>
+
+              {/* Grilla de celdas */}
+              <ScrollView
+                horizontal
+                onScroll={onGridHorizontalScroll}
+                scrollEventThrottle={16}
+                showsHorizontalScrollIndicator={true}
+              >
+                <View>
+                  {hours.map((hour) => (
+                    <View key={hour} style={styles.row}>
+                      {days.map((day) => {
+                        const cellData = scheduleData[day][hour];
+                        const isRegistered = cellData && cellData.length > 0;
+                        return (
+                          <TouchableOpacity
+                            key={day}
+                            style={[
+                              styles.cell,
+                              isRegistered
+                                ? styles.registeredCell
+                                : styles.emptyCell,
+                            ]}
+                            onPress={() => handleCellPress(day, hour)}
+                            disabled={!isRegistered}
+                          >
+                            {isRegistered && (
+                              <Text style={styles.registeredText}>
+                                {cellData.length} inscritos
+                              </Text>
+                            )}
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Botón de usuarios activos */}
+        <ActiveUsersButton />
+
+        {/* Modales */}
+        <ModalInscritos
+          visible={modalVisible}
+          day={selectedCellData.day}
+          hour={selectedCellData.hour}
+          persons={selectedCellData.persons}
+          onClose={() => setModalVisible(false)}
+        />
+
+        <ModalUsuariosActivos
+          visible={activeUsersModalVisible}
+          users={activeUsers}
+          onClose={() => setActiveUsersModalVisible(false)}
+        />
+    </ImageBackground>
   );
 };
 
@@ -289,35 +295,35 @@ const styles = StyleSheet.create({
   },
   // Nuevos estilos
   activeUsersButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
-    alignSelf: 'center',
-    backgroundColor: '#f0f0f0',
+    alignSelf: "center",
+    backgroundColor: "#f0f0f0",
     borderRadius: 30,
     padding: 10,
     elevation: 3,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
   },
   usersContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   userCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#2196F3',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#2196F3",
+    justifyContent: "center",
+    alignItems: "center",
     borderWidth: 2,
-    borderColor: 'white',
+    borderColor: "white",
   },
   userInitial: {
-    color: 'white',
-    fontWeight: 'bold',
+    color: "white",
+    fontWeight: "bold",
     fontSize: 16,
   },
 });
