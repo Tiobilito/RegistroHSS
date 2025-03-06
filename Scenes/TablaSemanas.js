@@ -20,9 +20,7 @@ import {
 } from "../Modulos/Base de Datos Sqlite/Horas";
 import { obtenerSemanasUsuario } from "../Modulos/Base de Datos Sqlite/Semanas";
 import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades";
-import { obtenerReportes } from "../Modulos/Operaciones Supabase/ReportesSupa";
-import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario"; // Para obtener los datos del usuario logueado
-import ModalReporteUsuario from "../Modulos/Modales/ModalReporteUsuario"; // Ajusta la ruta según sea necesario
+import ModalReporteUsuario from "../Modulos/Modales/ModalReporteUsuario";
 
 export default function PaginaTablaSemanas({ navigation }) {
   const { width, height } = useWindowDimensions();
@@ -62,17 +60,7 @@ export default function PaginaTablaSemanas({ navigation }) {
 
   // Función para abrir el modal de reportes del usuario
   const openModalReporteUsuario = async () => {
-    const reportes = await obtenerReportesDelUsuario(); // Obtener los reportes del usuario logueado
-    //console.log('Reportes obtenidos:', reportes);
-    setReportesUsuario(reportes); // Guardamos los reportes en el estado
     setModalReporteUsuarioVisible(true); // Abrimos el modal
-  };
-  // Función para actualizar la descripción
-  const handleDescripcionChange = (text) => {
-    setFormData({
-      ...formData,
-      descripcion: text,
-    });
   };
 
   // Función para construir una fecha a partir de los valores del formulario
@@ -217,19 +205,6 @@ export default function PaginaTablaSemanas({ navigation }) {
       semanasSeleccionadas.includes(hora.idSemana)
     );
     return sumarTiempos(horasSeleccionadas.map((item) => item.Total));
-  };
-
-  // Función para obtener solo los reportes del usuario logueado
-  const obtenerReportesDelUsuario = async () => {
-    const Udata = await ObtenerDatosUsuario(); // Obtener los datos del usuario logueado
-    const reportes = await obtenerReportes(Udata.idDepartamento); // Obtener todos los reportes de ese departamento
-
-    // Verificar los tipos y asegurar la comparación correcta
-    const reportesUsuario = reportes.filter((reporte) => 
-      parseInt(reporte.CodigoUsuario, 10) === parseInt(Udata.Codigo, 10) // Aseguramos que ambos sean enteros
-    );
-
-    return reportesUsuario;
   };
 
   const image = require("../assets/fondo.webp");
@@ -435,7 +410,6 @@ export default function PaginaTablaSemanas({ navigation }) {
       <ModalReporteUsuario
         visible={modalReporteUsuarioVisible}
         closeModal={() => setModalReporteUsuarioVisible(false)}
-        reportes={reportesUsuario} // Pasamos los reportes obtenidos del usuario logueado
       />
     </ImageBackground>
   );
