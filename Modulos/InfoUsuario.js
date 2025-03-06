@@ -27,6 +27,8 @@ export const GuardarDatosUsuario = async (
       Contraseña: contraseña,
       TipoServidor: tipoServidor,
       Inicio: "null",
+      LatDepartamento: localizaciones[0]?.latitud?.toString() || "",
+      LonDepartamento: localizaciones[0]?.longitud?.toString() || "",
       Localizaciones: localizaciones,
       idDepartamento: iddepartamento,
     };
