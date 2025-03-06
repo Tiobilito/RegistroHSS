@@ -9,15 +9,31 @@ import {
   Pressable,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { eliminarReporte } from "../Operaciones Supabase/ReportesSupa";
+import {
+  eliminarReporte,
+  obtenerReportesPorUsuario,
+} from "../Operaciones Supabase/ReportesSupa";
+import { ObtenerDatosUsuario } from "../InfoUsuario";
 
 export default function ModalReporteUsuario({ visible, closeModal, reportes }) {
   //console.log("Reportes en el modal:", reportes); // Verifica si los reportes están llegando al modal
+  const [reportes, setReportes] = React.useState(null);
 
   const handleBorrar = async (id) => {
     await eliminarReporte(id);
     closeModal();
   };
+
+  React.useEffect(() => {
+    const fetchReportes = async () => {
+      const data = await ObtenerDatosUsuario();
+      const reportes = await obtenerReportesPorUsuario(
+        parseInt(data.Codigo, 10)
+      );
+      setReportes(reportes);
+    };
+    fetchReportes();
+  }, []);
 
   return (
     <Modal
