@@ -300,7 +300,7 @@ export default function PaginaTablaSemanas({ navigation }) {
         {/* Botón para abrir el modal de horas (formulario) */}
         <Pressable
           style={{
-            marginTop: -height * 0.04,
+            marginTop: -height * 0.05,
             marginLeft: width * 0.65,
           }}
           onPress={openModal}
