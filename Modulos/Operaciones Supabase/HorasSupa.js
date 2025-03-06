@@ -1,7 +1,5 @@
 import { supabase } from "./supabase";
-import {
-  ObtenerDatosUsuario,
-} from "../InfoUsuario";
+import { ObtenerDatosUsuario } from "../InfoUsuario";
 
 // Añade horas
 export async function añadirHorasSup(
@@ -9,22 +7,28 @@ export async function añadirHorasSup(
   inicio,
   fin,
   total,
-  Dinicio
+  Dinicio,
+  Validada
 ) {
-  const { data, error } = await supabase.from("Horas").insert([
-    {
-      Inicio: inicio,
-      Final: fin,
-      Total: total,
-      CodigoUsuario: parseInt(codigoUsuario, 10),
-      DateInicio: Dinicio,
-    },
-  ]);
+  const { data, error } = await supabase
+    .from("Horas")
+    .insert([
+      {
+        Inicio: inicio,
+        Final: fin,
+        Total: total,
+        CodigoUsuario: parseInt(codigoUsuario, 10),
+        DateInicio: Dinicio,
+        Validada: Validada,
+      },
+    ])
+    .select(); 
+
   if (error) {
     console.log("Hubo un error", error);
-    return 0;
+    return null;
   } else {
-    return 1;
+    return data[0].id; 
   }
 }
 
@@ -65,4 +69,14 @@ export async function obtenerHoras(codigo) {
     return [];
   }
   return data;
+}
+
+// Función para borrar una hora
+export async function BorrarHoraSupa(id) {
+  const { data, error } = await supabase.from("Horas").delete().eq("id", id);
+  if (error) {
+    console.error("Error al borrar la hora:", error);
+  } else {
+    console.log("Hora borrada:", data);
+  }
 }

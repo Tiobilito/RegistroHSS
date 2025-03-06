@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react";
 import { StyleSheet, Text, View, FlatList, TouchableOpacity, ImageBackground, Modal, ScrollView } from "react-native";
 import { Ionicons } from "react-native-vector-icons"; // Importamos los iconos
 
-import { obtenerReportes } from "../Modulos/Operaciones Supabase/ReportesSupa"; // Aquí debes agregar tu función para obtener los reportes
+import { obtenerReportes } from "../Modulos/Operaciones Supabase/ReportesSupa";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
-const scaleFactor = 1; // Ajusta este valor de acuerdo a tu escala, si es necesario
+const scaleFactor = 1;
 
 export default function Reportes({ navigation }) {
   const [reportes, setReportes] = useState([]);
-  const [selectedUsuario, setSelectedUsuario] = useState(null); // Estado para el usuario seleccionado
-  const [modalVisible, setModalVisible] = useState(false); // Estado para mostrar el modal
+  const [selectedUsuario, setSelectedUsuario] = useState(null);
+  const [modalVisible, setModalVisible] = useState(false);
 
-  const image = require("../assets/Back.png"); // Ruta de la imagen de fondo
+  const image = require("../assets/Back.png"); 
 
-  // Cargar los reportes
   useEffect(() => {
     const fetchReportes = async () => {
       const Udata = await ObtenerDatosUsuario();

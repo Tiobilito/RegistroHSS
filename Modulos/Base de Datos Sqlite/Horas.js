@@ -45,34 +45,36 @@ export const añadirHoras = async () => {
   const idSem = await ChecarSemana(dIni);
   console.log("id semana: ", idSem);
   console.log("Inicio semana: ", dIni);
-  let isBacked;
+  let idSupabase;
   // Verificación de conexión y respaldo en Supabase si está disponible
   const state = await NetInfo.fetch();
 
   if (state.isConnected) {
     // El dispositivo tiene conexión a Internet
-    isBacked = await añadirHorasSup(
+    idSupabase = await añadirHorasSup(
       usuario.Codigo,
       inicioFormateado,
       finFormateado,
       total,
-      inicio
+      inicio,
+      true
     );
   } else {
     // El dispositivo no tiene conexión a Internet
-    isBacked = 0;
+    idSupabase = null;
   }
   try {
     db.runSync(
-      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana, idSupabase) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
       [
         inicio.toString(),
         inicioFormateado,
         finFormateado,
         total,
         parseInt(usuario.Codigo, 10),
-        isBacked,
+        idSupabase ? 1 : 0,
         idSem,
+        idSupabase ? idSupabase : null,
       ]
     );
     console.log("Registro de horas añadido exitosamente");
@@ -98,27 +100,29 @@ export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
   console.log("Inicio semana: ", dIni);
   // Verificación de conexión y respaldo en Supabase si está disponible
   const state = await NetInfo.fetch();
-  let isBacked = 0;
+  let idSupabase = 0;
   if (state.isConnected) {
-    isBacked = await añadirHorasSup(
+    idSupabase = await añadirHorasSup(
       usuario.Codigo,
       inicioFormateado,
       finFormateado,
       total,
-      inicio
+      inicio,
+      false
     );
   }
   try {
     db.runSync(
-      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana) VALUES (?, ?, ?, ?, ?, ?, ?);",
+      "INSERT INTO Horas (DInicio, Inicio, Final, Total, idUsuario, IsBackedInSupabase, idSemana, idSupabase) VALUES (?, ?, ?, ?, ?, ?, ?, ?);",
       [
         inicioFormulario,
         inicioFormateado,
         finFormateado,
         total,
         parseInt(usuario.Codigo, 10),
-        isBacked,
+        idSupabase ? 1 : 0,
         idSem,
+        idSupabase ? idSupabase : null,
       ]
     );
     console.log("Registro de horas añadido exitosamente");
@@ -151,4 +155,24 @@ export const obtenerHorasUsuario = async () => {
   } catch (error) {
     console.error("Error al obtener las horas:", error);
   }
-}
+};
+
+// Función para obtener las horas acumuladas desde la base de datos
+export const obtenerHorasAcumuladas = async () => {
+  const horas = await obtenerHorasUsuario();
+  if (horas && horas.length > 0) {
+    const totalHorasSegundos = horas.reduce((acc, hora) => {
+      // Verificar si la propiedad 'Total' es válida y no contiene valores inválidos
+      if (hora.Total && hora.Total.includes(":")) {
+        const [h, m, s] = hora.Total.split(":").map(Number); // Convertir "HH:MM:SS" a [h, m, s]
+        if (!isNaN(h) && !isNaN(m) && !isNaN(s)) {
+          return acc + (h * 3600 + m * 60 + s); // Convertir todo a segundos
+        }
+      }
+      return acc;
+    }, 0);
+    return totalHorasSegundos;
+  } else {
+    console.log("No se encontraron horas en la base de datos.");
+  }
+};

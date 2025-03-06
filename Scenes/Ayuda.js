@@ -13,29 +13,25 @@ import {
   Platform,
   Modal,
   SafeAreaView,
+  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-const handleGenericAPIRequest = async (message, apiUrl) => {
-  console.log("El mensaje enviado es: " + message);
-
-  if(!apiUrl) {
-    return "¡Ups! Parece que no has configurado la URL. Por favor, configúrala para poder continuar.";
-  }
-
-  if (!message.trim()) return null;
+// Función que envía la petición al endpoint /api/chat
+const sendChatRequest = async (messages, apiUrl) => {
+  const payload = {
+    model: "RegistroChat",
+    messages: messages,
+    stream: false,
+  };
 
   try {
-    const response = await fetch(apiUrl + "/api/generate", {
+    const response = await fetch(apiUrl + "/api/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        model: "RegistroChat",
-        prompt: message,
-        stream: false,
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (!response.ok) {
@@ -43,10 +39,10 @@ const handleGenericAPIRequest = async (message, apiUrl) => {
     }
 
     const data = await response.json();
-    return data.response;
+    return data.response || (data.message && data.message.content) || "";
   } catch (error) {
     console.error("Error en la solicitud:", error);
-    return "¡Ups! Parece que hay problemas de conexión. Inténtalo de nuevo más tarde.";
+    throw error;
   }
 };
 
@@ -57,7 +53,9 @@ export default function PaginaAyuda() {
   const [chatMessage, setChatMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef();
-  const [url, setUrl] = useState(""); // URL que se usará en el fetch
+  const [url, setUrl] = useState("");
+  // Contexto que se enviará únicamente en el primer mensaje
+  const PROMPT_PREFIXES_Ilab = "Plaza IlabTDI (departamento de servicio social al que el prestador se inscribió): IlabTDI es un departamento orientado a desarrollar proyectos prácticos, además de orientar a nuestros prestadores a experimentar el ámbito laboral mediante nuestras metodologías de desarrollo, así como fomentar las soft skills para formar equipos. ";
 
   // Estados para el modal de configuración de URL
   const [modalVisible, setModalVisible] = useState(false);
@@ -65,16 +63,32 @@ export default function PaginaAyuda() {
 
   const sendMessage = async () => {
     if (!chatMessage.trim() || isLoading) return;
+    if (!url.trim()) {
+      Alert.alert("Error", "La URL no está configurada. Por favor, configúrala.");
+      return;
+    }
 
-    const userMessage = { text: chatMessage, sender: "user" };
-    setChatHistory((prev) => [...prev, userMessage]);
+    // Almacenar el mensaje original en el historial para mostrar
+    const newUserMessage = { role: "user", content: chatMessage };
+    const updatedHistory = [...chatHistory, newUserMessage];
+    setChatHistory(updatedHistory);
+
+    // Armar el mensaje que se enviará al backend
+    const messageForBackend =
+      chatHistory.length === 0 ? PROMPT_PREFIXES_Ilab + chatMessage : chatMessage;
+    // Crear el arreglo de mensajes a enviar, sin modificar lo que se muestra en el chat
+    const messagesToSend = [...chatHistory, { role: "user", content: messageForBackend }];
+
     setChatMessage("");
 
     try {
       setIsLoading(true);
-      const botResponse = await handleGenericAPIRequest(chatMessage, url);
-      const botMessage = { text: botResponse, sender: "bot" };
-      setChatHistory((prev) => [...prev, botMessage]);
+      const botResponse = await sendChatRequest(messagesToSend, url);
+      const botMessage = { role: "assistant", content: botResponse };
+      setChatHistory(prev => [...prev, botMessage]);
+    } catch (error) {
+      // Mostrar alerta de error para que se configure la URL o se solucione el problema
+      Alert.alert("Error en la petición", "Hubo un problema al conectarse con el servidor. Por favor, verifica la URL y vuelve a intentarlo.");
     } finally {
       setIsLoading(false);
     }
@@ -100,15 +114,8 @@ export default function PaginaAyuda() {
         >
           {/* Botón para abrir el modal de configuración de URL */}
           <View style={styles.configButtonContainer}>
-            <Pressable
-              style={styles.configButton}
-              onPress={() => setModalVisible(true)}
-            >
-              <Ionicons
-                name="settings"
-                size={24 * scaleFactor}
-                color="#FFF"
-              />
+            <Pressable style={styles.configButton} onPress={() => setModalVisible(true)}>
+              <Ionicons name="settings" size={24 * scaleFactor} color="#FFF" />
               <Text style={styles.configButtonText}>Configurar URL</Text>
             </Pressable>
           </View>
@@ -129,34 +136,23 @@ export default function PaginaAyuda() {
               style={styles.scrollView}
               contentContainerStyle={{ paddingBottom: 100 }}
               keyboardDismissMode="interactive"
-              onContentSizeChange={() =>
-                scrollViewRef.current?.scrollToEnd({ animated: true })
-              }
+              onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
             >
               {chatHistory.map((msg, index) => (
                 <View
                   key={index}
                   style={[
                     styles.messageContainer,
-                    msg.sender === "user"
-                      ? styles.userMessage
-                      : styles.botMessage,
+                    msg.role === "user" ? styles.userMessage : styles.botMessage,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.chatText,
-                      { fontSize: 16 * scaleFactor },
-                    ]}
-                  >
-                    {msg.text}
+                  <Text style={[styles.chatText, { fontSize: 16 * scaleFactor }]}>
+                    {msg.content}
                   </Text>
                 </View>
               ))}
               {isLoading && (
-                <View
-                  style={[styles.messageContainer, styles.botMessage]}
-                >
+                <View style={[styles.messageContainer, styles.botMessage]}>
                   <ActivityIndicator size="small" color="#666" />
                 </View>
               )}
@@ -190,10 +186,7 @@ export default function PaginaAyuda() {
             />
             <Pressable onPress={sendMessage} disabled={isLoading}>
               {isLoading ? (
-                <ActivityIndicator
-                  size={35 * scaleFactor}
-                  color="#666"
-                />
+                <ActivityIndicator size={35 * scaleFactor} color="#666" />
               ) : (
                 <Ionicons
                   name="paper-plane"
@@ -229,9 +222,7 @@ export default function PaginaAyuda() {
                       setModalVisible(false);
                     }}
                   >
-                    <Text style={styles.modalButtonText}>
-                      Guardar
-                    </Text>
+                    <Text style={styles.modalButtonText}>Guardar</Text>
                   </Pressable>
                   <Pressable
                     style={styles.modalButton}
@@ -240,9 +231,7 @@ export default function PaginaAyuda() {
                       setModalVisible(false);
                     }}
                   >
-                    <Text style={styles.modalButtonText}>
-                      Cancelar
-                    </Text>
+                    <Text style={styles.modalButtonText}>Cancelar</Text>
                   </Pressable>
                 </View>
               </View>
@@ -264,7 +253,7 @@ const styles = StyleSheet.create({
   },
   configButtonContainer: {
     position: "absolute",
-    top: 10, // Ajusta este valor según sea necesario
+    top: 10,
     right: 20,
     zIndex: 10,
   },
@@ -275,7 +264,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 20,
-  marginTop: "10%",
+    marginTop: "10%",
   },
   configButtonText: {
     color: "#FFF",

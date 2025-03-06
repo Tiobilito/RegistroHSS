@@ -10,8 +10,9 @@ import {
   useWindowDimensions,
   Animated,
 } from "react-native";
+import { Picker } from "@react-native-picker/picker";
 import { añadirHoras } from "../Modulos/Base de Datos Sqlite/Horas";
-import { ObtenerDatosUsuario, ActualizarInicio } from "../Modulos/InfoUsuario";
+import { ObtenerDatosUsuario, ActualizarInicio, ActualizarLatLong } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
 import {
   functionGetLocation,
@@ -19,98 +20,79 @@ import {
   startBackgroundLocation,
   stopBackgroundLocation,
 } from "../Modulos/gps";
-import { Ionicons } from "@expo/vector-icons"; // Importamos Ionicons
-import { AnimatedCircularProgress } from 'react-native-circular-progress'; // Importar CircularProgress
-import { obtenerHorasUsuario } from "../Modulos/Base de Datos Sqlite/Horas"; // Asegúrate de importar esta función correctamente
-import { sumarTiempos } from "../Modulos/Base de Datos Sqlite/Utilidades"; // Importar la función sumarTiempos para obtener las horas acumuladas
+import { Ionicons } from "@expo/vector-icons";
+import { AnimatedCircularProgress } from "react-native-circular-progress";
+import { obtenerHorasAcumuladas } from "../Modulos/Base de Datos Sqlite/Horas";
 
 export default function PaginaIngreso() {
   const { width } = useWindowDimensions();
-  const [usuario, setUsuario] = useState(null);
   const [mostrarCrono, setMostrarCrono] = useState(false);
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [ubicacion, setUbicacion] = useState(null);
-  const [showIcon, setShowIcon] = useState(new Animated.Value(0)); // Inicializar en 0 para mostrar el ícono "Play"
-  const [showAll, setShowAll] = useState(false); // Estado para controlar si mostrar el contenedor principal o "Cargando..."
-  const [totalHorasAcumuladas, setTotalHorasAcumuladas] = useState(0); // Estado para almacenar las horas acumuladas
-  const [progress, setProgress] = useState(new Animated.Value(0)); // Usar Animated.Value para el valor de la barra circular
-  const totalHoras = 480; // Total de horas para la barra de progreso
-  const [actualFill, setActualFill] = useState(0); // Inicializa el fill a 0
+  const [showIcon, setShowIcon] = useState(new Animated.Value(0));
+  const [showAll, setShowAll] = useState(false);
+  const [progress, setProgress] = useState(new Animated.Value(0));
+  const totalHoras = 480;
+  const [actualFill, setActualFill] = useState(0);
+  const [localizaciones, setLocalizaciones] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
     obtenerUsuario();
-    obtenerHorasAcumuladas(); // Obtener las horas acumuladas al cargar la página
+    obtenerTotalHoras();
   }, []);
 
-  // Función para convertir segundos a formato HH:MM
-  const convertirAHorasMinutos = (segundos) => {
-    const horas = Math.floor(segundos / 3600); // Obtener las horas completas
-    const minutos = Math.floor((segundos % 3600) / 60); // Obtener los minutos restantes
-    return `${String(horas).padStart(2, '0')}:${String(minutos).padStart(2, '0')}`; // Formatear a HH:MM
+  const obtenerTotalHoras = async () => {
+    const Total = await obtenerHorasAcumuladas();
+    animateProgress(Total);
   };
 
-  // Función para obtener las horas acumuladas desde la base de datos
-  const obtenerHorasAcumuladas = async () => {
-    const horas = await obtenerHorasUsuario(); // Obtener todas las horas
-    console.log("Horas obtenidas:", horas);  // Verificar qué se está obteniendo
-
-    if (horas && horas.length > 0) {
-      const totalHorasSegundos = horas.reduce((acc, hora) => {
-        // Verificar si la propiedad 'Total' es válida y no contiene valores inválidos
-        if (hora.Total && hora.Total.includes(":")) {
-          const [h, m, s] = hora.Total.split(":").map(Number); // Convertir "HH:MM:SS" a [h, m, s]
-          if (!isNaN(h) && !isNaN(m) && !isNaN(s)) {
-            return acc + (h * 3600 + m * 60 + s); // Convertir todo a segundos
-          }
-        }
-        return acc; // Si la hora es inválida, la ignoramos y no sumamos
-      }, 0);
-
-      const totalSegundos = totalHorasSegundos; // Ya es total en segundos
-      setTotalHorasAcumuladas(totalSegundos); // Actualizar el estado con las horas acumuladas en segundos
-      console.log("Horas acumuladas en segundos:", totalSegundos);  // Verificar el total de segundos
-      animateProgress(totalSegundos); // Animar el progreso
-    } else {
-      console.log("No se encontraron horas en la base de datos.");
-    }
-  };
-
-  
-
-  // Función para animar la barra circular
   const animateProgress = (totalSegundosAcumulados) => {
-    const fillPercentage = Math.min((totalSegundosAcumulados / (totalHoras * 3600)) * 100, 100); // Limitar el porcentaje a un máximo de 100
+    const fillPercentage = Math.min(
+      (totalSegundosAcumulados / (totalHoras * 3600)) * 100,
+      100
+    );
     Animated.timing(progress, {
-      toValue: fillPercentage,  // Animar el progreso
-      duration: 1000,  // Duración de la animación
+      toValue: fillPercentage,
+      duration: 1000,
       useNativeDriver: false,
     }).start();
   };
 
-  // Actualizar directamente el valor de `actualFill` sin usar setInterval
   useEffect(() => {
-    // Sincroniza el valor de `actualFill` con el progreso
     progress.addListener(({ value }) => {
       setActualFill(value);
     });
-
-    // Limpiar listener cuando el componente se desmonte
-    return () => {
-      progress.removeAllListeners();
-    };
+    return () => progress.removeAllListeners();
   }, []);
-
 
   const obtenerUsuario = async () => {
     let data = await ObtenerDatosUsuario();
     if (data) {
-      setUsuario(data);
       if (data.Inicio !== "null") {
         setFechaInicio(new Date(data.Inicio));
         setMostrarCrono(true);
       }
+      if (data.Localizaciones) {
+        setLocalizaciones(data.Localizaciones);
+        
+        // Buscar ubicación que coincide con coordenadas almacenadas
+        const defaultLocation = data.Localizaciones.find(loc => 
+          loc.latitud.toString() === data.LatDepartamento &&
+          loc.longitud.toString() === data.LonDepartamento
+        ) || data.Localizaciones[0];
+        
+        setSelectedLocation(defaultLocation);
+        ActualizarLatLong(defaultLocation.latitud, defaultLocation.longitud);
+      }
     }
-    setShowAll(true); // Cambiar a true después de que los datos han sido cargados
+    setShowAll(true);
+  };
+
+  const handleLocationChange = (itemValue) => {
+    const loc = localizaciones.find((l) => l.nombre === itemValue);
+    setSelectedLocation(loc);
+    ActualizarLatLong(loc.latitud, loc.longitud);
   };
 
   const solicitarUbicacion = async () => {
@@ -121,13 +103,9 @@ export default function PaginaIngreso() {
         "Debes habilitar la ubicación en segundo plano.",
         [
           { text: "Cancelar", style: "cancel" },
-          {
-            text: "Abrir Configuración",
-            onPress: () => Linking.openSettings(),
-          },
+          { text: "Abrir Configuración", onPress: () => Linking.openSettings() },
         ]
       );
-      return null;
     }
     return location;
   };
@@ -136,20 +114,22 @@ export default function PaginaIngreso() {
     const permiso = await solicitarUbicacion();
     if (!permiso || !ubicacion) return;
     if (await validation(ubicacion)) {
+    const data = await ObtenerDatosUsuario();
+    if (await validation(ubicacion, data.LatDepartamento, data.LonDepartamento)) {
       const now = new Date();
       setFechaInicio(now);
       ActualizarInicio(now.toISOString());
       setMostrarCrono(true);
       startBackgroundLocation(detenerTiempo);
 
-      // Animación para suavizar la transición al mostrar el ícono "Stop"
       Animated.timing(showIcon, {
-        toValue: 1, // Cambiar a 1 para mostrar el ícono "Stop"
-        duration: 500, // Duración de la animación
-        useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
       }).start();
     } else {
       Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
+      Alert.alert("Ubicación incorrecta", "No estás dentro del área seleccionada.");
     }
   };
 
@@ -158,11 +138,10 @@ export default function PaginaIngreso() {
     setMostrarCrono(false);
     stopBackgroundLocation();
 
-    // Animación para suavizar la transición al mostrar el ícono "Play"
     Animated.timing(showIcon, {
-      toValue: 0, // Cambiar a 0 para mostrar el ícono "Play"
-      duration: 500, // Duración de la animación
-      useNativeDriver: true, // Usar el driver nativo para mejor rendimiento
+      toValue: 0,
+      duration: 500,
+      useNativeDriver: true,
     }).start();
   };
 
@@ -188,20 +167,19 @@ export default function PaginaIngreso() {
               )}
 
               <Pressable
-                style={{
-                  ...styles.btnChrono,
-                  backgroundColor: mostrarCrono ? "#B22222" : "#2272A7", // Rojo cuando detenido, azul cuando en pausa
-                }}
+                style={[
+                  styles.btnChrono,
+                  { backgroundColor: mostrarCrono ? "#B22222" : "#2272A7" }
+                ]}
                 onPress={mostrarCrono ? detenerTiempo : iniciarTiempo}
               >
                 <Animated.View
                   style={{
-                    opacity: 1, // Cambiar la opacidad para suavizar la transición
                     transform: [
                       {
                         scale: showIcon.interpolate({
                           inputRange: [0, 1],
-                          outputRange: [1, 1.2], // Agrandar el ícono ligeramente cuando es "Stop"
+                          outputRange: [1, 1.2],
                         }),
                       },
                     ],
@@ -221,23 +199,45 @@ export default function PaginaIngreso() {
         )}
       </View>
 
-      {/* Contenedor del gráfico circular en la parte inferior de la pantalla */}
-      <View style={styles.progressContainer}>
-        <AnimatedCircularProgress
-          size={140}
-          width={15}
-          fill={actualFill}  // Ahora `actualFill` tiene un valor numérico
-          tintColor="#00FF00"  // Color verde fijo para la barra de progreso
-          backgroundColor="#e0e0e0"
-          rotation={0}  // Rotar el gráfico para que comience desde la parte superior
-          style={styles.progressCircle}
-        >
-          {(fill) => <Text style={styles.progressText}>{`${fill.toFixed(2)}%`}</Text>}
-        </AnimatedCircularProgress>
+      {/* Contenedor inferior */}
+      <View style={styles.bottomContainer}>
+        <View style={styles.progressContainer}>
+          <AnimatedCircularProgress
+            size={140}
+            width={15}
+            fill={actualFill}
+            tintColor="#00FF00"
+            backgroundColor="#e0e0e0"
+            rotation={0}
+          >
+            {(fill) => <Text style={styles.progressText}>{`${fill.toFixed(2)}%`}</Text>}
+          </AnimatedCircularProgress>
+        </View>
+
+        {localizaciones.length > 0 && (
+          <View style={styles.pickerContainer}>
+            <Picker
+              selectedValue={selectedLocation?.nombre}
+              onValueChange={handleLocationChange}
+              style={styles.picker}
+              dropdownIconColor="#2272A7"
+              mode="dropdown"
+            >
+              {localizaciones.map((loc, index) => (
+                <Picker.Item
+                  key={index}
+                  label={loc.nombre}
+                  value={loc.nombre}
+                  color="#2272A7"
+                />
+              ))}
+            </Picker>
+          </View>
+        )}
       </View>
     </ImageBackground>
   );
-}
+}}
 
 const styles = StyleSheet.create({
   container: {
@@ -275,10 +275,10 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     position: "relative",
-    marginTop: -230,
+    marginTop: "-76%",
     borderWidth: 3,
     borderColor: "#2272A7",
-    overflow: 'visible',
+    overflow: "visible",
   },
   timerContent: {
     alignItems: "center",
@@ -305,15 +305,33 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginTop: 100,
   },
-  progressContainer: {
+  bottomContainer: {
     position: "absolute",
-    bottom: 0,
-    left: 20,
-    width: "100%",
-    alignItems: "flex-start",
-    paddingBottom: 20,
+    bottom: "1%",
+    left: "3%",
+    right: "3%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  progressCircle: {},
+  progressContainer: {
+    backgroundColor: "white",
+    borderRadius: 100,
+    padding: 10,
+    elevation: 5,
+  },
+  pickerContainer: {
+    flex: 1,
+    marginLeft: 15,
+    backgroundColor: "white",
+    borderRadius: 10,
+    elevation: 5,
+    maxWidth: 200,
+  },
+  picker: {
+    height: 50,
+    color: "#2272A7",
+  },
   progressText: {
     fontSize: 18,
     color: "black",

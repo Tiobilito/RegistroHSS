@@ -92,3 +92,16 @@ export async function fetchHorarios(idDepartamento) {
   });
   return aggregatedData;
 }
+
+export async function ObtenerActivos(idDepartamento) {
+  const { data, error } = await supabase
+    .from("Usuarios")
+    .select("Codigo, Nombre")
+    .eq("idDepartamento", idDepartamento)
+    .eq("Status", "Activo");
+  if (error) {
+    console.error("Error al obtener usuarios:", error);
+    return null;
+  }
+  return data;
+}
