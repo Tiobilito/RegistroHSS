@@ -28,6 +28,7 @@ export const obtenerReportes = async (idDepartamento) => {
       .from("Reportes")
       .select("*")
       .in("CodigoUsuario", codigosUsuarios);
+
     if (reportesError) throw reportesError;
 
     const reportesConNombres = reportes.map((reporte) => {
