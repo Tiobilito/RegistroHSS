@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     position: "relative",
-    marginTop: -230,
+    marginTop: "-76%",
     borderWidth: 3,
     borderColor: "#2272A7",
     overflow: "visible",
