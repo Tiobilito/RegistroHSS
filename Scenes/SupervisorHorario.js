@@ -27,7 +27,6 @@ const formatHour = (hour) => {
 
 const PaginaSupervisorHorario = () => {
   const { width, height } = useWindowDimensions();
-
   // Estado para almacenar la grilla de horarios
   const [scheduleData, setScheduleData] = useState(null);
   // Estado para controlar la visibilidad del modal de inscritos
@@ -43,6 +42,7 @@ const PaginaSupervisorHorario = () => {
   const [activeUsersModalVisible, setActiveUsersModalVisible] = useState(false);
 
   const headerScrollRef = useRef(null);
+
 
   // Función que carga los horarios desde Supabase
   const loadHorarios = async () => {
@@ -218,8 +218,7 @@ const PaginaSupervisorHorario = () => {
           persons={selectedCellData.persons}
           onClose={() => setModalVisible(false)}
         />
-        
-        <ModalUsuariosActivos
+       <ModalUsuariosActivos
           visible={activeUsersModalVisible}
           users={activeUsers}
           onClose={() => setActiveUsersModalVisible(false)}
