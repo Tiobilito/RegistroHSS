@@ -56,7 +56,8 @@ export const añadirHoras = async () => {
       inicioFormateado,
       finFormateado,
       total,
-      inicio
+      inicio,
+      true
     );
   } else {
     // El dispositivo no tiene conexión a Internet
@@ -106,7 +107,8 @@ export const añadirHoraModal = async (inicioFormulario, finFormulario) => {
       inicioFormateado,
       finFormateado,
       total,
-      inicio
+      inicio,
+      false
     );
   }
   try {
