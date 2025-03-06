@@ -62,7 +62,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
     // Buscar el departamento correspondiente al usuario
     const { data: departamentos, error: errorDepartamento } = await supabase
       .from("Departamento")
-      .select("Latitud, Longitud")
+      .select("Localizaciones")
       .eq("id", idDepartamento);
 
     if (errorDepartamento) {
@@ -73,8 +73,13 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
     }
 
     if (departamentos.length > 0) {
-      const latitud = departamentos[0].Latitud;
-      const longitud = departamentos[0].Longitud;
+      const localizaciones = departamentos[0].Localizaciones;
+
+      // Verificar que hay al menos una localización
+      if (!localizaciones || localizaciones.length === 0) {
+        console.log("El departamento no tiene localizaciones registradas");
+        return false;
+      }
 
       // Verificar si hay un usuario registrado localmente en la app o no
       const dataLocal = await ObtenerDatosUsuario();
@@ -87,8 +92,7 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
             await GuardarDatosUsuario(
               Codigo,
               Contraseña,
-              latitud.toString(),
-              longitud.toString(),
+              localizaciones,
               tipoServidor,
               idDepartamento
             );
@@ -103,12 +107,11 @@ export async function EncontrarUsuario(Codigo, Contraseña) {
           return true;
         }
       } else {
-        // Si no hay usuario local, guardar los datos del usuario actual (incluyendo el TipoServidor)
+        // Si no hay usuario local, guardar los datos del usuario actual
         await GuardarDatosUsuario(
           Codigo,
           Contraseña,
-          latitud.toString(),
-          longitud.toString(),
+          localizaciones,
           tipoServidor,
           idDepartamento
         );
