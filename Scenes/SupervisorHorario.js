@@ -7,8 +7,10 @@ import {
   StyleSheet,
 } from "react-native";
 import ModalInscritos from "../Modulos/Modales/ModalInscritosHorario";
+import ModalUsuariosActivos from "../Modulos/Modales/ModalUsuariosActivos";
 import { fetchHorarios } from "../Modulos/Operaciones Supabase/HorarioSupa";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
+import { ObtenerActivos } from "../Modulos/Operaciones Supabase/HorarioSupa";
 
 // Días de la semana
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
@@ -21,21 +23,23 @@ const formatHour = (hour) => {
 };
 
 const PaginaSupervisorHorario = () => {
-  // Estado para almacenar la grilla de horarios (por día/hora) obtenida desde Supabase
+  // Estado para almacenar la grilla de horarios
   const [scheduleData, setScheduleData] = useState(null);
   // Estado para controlar la visibilidad del modal de inscritos
   const [modalVisible, setModalVisible] = useState(false);
-  // Estado para la celda seleccionada (día, hora y lista de inscritos)
+  // Estado para la celda seleccionada
   const [selectedCellData, setSelectedCellData] = useState({
     day: "",
     hour: 0,
     persons: [],
   });
+  // Nuevos estados para usuarios activos
+  const [activeUsers, setActiveUsers] = useState([]);
+  const [activeUsersModalVisible, setActiveUsersModalVisible] = useState(false);
 
-  // Ref para sincronizar el scroll horizontal entre la grilla y el encabezado (días)
   const headerScrollRef = useRef(null);
 
-  // Función que carga los horarios desde Supabase usando fetchHorarios
+  // Función que carga los horarios desde Supabase
   const loadHorarios = async () => {
     const Udata = await ObtenerDatosUsuario();
     const data = await fetchHorarios(Udata.idDepartamento);
@@ -44,11 +48,30 @@ const PaginaSupervisorHorario = () => {
     }
   };
 
+  // Función para cargar usuarios activos
+  const loadActiveUsers = async () => {
+    const Udata = await ObtenerDatosUsuario();
+    const users = await ObtenerActivos(Udata.idDepartamento);
+    if (users) {
+      setActiveUsers(users);
+    }
+  };
+
   useEffect(() => {
+    // Cargar datos iniciales
     loadHorarios();
+    loadActiveUsers();
+    
+    // Configurar actualizaciones periódicas
+    const horariosInterval = setInterval(loadHorarios, 30000);
+    const usuariosInterval = setInterval(loadActiveUsers, 30000);
+    
+    return () => {
+      clearInterval(horariosInterval);
+      clearInterval(usuariosInterval);
+    };
   }, []);
 
-  // Al tocar una celda, se abre el modal si hay inscritos
   const handleCellPress = (day, hour) => {
     const persons = scheduleData[day][hour];
     if (persons && persons.length > 0) {
@@ -57,16 +80,42 @@ const PaginaSupervisorHorario = () => {
     }
   };
 
-  // Arreglo de horas de 7 a 21
   const hours = Array.from({ length: 21 - 7 + 1 }, (_, i) => i + 7);
 
-  // Sincroniza el scroll horizontal de la grilla con el encabezado
   const onGridHorizontalScroll = (e) => {
     const offsetX = e.nativeEvent.contentOffset.x;
     if (headerScrollRef.current) {
       headerScrollRef.current.scrollTo({ x: offsetX, animated: false });
     }
   };
+
+  // Componente para el botón de usuarios activos
+  const ActiveUsersButton = () => (
+    <TouchableOpacity 
+      style={styles.activeUsersButton}
+      onPress={() => setActiveUsersModalVisible(true)}
+    >
+      <ScrollView 
+        horizontal 
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.usersContainer}
+      >
+        {activeUsers.map((user, index) => (
+          <View 
+            key={user.Codigo} 
+            style={[
+              styles.userCircle,
+              { marginLeft: index !== 0 ? -10 : 0 }
+            ]}
+          >
+            <Text style={styles.userInitial}>
+              {user.Nombre.charAt(0).toUpperCase()}
+            </Text>
+          </View>
+        ))}
+      </ScrollView>
+    </TouchableOpacity>
+  );
 
   if (!scheduleData) {
     return <Text style={styles.loadingText}>Cargando datos...</Text>;
@@ -92,7 +141,8 @@ const PaginaSupervisorHorario = () => {
             ))}
           </ScrollView>
         </View>
-        {/* Cuerpo: scroll vertical que incluye la columna fija de horas y la grilla */}
+        
+        {/* Cuerpo: scroll vertical */}
         <ScrollView style={styles.bodyScrollView}>
           <View style={styles.bodyRow}>
             {/* Columna fija: horas */}
@@ -103,7 +153,8 @@ const PaginaSupervisorHorario = () => {
                 </View>
               ))}
             </View>
-            {/* Grilla de celdas: scroll horizontal */}
+            
+            {/* Grilla de celdas */}
             <ScrollView
               horizontal
               onScroll={onGridHorizontalScroll}
@@ -143,12 +194,23 @@ const PaginaSupervisorHorario = () => {
           </View>
         </ScrollView>
       </View>
+      
+      {/* Botón de usuarios activos */}
+      <ActiveUsersButton />
+      
+      {/* Modales */}
       <ModalInscritos
         visible={modalVisible}
         day={selectedCellData.day}
         hour={selectedCellData.hour}
         persons={selectedCellData.persons}
         onClose={() => setModalVisible(false)}
+      />
+      
+      <ModalUsuariosActivos
+        visible={activeUsersModalVisible}
+        users={activeUsers}
+        onClose={() => setActiveUsersModalVisible(false)}
       />
     </View>
   );
@@ -190,10 +252,6 @@ const styles = StyleSheet.create({
   bodyRow: {
     flexDirection: "row",
   },
-  leftColumn: {
-    // La columna de horas se desplaza verticalmente junto con la grilla,
-    // quedando fija en el eje horizontal.
-  },
   row: {
     flexDirection: "row",
   },
@@ -214,9 +272,8 @@ const styles = StyleSheet.create({
   headerText: {
     fontWeight: "bold",
   },
-  hourText: {},
   registeredCell: {
-    backgroundColor: "blue", // Celda azul cuando hay inscritos
+    backgroundColor: "blue",
   },
   emptyCell: {
     backgroundColor: "#fff",
@@ -228,6 +285,39 @@ const styles = StyleSheet.create({
   loadingText: {
     textAlign: "center",
     marginTop: 20,
+    fontSize: 16,
+  },
+  // Nuevos estilos
+  activeUsersButton: {
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
+    backgroundColor: '#f0f0f0',
+    borderRadius: 30,
+    padding: 10,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  usersContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  userCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#2196F3',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+  },
+  userInitial: {
+    color: 'white',
+    fontWeight: 'bold',
     fontSize: 16,
   },
 });
