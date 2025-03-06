@@ -1,8 +1,24 @@
 import React from "react";
-import { Modal, View, Text, TouchableOpacity, ScrollView, StyleSheet } from "react-native";
+import {
+  Modal,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  Pressable,
+} from "react-native";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { eliminarReporte } from "../Operaciones Supabase/ReportesSupa";
 
 export default function ModalReporteUsuario({ visible, closeModal, reportes }) {
-console.log("Reportes en el modal:", reportes); // Verifica si los reportes están llegando al modal
+  console.log("Reportes en el modal:", reportes); // Verifica si los reportes están llegando al modal
+
+  const handleBorrar = async (id) => {
+    await eliminarReporte(id);
+    closeModal();
+  };
+
   return (
     <Modal
       visible={visible}
@@ -17,16 +33,30 @@ console.log("Reportes en el modal:", reportes); // Verifica si los reportes est�
             {reportes && reportes.length > 0 ? (
               reportes.map((reporte) => (
                 <View key={reporte.id} style={styles.reportDetailsContainer}>
-                  <Text style={styles.reportText}>Nombre: {reporte.NombreEstudiante}</Text>
-                  <Text style={styles.reportText}>Código: {reporte.CodigoUsuario}</Text>
-                  <Text style={styles.reportText}>Fecha Reporte: {reporte.FechaReporte}</Text>
-                  <Text style={styles.reportText}>Periodo Inicio: {reporte.PeriodoInicio}</Text>
-                  <Text style={styles.reportText}>Periodo Fin: {reporte.PeriodoFin}</Text>
-                  <Text style={styles.reportText}>Actividades Realizadas: {reporte.Actividades}</Text>
+                  <Text style={styles.reportText}>
+                    Fecha Reporte: {reporte.FechaReporte}
+                  </Text>
+                  <Text style={styles.reportText}>
+                    Periodo Inicio: {reporte.PeriodoInicio}
+                  </Text>
+                  <Text style={styles.reportText}>
+                    Periodo Fin: {reporte.PeriodoFin}
+                  </Text>
+                  <Text style={styles.reportText}>
+                    Actividades Realizadas: {reporte.Actividades}
+                  </Text>
+                  <Pressable
+                    onPress={() => handleBorrar(reporte.id)}
+                    style={styles.deleteButton}
+                  >
+                    <Ionicons name="trash" size={32} color="red" />
+                  </Pressable>
                 </View>
               ))
             ) : (
-              <Text style={styles.reportText}>No tienes reportes disponibles.</Text>
+              <Text style={styles.reportText}>
+                No tienes reportes disponibles.
+              </Text>
             )}
           </ScrollView>
           <TouchableOpacity onPress={closeModal} style={styles.closeButton}>
@@ -81,5 +111,12 @@ const styles = StyleSheet.create({
     color: "white",
     textAlign: "center",
     fontSize: 16,
+  },
+  deleteButton: {
+    left: "85%",
+    backgroundColor: "white",
+    borderRadius: 200,
+    width: "14%",
+    top: "1%",
   },
 });

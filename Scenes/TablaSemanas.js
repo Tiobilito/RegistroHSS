@@ -229,8 +229,6 @@ export default function PaginaTablaSemanas({ navigation }) {
       parseInt(reporte.CodigoUsuario, 10) === parseInt(Udata.Codigo, 10) // Aseguramos que ambos sean enteros
     );
 
-    //console.log("Reportes filtrados:", reportesUsuario); // Verifica los reportes después de filtrarlos
-
     return reportesUsuario;
   };
 
