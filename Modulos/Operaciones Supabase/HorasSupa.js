@@ -7,7 +7,8 @@ export async function añadirHorasSup(
   inicio,
   fin,
   total,
-  Dinicio
+  Dinicio,
+  Validada
 ) {
   const { data, error } = await supabase
     .from("Horas")
@@ -18,6 +19,7 @@ export async function añadirHorasSup(
         Total: total,
         CodigoUsuario: parseInt(codigoUsuario, 10),
         DateInicio: Dinicio,
+        Validada: Validada,
       },
     ])
     .select(); 
