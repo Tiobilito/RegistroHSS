@@ -18,6 +18,7 @@ import PaginaHorario from "./Scenes/Horario";
 import PaginaSupervisorHorario from "./Scenes/SupervisorHorario";
 import PaginaSupervisorReportes from "./Scenes/Reportes";
 import PaginaSupervisorAjustes from "./Scenes/SupervisorAjustes";
+import PaginaSupervisorHoras from "./Scenes/SupervisorHoras";
 
 const Tab = createBottomTabNavigator();
 const TabSupervisor = createBottomTabNavigator();
@@ -104,7 +105,9 @@ const SupervisorNavigation = () => {
             iconName = focused ? "today" : "today-outline";
           } else if (route.name === "Reportes") {
             iconName = focused ? "reader" : "reader-outline";
-          } else if (route.name === "SupervisorAjustes") {
+          } else if (route.name === "Horas") {
+            iconName = focused ? "time-outline" : "time-outline";
+          } else if (route.name === "Ajustes") {
             iconName = focused ? "cog" : "cog-outline";
           }
 
@@ -124,7 +127,11 @@ const SupervisorNavigation = () => {
         component={PaginaSupervisorReportes} // Aquí se usan los reportes
       />
       <TabSupervisor.Screen
-        name="SupervisorAjustes"
+        name="Horas"
+        component={PaginaSupervisorHoras} // Aquí se usan los reportes
+      />
+      <TabSupervisor.Screen
+        name="Ajustes"
         component={PaginaSupervisorAjustes} // Aquí se usan los reportes
       />
     </TabSupervisor.Navigator>
