@@ -113,7 +113,7 @@ export default function PaginaIngreso() {
   const iniciarTiempo = async () => {
     const permiso = await solicitarUbicacion();
     if (!permiso || !ubicacion) return;
-    if (await validation(ubicacion)) {
+    
     const data = await ObtenerDatosUsuario();
     if (await validation(ubicacion, data.LatDepartamento, data.LonDepartamento)) {
       const now = new Date();
@@ -128,7 +128,6 @@ export default function PaginaIngreso() {
         useNativeDriver: true,
       }).start();
     } else {
-      Alert.alert("Ubicación incorrecta", "No estás dentro del Departamento.");
       Alert.alert("Ubicación incorrecta", "No estás dentro del área seleccionada.");
     }
   };
@@ -237,7 +236,7 @@ export default function PaginaIngreso() {
       </View>
     </ImageBackground>
   );
-}}
+}
 
 const styles = StyleSheet.create({
   container: {
