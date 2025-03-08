@@ -186,8 +186,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fcfcfc", // Fondo gris claro para los filtros
     borderRadius: 10, // Bordes redondeados para los filtros
     padding: 15, // Espaciado interno
-    borderColor: "grey", // Borde negro
-    borderWidth: 0.3, // Grosor del borde
+    borderColor: "black", // Borde negro
+    borderWidth: 0.5, // Grosor del borde
   },
   filterRow: {
     flexDirection: "row",
@@ -214,8 +214,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: "#fcfcfc", // Fondo gris claro para los filtros
     borderRadius: 10,
-    borderColor: "grey", // Borde negro
-    borderWidth: 0.3, // Grosor del borde
+    borderColor: "black", // Borde negro
+    borderWidth: 0.5, // Grosor del borde
+    padding: 7,
   },
   text: {
     fontSize: 16, // Nombre más pequeño para que todo se acomode
@@ -240,5 +241,7 @@ const styles = StyleSheet.create({
     width: 20, // Aumento el tamaño del círculo de estado
     height: 20,
     borderRadius: 15,
+    borderColor: "black", // Borde negro
+    borderWidth: 1.1, // Grosor del borde
   },
 });

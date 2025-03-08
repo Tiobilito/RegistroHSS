@@ -79,7 +79,7 @@ export default function PaginaModUsuario({ navigation }) {
           { marginTop: height * 0.25, marginBottom: height * 0.05 },
         ]}
       >
-        <Text style={[styles.title, { fontSize: scaleFactor > 1 ? 24 : 20 }]}>
+        <Text style={[styles.title, { fontSize: scaleFactor > 1 ? 30 : 28 }]}>
           Editar usuario
         </Text>
       </View>
@@ -102,7 +102,7 @@ export default function PaginaModUsuario({ navigation }) {
         </Text>
         <Text
           style={{
-            fontSize: 30 * scaleFactor,
+            fontSize: 24 * scaleFactor,
             marginLeft: "4%",
             color: "black",
           }}
@@ -287,5 +287,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    alignSelf: "center",
   },
 });

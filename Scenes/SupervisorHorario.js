@@ -13,6 +13,7 @@ import ModalUsuariosActivos from "../Modulos/Modales/ModalUsuariosActivos";
 import { fetchHorarios } from "../Modulos/Operaciones Supabase/HorarioSupa";
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 import { ObtenerActivos } from "../Modulos/Operaciones Supabase/HorarioSupa";
+import { Ionicons } from "react-native-vector-icons";
 
 // Días de la semana
 const days = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
@@ -99,6 +100,11 @@ const PaginaSupervisorHorario = () => {
       style={styles.activeUsersButton}
       onPress={() => setActiveUsersModalVisible(true)}
     >
+      <Ionicons
+      name="person-circle-outline"
+      size={24}
+      color="#2272A7"
+    />
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -212,7 +218,7 @@ const PaginaSupervisorHorario = () => {
           persons={selectedCellData.persons}
           onClose={() => setModalVisible(false)}
         />
-
+        
         <ModalUsuariosActivos
           visible={activeUsersModalVisible}
           users={activeUsers}
@@ -279,7 +285,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   registeredCell: {
-    backgroundColor: "blue",
+    backgroundColor: "#2272A7",
   },
   emptyCell: {
     backgroundColor: "#fff",
