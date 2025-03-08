@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, Modal, StyleSheet, ScrollView, Button } from "react-native";
+import { View, Text, Modal, StyleSheet, ScrollView ,TouchableOpacity,} from "react-native";
 
 const ModalInscritos = ({ visible, day, hour, persons, onClose }) => {
   const formatHour = (hour) => {
@@ -27,7 +27,9 @@ const ModalInscritos = ({ visible, day, hour, persons, onClose }) => {
               </Text>
             ))}
           </ScrollView>
-          <Button title="Cerrar" onPress={onClose} />
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Text style={styles.closeButtonText}>Cerrar</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -59,6 +61,17 @@ const styles = StyleSheet.create({
   modalText: {
     fontSize: 16,
     marginBottom: 5,
+  },
+  closeButton: {
+    marginTop: 10,
+    backgroundColor: "#2272A7",
+    padding: 10,
+    borderRadius: 5,
+  },
+  closeButtonText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "center",
   },
 });
 
