@@ -85,7 +85,6 @@ export default function PaginaAjustes({ navigation }) {
             <Text style={styles.userName}>{usuario.nombre}</Text>
             <Text style={styles.tapToFlip}>Toca para ver detalles</Text>
           </View>
-
           <View style={[styles.cardBack, { height: height * 0.25 }]}>
             <Ionicons name="person-circle-outline" size={80 * scaleFactor} color="white" />
             <Text style={styles.userDetail}>Nombre: {usuario.nombre || "Nombre no disponible"}</Text>
@@ -200,6 +199,7 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     width: "100%",
     alignItems: "center",
+    marginTop: 30,
   },
   customButton: {
     flexDirection: "row",
