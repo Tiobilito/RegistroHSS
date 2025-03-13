@@ -68,8 +68,8 @@ const PaginaSupervisorHorario = () => {
     loadActiveUsers();
 
     // Configurar actualizaciones periódicas
-    const horariosInterval = setInterval(loadHorarios, 30000);
-    const usuariosInterval = setInterval(loadActiveUsers, 30000);
+    const horariosInterval = setInterval(loadHorarios, 5000); 
+    const usuariosInterval = setInterval(loadActiveUsers, 5000);
 
     return () => {
       clearInterval(horariosInterval);
