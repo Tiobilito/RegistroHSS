@@ -102,7 +102,7 @@ export const activateActivity = async () => {
   if (isConnected) {
     console.log("Activando Status...");
     try {
-      await fetch(`http://10.214.110.80:8000/activity/${data.Codigo}`, {
+      await fetch(`https://checkactives-api-registrohss.onrender.com/activity/${data.Codigo}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
@@ -118,7 +118,7 @@ export const deactivateActivity = async () => {
   if (isConnected) {
     console.log("Desactivando Status...");
     try {
-      await fetch(`http://10.214.110.80:8000/deactivate/${data.Codigo}`, {
+      await fetch(`https://checkactives-api-registrohss.onrender.com/deactivate/${data.Codigo}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
