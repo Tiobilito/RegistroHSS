@@ -11,11 +11,12 @@ export async function AñadeUsuario(
   tipoUsuario,
   codigo,
   contraseña,
-  idDepart
+  idDepart,
+  correo
 ) {
   let ChkUser = await checkUser(codigo);
   if (ChkUser) {
-    Alert.alert("Ya existe un usuario asociado al codigo");
+    Alert.alert("Ya existe un usuario asociado al código");
   } else {
     const { data, error } = await supabase.from("Usuarios").insert([
       {
@@ -24,6 +25,7 @@ export async function AñadeUsuario(
         TipoServidor: tipoUsuario,
         Contraseña: contraseña,
         idDepartamento: idDepart,
+        Correo: correo, // Se agrega el correo aquí
       },
     ]);
     if (error) {

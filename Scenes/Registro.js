@@ -19,6 +19,7 @@ import { CommonActions } from "@react-navigation/native";
 const Scale = Dimensions.get("window").width;
 
 export default function PaginaRegistro({ navigation }) {
+  const [Correo, DefCorreo] = useState("");
   const { width, height } = useWindowDimensions(); // Hook para responsividad
   const [Nombre, DefNombre] = useState("");
   const [tipoUsuario, DeftipoUsuario] = useState("");
@@ -107,6 +108,14 @@ export default function PaginaRegistro({ navigation }) {
             keyboardType="numeric"
             value={codigo}
             placeholder="Codigo"
+          />
+          <Text style={styles.subtitle}>Correo Electrónico</Text>
+          <TextInput
+            style={styles.input}
+            onChangeText={(text) => DefCorreo(text)}
+            value={Correo}
+            placeholder="Correo Electrónico"
+            keyboardType="email-address"
           />
           <Text style={styles.subtitle}>Rol </Text>
           <View
@@ -202,15 +211,22 @@ export default function PaginaRegistro({ navigation }) {
                 tipoUsuario !== "" &&
                 codigo !== "" &&
                 selectedCentro !== null &&
-                selectedDepartamento !== null
+                selectedDepartamento !== null &&
+                Correo !== ""
               ) {
+                const emailRegex = /^[^\s@]+@alumnos\.udg\.mx$/;
+                if (!emailRegex.test(Correo)) {
+                  Alert.alert("El correo debe pertenecer a alumnos.udg.mx");
+                  return;
+                }
                 if (codigo.length === 9) {
                   AñadeUsuario(
                     Nombre.toUpperCase(),
                     tipoUsuario,
                     parseInt(codigo, 10),
                     Contraseña,
-                    parseInt(selectedDepartamento, 10)
+                    parseInt(selectedDepartamento, 10),
+                    Correo.toLowerCase() // Asegurar que el correo sea en minúsculas
                   );
                   navigation.dispatch(
                     CommonActions.reset({

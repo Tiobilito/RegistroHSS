@@ -18,6 +18,7 @@
     "@react-navigation/native-stack": "^6.9.26",
     "@rneui/base": "^4.0.0-rc.7",
     "@rneui/themed": "^4.0.0-rc.8",
+    "@sendgrid/mail": "^8.1.4",
     "@shopify/flash-list": "1.7.3",
     "@supabase/supabase-js": "^2.43.4",
     "@types/react": "~18.3.12",
@@ -33,6 +34,7 @@
     "expo-status-bar": "~2.0.1",
     "expo-task-manager": "~12.0.5",
     "install": "^0.13.0",
+    "nodemailer": "^6.10.0",
     "react": "18.3.1",
     "react-native": "0.76.7",
     "react-native-circular-progress": "^1.4.1",
@@ -42,6 +44,7 @@
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "react-native-svg": "^15.8.0",
+    "react-native-tcp": "^4.0.0",
     "react-native-web": "^0.19.13",
     "typescript": "~5.3.3"
   },
