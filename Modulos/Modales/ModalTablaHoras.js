@@ -34,7 +34,7 @@ export default function ModalTablaHoras({
     setHoras(horasSemana);
   };
 
-  const handleBorrar = (id, idSemana) => {
+  const handleBorrar = (id, idSemana, idSupabase) => {
     Alert.alert(
       "Confirmación",
       "¿Estás seguro de eliminar este registro?",
@@ -66,7 +66,7 @@ export default function ModalTablaHoras({
         <Text>Final: {item.Final}</Text>
         <Text>Total: {item.Total}</Text>
       </View>
-      <Pressable onPress={() => handleBorrar(item.id, item.idSemana)}>
+      <Pressable onPress={() => handleBorrar(item.id, item.idSemana, item.idSupabase)}>
         <Ionicons name="trash" size={24} color="red" />
       </Pressable>
     </View>
