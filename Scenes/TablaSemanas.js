@@ -166,6 +166,11 @@ export default function PaginaTablaSemanas({ navigation }) {
     });
   };
 
+  const refreshData = async () => {
+    await obtenerSemanas();
+    await obtenerHoras();
+  };
+
   // Obtener horas de usuario
   const obtenerHoras = async () => {
     const HorasSemana = await obtenerHorasUsuario();
@@ -406,6 +411,7 @@ export default function PaginaTablaSemanas({ navigation }) {
         modalVisible={modalHorasVisible}
         closeModal={() => setModalHorasVisible(false)}
         idSem={selectedIdSem}
+        refreshData={refreshData}
       />
       <ModalReporteUsuario
         visible={modalReporteUsuarioVisible}
