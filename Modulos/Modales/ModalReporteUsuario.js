@@ -16,8 +16,7 @@ import {
 } from "../Operaciones Supabase/ReportesSupa";
 import { ObtenerDatosUsuario } from "../InfoUsuario";
 
-export default function ModalReporteUsuario({ visible, closeModal, reportes }) {
-  //console.log("Reportes en el modal:", reportes); // Verifica si los reportes están llegando al modal
+export default function ModalReporteUsuario({ visible, closeModal }) {
   const [reportes, setReportes] = React.useState(null);
 
   const fetchReportes = async () => {
@@ -104,16 +103,16 @@ export default function ModalReporteUsuario({ visible, closeModal, reportes }) {
 const styles = StyleSheet.create({
   modalOverlay: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center", // Esto centra el modal verticalmente
+    alignItems: "center", // Esto lo centra horizontalmente
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo oscuro semi-transparente
   },
   modalContainer: {
     backgroundColor: "white",
     padding: 20,
     borderRadius: 10,
-    width: "80%",
-    maxHeight: "80%", // Limitar la altura del modal
+    width: "80%", // Ancho del modal
+    maxHeight: "80%", // Limitar la altura del modal para evitar que sea demasiado grande
   },
   modalContent: {
     maxHeight: "85%", // Limitar el área de contenido dentro del modal
@@ -153,4 +152,3 @@ const styles = StyleSheet.create({
     top: "1%",
   },
 });
-

@@ -432,6 +432,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     resizeMode: "cover",
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)", // Fondo semi-transparente para superponer el modal
+    position: 'absolute', // Asegura que el modal se superponga a otros elementos
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0, 
+  },
+  modalContainer: {
+    backgroundColor: "white",
+    padding: 20,
+    borderRadius: 10,
+    width: "80%",  // Ajusta el ancho del modal al 80% de la pantalla
+    maxHeight: "80%", // Limita la altura para que no ocupe toda la pantalla
+    alignItems: "center", // Centra el contenido dentro del modal
+  },
   item: {
     backgroundColor: "#2272A7",
     borderRadius: 15,

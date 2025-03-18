@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     width: "80%",
     minHeight: height * 0.4,  // Al menos 40% del alto de la pantalla
     maxHeight: height * 0.7,  // No más del 70% del alto
-    alignSelf: "stretch",  // Evita problemas con el tamaño
+    alignSelf: "center",  // Esto asegura que el modal está bien alineado
   },
   scrollContent: {
     flexGrow: 1,
