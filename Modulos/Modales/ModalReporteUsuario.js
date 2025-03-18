@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Pressable,
+  Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import {
@@ -18,19 +19,35 @@ import { ObtenerDatosUsuario } from "../InfoUsuario";
 export default function ModalReporteUsuario({ visible, closeModal }) {
   const [reportes, setReportes] = React.useState(null);
 
-  const handleBorrar = async (id) => {
-    await eliminarReporte(id);
-    closeModal();
+  const fetchReportes = async () => {
+    const data = await ObtenerDatosUsuario();
+    const reportes = await obtenerReportesPorUsuario(
+      parseInt(data.Codigo, 10)
+    );
+    setReportes(reportes);
+  };
+
+  const handleBorrar = (id) => {
+    Alert.alert(
+      "Confirmación",
+      "¿Estás seguro de eliminar este reporte?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          onPress: async () => {
+            await eliminarReporte(id);
+            await fetchReportes();
+            closeModal();
+          },
+          style: "destructive",
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   React.useEffect(() => {
-    const fetchReportes = async () => {
-      const data = await ObtenerDatosUsuario();
-      const reportes = await obtenerReportesPorUsuario(
-        parseInt(data.Codigo, 10)
-      );
-      setReportes(reportes);
-    };
     fetchReportes();
   }, []);
 
