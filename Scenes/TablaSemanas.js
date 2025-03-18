@@ -12,7 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import Checkbox from "expo-checkbox";
 import { Ionicons } from "@expo/vector-icons";
 import ModalFormulario from "../Modulos/Modales/ModalFormularioHoras";
-import ModalReporte from "../Modulos/Modales/ModalReporte";
+import ModalReporte from "../Modulos/Modales/ModalFormularioReporte";
 import ModalTablaHoras from "../Modulos/Modales/ModalTablaHoras";
 import {
   añadirHoraModal,
