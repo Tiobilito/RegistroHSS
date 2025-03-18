@@ -14,14 +14,12 @@ const ModalFormulario = ({
   closeModalAndSent,
   formData,
   setFormData,
+  refreshData,
 }) => {
 
-  const handleCloseModalAndSent = () => {
-    const dataToSend = {
-      ...formData,
-      validada: false,
-    };
-    console.log("Datos a enviar:", dataToSend);
+  const handleCloseModalAndSent = async () => {
+    await refreshData();
+    await closeModalAndSent();
   };
   
   const handleDateChange = (field, value) => {
