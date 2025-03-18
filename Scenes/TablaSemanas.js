@@ -56,7 +56,6 @@ export default function PaginaTablaSemanas({ navigation }) {
 
   // Estados para el modal
   const [modalReporteUsuarioVisible, setModalReporteUsuarioVisible] = useState(false);
-  const [reportesUsuario, setReportesUsuario] = useState([]);
 
   // Función para abrir el modal de reportes del usuario
   const openModalReporteUsuario = async () => {
@@ -110,7 +109,7 @@ export default function PaginaTablaSemanas({ navigation }) {
   };
 
   // Cerrar el modal de horas (formulario)
-  const closeModal = () => {
+  const closeModal = async () => {
     DetModalVisible(false);
     setFormData({
       entryHours: "",
@@ -310,6 +309,7 @@ export default function PaginaTablaSemanas({ navigation }) {
           closeModalAndSent={closeModalAndSent}
           formData={formData}
           setFormData={setFormData}
+          refreshData={refreshData}
           handleDateChange={(field, value) => {}}
           handleTimeChange={(field, value) => {}}
         />
