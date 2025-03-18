@@ -18,6 +18,7 @@ export default function ModalTablaHoras({
   modalVisible,
   closeModal,
   idSem,
+  refreshData,
 }) {
   const { width, height } = useWindowDimensions();
   const [horas, setHoras] = useState([]);
@@ -42,10 +43,13 @@ export default function ModalTablaHoras({
         { text: "Cancelar", style: "cancel" },
         {
           text: "Borrar",
-          onPress: () => {
-            BorrarHora(id, idSemana);
-            BorrarHoraSupa(idSupabase);
-            cargarHoras();
+          onPress: async () => {
+            await BorrarHora(id, idSemana);
+            await BorrarHoraSupa(idSupabase);
+            await cargarHoras(); 
+            if (refreshData) {
+              refreshData();
+            }
           },
           style: "destructive",
         },
