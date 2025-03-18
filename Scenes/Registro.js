@@ -86,7 +86,7 @@ export default function PaginaRegistro({ navigation }) {
             {
               width: width * 0.84,
               height: height * 0.5,
-              marginBottom: height * 0.10 // Espacio entre el ScrollView y el final de la pantalla
+              marginBottom: height * 0.05 // Espacio entre el ScrollView y el final de la pantalla
             }
           ]}
         >
@@ -252,9 +252,10 @@ export default function PaginaRegistro({ navigation }) {
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: Scale > 400 ? 24 : 20,
+    fontSize: 28,
     fontWeight: "bold",
     color: "black",
+    marginTop: -40,
   },
   subtitle: {
     fontSize: Scale > 400 ? 18 : 14,
@@ -272,7 +273,7 @@ const styles = StyleSheet.create({
     // Se eliminó resizeMode aquí ya que se especifica en la prop resizeMode del ImageBackground
   },
   formContainer: {
-    height: "50%",
+    height: "65%",
     width: "84%",
   },
   titleContainer: {

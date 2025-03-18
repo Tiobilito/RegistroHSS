@@ -209,7 +209,7 @@ export default function PaginaIngreso() {
             backgroundColor="#e0e0e0"
             rotation={0}
           >
-            {(fill) => <Text style={styles.progressText}>{`${fill.toFixed(2)}%`}</Text>}
+            {(fill) => <Text style={styles.progressText}>{`${isNaN(fill) ? "0.00" : fill.toFixed(2)}%`}</Text>}
           </AnimatedCircularProgress>
         </View>
 

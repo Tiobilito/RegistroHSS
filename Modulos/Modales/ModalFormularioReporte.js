@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Modal, View, Text, Pressable, StyleSheet, TextInput } from "react-native";
+import { Modal, View, Text, Pressable, StyleSheet, TextInput, ScrollView } from "react-native";
 import { ObtenerDatosUsuario } from "../InfoUsuario";
 import { insertarReporte } from "../Operaciones Supabase/ReportesSupa";
+import { Dimensions } from "react-native";
 
 const formatDate = (date) => {
   const [day, month, year] = date.split('/');
   return `${year}-${month}-${day}`; 
 };
+const { height } = Dimensions.get("window"); // Obtener altura de la pantalla
 
 export default function ModalReporte({
   modalVisible,
@@ -26,7 +28,7 @@ export default function ModalReporte({
   }, []);
 
   const handleEnviarReporte = async () => {
-    if (isSubmitting) return; // Evitar múltiples envíos
+    if (isSubmitting) return;
     setIsSubmitting(true);
 
     try {
@@ -50,7 +52,6 @@ export default function ModalReporte({
       };
 
       await insertarReporte(nuevoReporte);
-      // Limpiar el campo de actividades y cerrar el modal
       setActividades("");
       closeModal();
     } catch (error) {
@@ -64,27 +65,33 @@ export default function ModalReporte({
     <Modal visible={modalVisible} animationType="slide" transparent={true}>
       <View style={styles.modalContainer}>
         <View style={styles.modalContent}>
-          <Text style={styles.text}>Fecha de Reporte: {formData.fechaReporte}</Text>
-          <Text style={styles.text}>Horas Reportadas: {formData.horasReportadas}</Text>
-          <Text style={styles.text}>Periodo Inicio: {formData.periodoInicio}</Text>
-          <Text style={styles.text}>Periodo Fin: {formData.periodoFin}</Text>
+          <ScrollView 
+            contentContainerStyle={styles.scrollContent} 
+            keyboardShouldPersistTaps="handled"
+            style={styles.scrollView}
+          >
+            <Text style={styles.text}>Fecha de Reporte: {formData.fechaReporte}</Text>
+            <Text style={styles.text}>Horas Reportadas: {formData.horasReportadas}</Text>
+            <Text style={styles.text}>Periodo Inicio: {formData.periodoInicio}</Text>
+            <Text style={styles.text}>Periodo Fin: {formData.periodoFin}</Text>
 
-          <Text style={styles.text}>Actividades Realizadas:</Text>
-          <TextInput
-            style={styles.textInput}
-            multiline
-            numberOfLines={4}
-            value={actividades} 
-            onChangeText={setActividades} 
-            placeholder="Escribe las actividades realizadas..."
-          />
+            <Text style={styles.text}>Actividades Realizadas:</Text>
+            <TextInput
+              style={styles.textInput}
+              multiline
+              numberOfLines={4}
+              value={actividades} 
+              onChangeText={setActividades} 
+              placeholder="Escribe las actividades realizadas..."
+            />
 
-          <Pressable onPress={handleEnviarReporte} style={styles.button} disabled={isSubmitting}>
-            <Text style={styles.buttonText}>{ isSubmitting ? "Enviando..." : "Enviar Reporte" }</Text>
-          </Pressable>
-          <Pressable onPress={closeModal} style={styles.button}>
-            <Text style={styles.buttonText}>Cancelar</Text>
-          </Pressable>
+            <Pressable onPress={handleEnviarReporte} style={styles.button} disabled={isSubmitting}>
+              <Text style={styles.buttonText}>{ isSubmitting ? "Enviando..." : "Enviar Reporte" }</Text>
+            </Pressable>
+            <Pressable onPress={closeModal} style={styles.button}>
+              <Text style={styles.buttonText}>Cancelar</Text>
+            </Pressable>
+          </ScrollView>
         </View>
       </View>
     </Modal>
@@ -103,7 +110,16 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: "80%",
-    alignItems: "center",
+    minHeight: height * 0.4,  // Al menos 40% del alto de la pantalla
+    maxHeight: height * 0.7,  // No más del 70% del alto
+    alignSelf: "stretch",  // Evita problemas con el tamaño
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+  },
+  scrollView: {
+    flexShrink: 1, // Evita que el contenido expanda demasiado
   },
   text: {
     fontSize: 18,
@@ -114,6 +130,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginTop: 10,
     borderRadius: 5,
+    alignItems: "center",
   },
   buttonText: {
     color: "white",

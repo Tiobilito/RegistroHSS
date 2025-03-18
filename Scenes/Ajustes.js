@@ -9,7 +9,7 @@ import { supabase } from "../Modulos/Operaciones Supabase/supabase";
 const image = require("../assets/fondo.webp");
 
 export default function PaginaAjustes({ navigation }) {
-  const { width, height } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();  // Usar hook de dimensiones para obtener height y width
   const scaleFactor = width / 375;
 
   // Estado para guardar los datos del usuario
@@ -72,31 +72,32 @@ export default function PaginaAjustes({ navigation }) {
         </Text>
       </View>
 
-      <View style={styles.flipCardWrapper}>
+      <View style={[styles.flipCardWrapper, { maxWidth: width * 0.9 }]}>
         <FlipCard
           friction={8}
           perspective={1000}
           flipHorizontal={true}
           flipVertical={false}
-          style={styles.flipCardContainer}
+          style={[styles.flipCardContainer, { width: '100%' }]}
         >
-          <View style={styles.cardFront}>
+          <View style={[styles.cardFront, { height: height * 0.25 }]}>
             <Ionicons name="person-circle-outline" size={80 * scaleFactor} color="white" />
             <Text style={styles.userName}>{usuario.nombre}</Text>
             <Text style={styles.tapToFlip}>Toca para ver detalles</Text>
           </View>
 
-          <View style={styles.cardBack}>
-          <Ionicons name="person-circle-outline" size={80 * scaleFactor} color="white" />
-          <Text style={styles.userDetail}>Nombre: {usuario.nombre || "Nombre no disponible"}</Text>
-          <Text style={styles.userDetail}>Código: {usuario.codigo || "Código no disponible"}</Text>
-          <Text style={styles.userDetail}>{usuario.tipoServidor || "Tipo de servidor no disponible"}</Text>
+          <View style={[styles.cardBack, { height: height * 0.25 }]}>
+            <Ionicons name="person-circle-outline" size={80 * scaleFactor} color="white" />
+            <Text style={styles.userDetail}>Nombre: {usuario.nombre || "Nombre no disponible"}</Text>
+            <Text style={styles.userDetail}>Código: {usuario.codigo || "Código no disponible"}</Text>
+            <Text style={styles.userDetail}>{usuario.tipoServidor || "Tipo de servidor no disponible"}</Text>
             <Text style={styles.tapToFlip}>Toca para regresar</Text>
           </View>
         </FlipCard>
       </View>
 
-      <View style={[styles.buttonsContainer, { marginTop: 270 }]}>
+      {/* Botones */}
+      <View style={[styles.buttonsContainer, { marginTop: height * 0.35 }]}>
         <Pressable
           style={styles.customButton}
           onPress={() => navigation.navigate("PaginaModificarUsusario")}
@@ -156,15 +157,15 @@ const styles = StyleSheet.create({
     color: "black",
   },
   flipCardWrapper: {
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   flipCardContainer: {
-    width: "90%",
+    width: "100%",
+    maxWidth: 400,
   },
   cardFront: {
     width: "100%",
-    height: 250,
     backgroundColor: "#2272A7",
     alignItems: "center",
     justifyContent: "center",
@@ -173,7 +174,6 @@ const styles = StyleSheet.create({
   },
   cardBack: {
     width: "100%",
-    height: 250,
     backgroundColor: "#1E5B87",
     alignItems: "center",
     justifyContent: "center",
@@ -200,7 +200,6 @@ const styles = StyleSheet.create({
   buttonsContainer: {
     width: "100%",
     alignItems: "center",
-    marginTop: 30,
   },
   customButton: {
     flexDirection: "row",

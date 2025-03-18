@@ -182,7 +182,9 @@ const styles = StyleSheet.create({
     padding: 20,
     borderRadius: 10,
     width: "80%",
-    maxHeight: "100%", // Limitar la altura máxima del modal
+    minHeight: "40%", // Nueva altura mínima
+    maxHeight: "60%", // Reducida para no ocupar toda la pantalla
+    alignSelf: "center", // Asegura que el modal esté centrado
   },
   modalContent: {
     maxHeight: "85%", // Limitar el área de contenido dentro del modal
