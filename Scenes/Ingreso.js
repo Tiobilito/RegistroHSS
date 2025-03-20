@@ -136,22 +136,31 @@ export default function PaginaIngreso({ navigation }) {
           <Text style={[styles.subtitle]}>
             Código
           </Text>
+          <View style={styles.inputContainer}>
+            <Ionicons name="person-outline" size={20} color="black" style={styles.icon} />
           <TextInput
             style={styles.input}
             onChangeText={(text) => setCodigo(text)}
             keyboardType="numeric"
             value={Codigo}
+            placeholder="Ingrese su codigo"
+            placeholderTextColor="gray"
           />
+          </View>
           <Text style={[styles.subtitle]}>
             Contraseña
           </Text>
+          <View style={styles.inputContainer}>
+            <Ionicons name="key-outline" size={20} color="black" style={styles.icon} />
           <TextInput
             style={styles.input}
             onChangeText={(text) => setContraseña(text)}
             value={Contraseña}
             secureTextEntry={true}
+            placeholder="Ingrese su contraseña"
+            placeholderTextColor="gray"
           />
-
+          </View>
           <View style={styles.btnContainer}>
             <View
               style={{
@@ -292,6 +301,7 @@ const styles = StyleSheet.create({
     fontSize: Scale > 400 ? 18 : 14,
     marginLeft: "4%",
     color: "black",
+    fontWeight: "bold",
   },
   txtBtn: {
     color: "white",
@@ -313,10 +323,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: "10%",
   },
-  input: {
-    height: 40,
-    margin: 12,
-    padding: 10,
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: "#C5E0F2",
     borderRadius: 50,
     elevation: 15,
@@ -327,6 +336,17 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 4,
+    paddingHorizontal: 10,
+    margin: 12,
+  },
+  icon: {
+    marginRight: 10,
+  },
+  input: {
+    flex: 1,
+    height: 40,
+    padding: 10,
+    backgroundColor: "transparent",
   },
   btnContainer: {
     alignItems: "center",
