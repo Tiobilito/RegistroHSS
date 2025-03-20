@@ -9,111 +9,186 @@ import {
   ImageBackground,
   Pressable,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
-import { changePassword, checkUser } from "../Modulos/Operaciones Supabase/UsuariosSupa";
+import { changePassword } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 
 const image = require("../assets/Back.png");
 
+// Cambia esta URL a la dirección de tu API
+const API_BASE_URL = "https://checkactives-api-registrohss.onrender.com";
+
 export default function ChangePassword({ navigation }) {
-  const [isVer, setIsVer] = useState(false); // Para controlar qué paso mostrar
-  const [code, setCode] = useState("");
+  const { width } = useWindowDimensions();
+  
+  // Estados para solicitar token
+  const [email, setEmail] = useState("");
+  
+  // Estados para verificar token y cambiar contraseña
+  const [token, setToken] = useState("");
+  const [userId, setUserId] = useState(""); // Se llena al verificar el token
   const [password, setPassword] = useState("");
-  const [newPassword, setnewPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
-  // Obtén las dimensiones actuales de la pantalla
-  const { width, height } = useWindowDimensions();
-
-  async function verificationUser() {
+  async function handleRequestToken() {
     try {
-      const get = await checkUser(code);
-      if (get) {
-        console.log("Usuario verificado");
-        setIsVer(true);
+      const response = await fetch(`${API_BASE_URL}/send-reset-token/${email}`, {
+        method: "POST",
+      });
+      const data = await response.json();
+      if (response.ok) {
+        Alert.alert("Token enviado", "Revisa tu correo para el token.");
       } else {
-        Alert.alert("El usuario no existe :(");
+        Alert.alert("Error", data.detail || "Error al solicitar el token");
       }
     } catch (error) {
-      console.error("Error en la verificación del usuario:", error);
-      Alert.alert("Error en la verificación del usuario");
+      console.error("Error solicitando el token:", error);
+      Alert.alert("Error", "Error al solicitar el token");
     }
   }
 
-  async function verification() {
+  async function handleVerifyToken() {
     try {
-      if (password === newPassword) {
-        Alert.alert("Las contraseñas son iguales");
-        await changePassword(password, code);
-        navigation.navigate("Ingreso");
+      const response = await fetch(`${API_BASE_URL}/verify-token/${token}`);
+      const data = await response.json();
+      if (data.user_id) {
+        setUserId(data.user_id);
+        Alert.alert("Token verificado", "Token validado exitosamente");
       } else {
-        Alert.alert("Las contraseñas no son iguales :(");
+        Alert.alert("Token inválido", "El token es inválido o ha expirado");
+        setUserId("");
       }
+    } catch (error) {
+      console.error("Error verificando el token:", error);
+      Alert.alert("Error", "Error al verificar el token");
+      setUserId("");
+    }
+  }
+
+  async function handleChangePassword() {
+    try {
+      if (!userId) {
+        Alert.alert("Error", "Primero verifica el token");
+        return;
+      }
+      if (password !== newPassword) {
+        Alert.alert("Error", "Las contraseñas no coinciden");
+        return;
+      }
+      // Se asume que changePassword requiere la nueva contraseña y el userId
+      await changePassword(password, userId);
+      // Llamada al endpoint para eliminar el token activo
+      await fetch(`${API_BASE_URL}/remove-token/${token}`, { method: "POST" });
+      Alert.alert("Éxito", "Contraseña cambiada exitosamente");
+      navigation.navigate("Ingreso");
     } catch (error) {
       console.error("Error al cambiar la contraseña:", error);
-      Alert.alert("Error al cambiar la contraseña");
+      Alert.alert("Error", "Error al cambiar la contraseña");
     }
   }
 
-  // Función simple para escalar fuentes (puedes personalizarla)
+  // Función para escalar fuentes (puedes personalizarla)
   const scaleFont = (size) => (width / 375) * size;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
-      <ImageBackground source={image} style={styles.imgBackground}>
-        {!isVer ? (
-          <>
-            <View style={styles.titleContainer}>
-              <Text style={[styles.title, { fontSize: scaleFont(24) }]}>
-                Cambiar contraseña
-              </Text>
-            </View>
-            <View style={styles.subtitleContainer}>
-              <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
-                Código
-              </Text>
-              <TextInput
-                style={styles.input}
-                value={code}
-                placeholder="Código"
-                onChangeText={setCode}
-              />
-            </View>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ImageBackground source={image} style={styles.imgBackground}>
+          <View style={styles.formContainer}>
+            {!userId && (
+              <>
+                {/* Sección para solicitar token */}
+                <View style={styles.section}>
+                  <Text style={[styles.title, { fontSize: scaleFont(24) }]}>
+                    Solicitar Token
+                  </Text>
+                  <View style={styles.subtitleContainer}>
+                    <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
+                      Ingresa tu correo
+                    </Text>
+                    <TextInput
+                      style={styles.input}
+                      value={email}
+                      placeholder="Correo electrónico"
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  </View>
+                  <Pressable
+                    style={[styles.btnIngresar, { width: "60%" }]}
+                    onPress={handleRequestToken}
+                  >
+                    <Text style={styles.txtBtn}>Solicitar token</Text>
+                  </Pressable>
+                </View>
 
-            <Pressable style={[styles.btnIngresar, { width: "60%" }]} onPress={verificationUser}>
-              <Text style={styles.txtBtn}>Cambiar contraseña</Text>
-            </Pressable>
-          </>
-        ) : (
-          <>
-            <View style={{ width: "80%", marginVertical: 20 }}>
-              <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
-                Escribe la nueva contraseña
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Contraseña"
-                placeholderTextColor="#888"
-                secureTextEntry
-                value={password}
-                onChangeText={setPassword}
-              />
-              <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
-                Escribe nuevamente la contraseña
-              </Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Nueva contraseña"
-                placeholderTextColor="#888"
-                secureTextEntry
-                value={newPassword}
-                onChangeText={setnewPassword}
-              />
-            </View>
-            <Pressable style={[styles.btnIngresar, { width: "60%" }]} onPress={verification}>
-              <Text style={styles.txtBtn}>Cambiar contraseña</Text>
-            </Pressable>
-          </>
-        )}
-      </ImageBackground>
+                {/* Sección para verificar token */}
+                <View style={styles.section}>
+                  <Text style={[styles.title, { fontSize: scaleFont(24) }]}>
+                    Verificar Token
+                  </Text>
+                  <View style={styles.subtitleContainer}>
+                    <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
+                      Ingresa el token
+                    </Text>
+                    <TextInput
+                      style={styles.input}
+                      value={token}
+                      placeholder="Token"
+                      onChangeText={setToken}
+                      autoCapitalize="none"
+                    />
+                  </View>
+                  <Pressable
+                    style={[styles.btnIngresar, { width: "60%", marginBottom: 20 }]}
+                    onPress={handleVerifyToken}
+                  >
+                    <Text style={styles.txtBtn}>Verificar token</Text>
+                  </Pressable>
+                </View>
+              </>
+            )}
+            {userId && (
+              <View style={styles.section}>
+                <Text style={[styles.title, { fontSize: scaleFont(24) }]}>
+                  Cambiar Contraseña
+                </Text>
+                <View style={styles.subtitleContainer}>
+                  <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
+                    Ingresa la nueva contraseña
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Nueva contraseña"
+                    placeholderTextColor="#888"
+                    secureTextEntry
+                    value={password}
+                    onChangeText={setPassword}
+                  />
+                  <Text style={[styles.subtitle, { fontSize: scaleFont(18) }]}>
+                    Confirma la nueva contraseña
+                  </Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Confirmar contraseña"
+                    placeholderTextColor="#888"
+                    secureTextEntry
+                    value={newPassword}
+                    onChangeText={setNewPassword}
+                  />
+                </View>
+                <Pressable
+                  style={[styles.btnIngresar, { width: "60%" }]}
+                  onPress={handleChangePassword}
+                >
+                  <Text style={styles.txtBtn}>Cambiar contraseña</Text>
+                </Pressable>
+              </View>
+            )}
+          </View>
+        </ImageBackground>
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -123,19 +198,30 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    resizeMode: "cover",
   },
-  titleContainer: {
+  formContainer: {
+    width: "90%",
     alignItems: "center",
-    marginBottom: "5%",
+    justifyContent: "center",
+    paddingVertical: 20,
   },
-  subtitleContainer: {
-    alignSelf: "stretch",
-    paddingHorizontal: "5%",
+  section: {
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    borderRadius: 10,
+    padding: 20,
+    marginBottom: 20,
+    width: "100%",
+    alignItems: "center",
   },
   title: {
     fontWeight: "bold",
     color: "black",
+    marginBottom: 10,
+  },
+  subtitleContainer: {
+    alignSelf: "stretch",
+    paddingHorizontal: "5%",
+    marginBottom: 10,
   },
   subtitle: {
     marginBottom: 5,
@@ -171,10 +257,16 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.3,
     shadowRadius: 4,
-    marginTop: 20,
+    marginTop: 10,
   },
   txtBtn: {
     color: "white",
     fontWeight: "bold",
+  },
+  infoText: {
+    fontSize: 14,
+    color: "red",
+    textAlign: "center",
+    marginTop: 10,
   },
 });
