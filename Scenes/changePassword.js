@@ -10,27 +10,38 @@ import {
   Pressable,
   SafeAreaView,
   ScrollView,
+  Modal,
+  ActivityIndicator,
+  KeyboardAvoidingView, // Importar KeyboardAvoidingView
+  Platform, // Para manejar el comportamiento específico según el sistema operativo
 } from "react-native";
 import { changePassword } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 
 const image = require("../assets/Back.png");
-
-// Cambia esta URL a la dirección de tu API
 const API_BASE_URL = "https://checkactives-api-registrohss.onrender.com";
 
 export default function ChangePassword({ navigation }) {
   const { width } = useWindowDimensions();
   
-  // Estados para solicitar token
   const [email, setEmail] = useState("");
-  
-  // Estados para verificar token y cambiar contraseña
   const [token, setToken] = useState("");
-  const [userId, setUserId] = useState(""); // Se llena al verificar el token
+  const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
+  // Estado para controlar el modal de carga
+  const [isLoading, setIsLoading] = useState(false);
+
   async function handleRequestToken() {
+    if (isLoading) return; // Aseguramos que no se ejecute si ya está en carga
+  
+    if (!email) {
+      Alert.alert("Error", "Por favor ingresa un correo válido.");
+      return;
+    }
+  
+    setIsLoading(true);  // Mostrar el modal de carga
+  
     try {
       const response = await fetch(`${API_BASE_URL}/send-reset-token/${email}`, {
         method: "POST",
@@ -44,10 +55,21 @@ export default function ChangePassword({ navigation }) {
     } catch (error) {
       console.error("Error solicitando el token:", error);
       Alert.alert("Error", "Error al solicitar el token");
+    } finally {
+      setIsLoading(false);  // Ocultar el modal de carga
     }
   }
 
   async function handleVerifyToken() {
+    if (isLoading) return; // Aseguramos que no se ejecute si ya está en carga
+  
+    if (!token) {
+      Alert.alert("Error", "Por favor ingresa un token válido.");
+      return;
+    }
+  
+    setIsLoading(true);  // Mostrar el modal de carga
+  
     try {
       const response = await fetch(`${API_BASE_URL}/verify-token/${token}`);
       const data = await response.json();
@@ -62,36 +84,46 @@ export default function ChangePassword({ navigation }) {
       console.error("Error verificando el token:", error);
       Alert.alert("Error", "Error al verificar el token");
       setUserId("");
+    } finally {
+      setIsLoading(false);  // Ocultar el modal de carga
     }
-  }
+  }  
 
   async function handleChangePassword() {
+    if (isLoading) return; // Aseguramos que no se ejecute si ya está en carga
+  
+    if (!userId) {
+      Alert.alert("Error", "Primero verifica el token");
+      return;
+    }
+    if (password !== newPassword) {
+      Alert.alert("Error", "Las contraseñas no coinciden");
+      return;
+    }
+  
+    setIsLoading(true);  // Mostrar el modal de carga
+  
     try {
-      if (!userId) {
-        Alert.alert("Error", "Primero verifica el token");
-        return;
-      }
-      if (password !== newPassword) {
-        Alert.alert("Error", "Las contraseñas no coinciden");
-        return;
-      }
-      // Se asume que changePassword requiere la nueva contraseña y el userId
       await changePassword(password, userId);
-      // Llamada al endpoint para eliminar el token activo
       await fetch(`${API_BASE_URL}/remove-token/${token}`, { method: "POST" });
       Alert.alert("Éxito", "Contraseña cambiada exitosamente");
       navigation.navigate("Ingreso");
     } catch (error) {
       console.error("Error al cambiar la contraseña:", error);
       Alert.alert("Error", "Error al cambiar la contraseña");
+    } finally {
+      setIsLoading(false);  // Ocultar el modal de carga
     }
   }
 
-  // Función para escalar fuentes (puedes personalizarla)
   const scaleFont = (size) => (width / 375) * size;
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"} // Ajustar comportamiento según plataforma
+      >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <ImageBackground source={image} style={styles.imgBackground}>
           <View style={styles.formContainer}>
@@ -118,6 +150,7 @@ export default function ChangePassword({ navigation }) {
                   <Pressable
                     style={[styles.btnIngresar, { width: "60%" }]}
                     onPress={handleRequestToken}
+                    disabled={isLoading}  // Deshabilitar mientras se carga
                   >
                     <Text style={styles.txtBtn}>Solicitar token</Text>
                   </Pressable>
@@ -143,6 +176,7 @@ export default function ChangePassword({ navigation }) {
                   <Pressable
                     style={[styles.btnIngresar, { width: "60%", marginBottom: 20 }]}
                     onPress={handleVerifyToken}
+                    disabled={isLoading}  // Deshabilitar mientras se carga
                   >
                     <Text style={styles.txtBtn}>Verificar token</Text>
                   </Pressable>
@@ -189,6 +223,17 @@ export default function ChangePassword({ navigation }) {
           </View>
         </ImageBackground>
       </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Modal de carga */}
+      <Modal transparent={true} animationType="fade" visible={isLoading}>
+        <View style={styles.modalBackground}>
+          <View style={styles.activityIndicatorWrapper}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text style={{ marginTop: 10 }}>Cargando...</Text>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -268,5 +313,20 @@ const styles = StyleSheet.create({
     color: "red",
     textAlign: "center",
     marginTop: 10,
+  },
+  modalBackground: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: "#FFFFFF",
+    height: 120,
+    width: 120,
+    borderRadius: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
