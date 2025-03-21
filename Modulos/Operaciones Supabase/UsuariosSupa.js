@@ -45,7 +45,8 @@ export async function ModificaUsuario(
   tipoUsuario,
   codigo,
   contraseña,
-  idDepart
+  idDepart,
+  Correo // Se agrega el correo como parámetro
 ) {
   const { data, error } = await supabase
     .from("Usuarios")
@@ -54,6 +55,7 @@ export async function ModificaUsuario(
       TipoServidor: tipoUsuario,
       Contraseña: contraseña,
       idDepartamento: idDepart,
+      Correo: Correo, // Se agrega el campo Correo
     })
     .eq("Codigo", parseInt(codigo, 10));
   if (error) {

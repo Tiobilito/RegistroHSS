@@ -19,7 +19,8 @@ export const GuardarDatosUsuario = async (
   contraseña,
   localizaciones,
   tipoServidor,
-  iddepartamento
+  iddepartamento,
+  Correo
 ) => {
   try {
     const data = {
@@ -31,6 +32,7 @@ export const GuardarDatosUsuario = async (
       LonDepartamento: localizaciones[0]?.longitud?.toString() || "",
       Localizaciones: localizaciones,
       idDepartamento: iddepartamento,
+      Correo: Correo
     };
 
     const jsonData = JSON.stringify(data);

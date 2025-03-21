@@ -126,6 +126,7 @@ export default function ChangePassword({ navigation }) {
       >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <ImageBackground source={image} style={styles.imgBackground}>
+        <Text style={styles.title}>Recuperar contraseña</Text>
           <View style={styles.formContainer}>
             {!userId && (
               <>
@@ -328,5 +329,12 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+    marginTop: 40,
   },
 });

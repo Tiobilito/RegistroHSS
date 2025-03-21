@@ -7,8 +7,9 @@ import {
   ImageBackground,
   Pressable,
   useWindowDimensions,
+  TouchableWithoutFeedback,
 } from "react-native";
-import FlipCard from "react-native-flip-card";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming } from "react-native-reanimated";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { EliminarUsuarioHoras } from "../Modulos/Operaciones Supabase/HorasSupa";
 import {
@@ -22,8 +23,9 @@ const image = require("../assets/fondo.webp");
 export default function PaginaAjustes({ navigation }) {
   const { width } = useWindowDimensions();
   const scaleFactor = width / 375;
-
   const [usuario, setUsuario] = useState(null);
+  const rotateY = useSharedValue(0);
+  const [flipped, setFlipped] = useState(false);
 
   useEffect(() => {
     const cargarDatosUsuario = async () => {
@@ -54,6 +56,25 @@ export default function PaginaAjustes({ navigation }) {
     cargarDatosUsuario();
   }, []);
 
+  const frontAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotateY: `${rotateY.value}deg` }],
+      backfaceVisibility: "hidden",
+    };
+  });
+  
+  const backAnimatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotateY: `${rotateY.value + 180}deg` }],
+      backfaceVisibility: "hidden",
+    };
+  });
+
+  const handleFlip = () => {
+    const nextRotation = rotateY.value === 0 ? 180 : 0;
+    rotateY.value = withTiming(nextRotation, { duration: 500 });
+  };
+
   if (!usuario) {
     return null;
   }
@@ -61,54 +82,36 @@ export default function PaginaAjustes({ navigation }) {
   return (
     <ImageBackground source={image} resizeMode="cover" style={styles.container}>
       <View style={styles.titleContainer}>
-        <Text style={[styles.title]}>
-          Ajustes
-        </Text>
+        <Text style={styles.title}>Ajustes</Text>
       </View>
-      <View style={{marginTop: "20%", height: "30%", marginBottom: "10%"}}>
-        <FlipCard
-          friction={8}
-          perspective={1000}
-          flipHorizontal={true}
-          flipVertical={false}
-        >
-          <View style={styles.cardFront}>
-            <Ionicons
-              name="person-circle-outline"
-              size={80 * scaleFactor}
-              color="white"
-            />
+      <TouchableWithoutFeedback onPress={handleFlip}>
+        <View style={styles.cardContainer}>
+          {/* Tarjeta Frontal */}
+          <Animated.View style={[styles.card, styles.cardFront, frontAnimatedStyle]}>
+            <Ionicons name="person-circle-outline" size={80 * scaleFactor} color="white" />
             <Text style={styles.userName}>{usuario.nombre}</Text>
             <Text style={styles.tapToFlip}>Toca para ver detalles</Text>
-          </View>
-          <View style={styles.cardBack}>
-            <Ionicons
-              name="person-circle-outline"
-              size={80 * scaleFactor}
-              color="white"
-            />
+          </Animated.View>
+
+          {/* Tarjeta Trasera */}
+          <Animated.View style={[styles.card, styles.cardBack, backAnimatedStyle]}>
+            <Ionicons name="person-circle-outline" size={80 * scaleFactor} color="white" />
             <Text style={styles.userDetail}>Nombre: {usuario.nombre}</Text>
             <Text style={styles.userDetail}>Código: {usuario.codigo}</Text>
             <Text style={styles.userDetail}>{usuario.tipoServidor}</Text>
             <Text style={styles.tapToFlip}>Toca para regresar</Text>
-          </View>
-        </FlipCard>
-      </View>
+          </Animated.View>
+        </View>
+      </TouchableWithoutFeedback>
 
       <View style={styles.buttonContainer}>
         <Pressable
           style={styles.customButton}
           onPress={() => navigation.navigate("PaginaModificarUsusario")}
         >
-          <Ionicons
-            name="person-outline"
-            size={24 * scaleFactor}
-            color="white"
-            style={styles.icon}
-          />
+          <Ionicons name="person-outline" size={24 * scaleFactor} color="white" style={styles.icon} />
           <Text style={styles.buttonText}>Editar usuario</Text>
         </Pressable>
-
         <Pressable
           style={styles.customButton}
           onPress={() => {
@@ -129,25 +132,14 @@ export default function PaginaAjustes({ navigation }) {
             );
           }}
         >
-          <Ionicons
-            name="trash-outline"
-            size={24 * scaleFactor}
-            color="white"
-            style={styles.icon}
-          />
+          <Ionicons name="trash-outline" size={24 * scaleFactor} color="white" style={styles.icon} />
           <Text style={styles.buttonText}>Borrar Usuario</Text>
         </Pressable>
-
         <Pressable
           style={styles.customButton}
           onPress={() => navigation.navigate("Ingreso")}
         >
-          <Ionicons
-            name="log-out-outline"
-            size={24 * scaleFactor}
-            color="white"
-            style={styles.icon}
-          />
+          <Ionicons name="log-out-outline" size={24 * scaleFactor} color="white" style={styles.icon} />
           <Text style={styles.buttonText}>Cerrar Sesión</Text>
         </Pressable>
       </View>
@@ -162,17 +154,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  cardFront: {
+  card: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+    justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#2272A7",
-    padding: 20,
     borderRadius: 10,
   },
+  cardFront: {
+    backgroundColor: "#2272A7",
+  },
   cardBack: {
-    alignItems: "center",
     backgroundColor: "#18537a",
-    padding: 20,
-    borderRadius: 10,
   },
   userName: {
     fontSize: 22,
@@ -215,9 +209,13 @@ const styles = StyleSheet.create({
     color: "black",
   },
   titleContainer: {
-    position: "absolute",  // Esto hace que el título esté posicionado de manera independiente
-    top: "12%",            // Ajusta este valor para mover el título hacia arriba o abajo
+    position: "absolute",
+    top: "12%",
     alignItems: "center",
-    marginBottom: "10%",
+  },
+  cardContainer: {
+    width: "80%",
+    height: "30%",
+    position: "relative",
   },
 });

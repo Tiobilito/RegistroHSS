@@ -188,6 +188,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     maxHeight: "85%", // Limitar el área de contenido dentro del modal
+    overflow: "scroll", // Permite el desplazamiento del contenido
   },
   modalTitle: {
     fontSize: 22,

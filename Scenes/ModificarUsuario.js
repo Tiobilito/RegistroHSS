@@ -30,6 +30,7 @@ export default function PaginaModUsuario({ navigation }) {
   const [departamentos, setDepartamentos] = useState([]);
   const [selectedCentro, setSelectedCentro] = useState(null);
   const [selectedDepartamento, setSelectedDepartamento] = useState(null);
+  const [correo, setCorreo] = useState("");
 
   const DefDatosUsuario = async () => {
     const dataL = await ObtenerDatosUsuario();
@@ -39,6 +40,7 @@ export default function PaginaModUsuario({ navigation }) {
       DefCodigo(data.Codigo.toString());
       DeftipoUsuario(data.TipoServidor);
       DefContraseña(data.Contraseña);
+      setCorreo(data.Correo);  // Agregar el correo
     }
   };
 
@@ -109,6 +111,16 @@ export default function PaginaModUsuario({ navigation }) {
         >
           {codigo}
         </Text>
+
+        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>
+          Correo
+        </Text>
+        <TextInput
+          style={[styles.input, { fontSize: 16 * scaleFactor }]}
+          onChangeText={(text) => setCorreo(text)}
+          value={correo}
+          placeholder="Correo electrónico"
+        />
 
         <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginBottom: 5 }]}>
           Rol
@@ -214,7 +226,8 @@ export default function PaginaModUsuario({ navigation }) {
                   tipoUsuario,
                   parseInt(codigo, 10),
                   Contraseña,
-                  parseInt(selectedDepartamento, 10)
+                  parseInt(selectedDepartamento, 10),
+                  correo // Se agrega el correo aquí
                 );
                 navigation.goBack();
               } else {
