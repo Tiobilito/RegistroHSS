@@ -55,15 +55,16 @@ export default function PaginaAjustes({ navigation }) {
   }, []);
 
   if (!usuario) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text style={styles.loadingText}>Cargando datos...</Text>
-      </View>
-    );
+    return null;
   }
 
   return (
     <ImageBackground source={image} resizeMode="cover" style={styles.container}>
+      <View style={styles.titleContainer}>
+        <Text style={[styles.title]}>
+          Ajustes
+        </Text>
+      </View>
       <View style={{marginTop: "20%", height: "30%", marginBottom: "10%"}}>
         <FlipCard
           friction={8}
@@ -161,25 +162,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     padding: 20,
   },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#000000aa",
-  },
-  loadingText: {
-    color: "white",
-    fontSize: 18,
-  },
   cardFront: {
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "#2272A7",
     padding: 20,
     borderRadius: 10,
   },
   cardBack: {
     alignItems: "center",
-    backgroundColor: "rgba(0,0,0,0.6)",
+    backgroundColor: "#18537a",
     padding: 20,
     borderRadius: 10,
   },
@@ -206,7 +197,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#007AFF",
+    backgroundColor: "#2272A7",
     padding: 15,
     marginVertical: 5,
     borderRadius: 10,
@@ -217,5 +208,16 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 10,
+  },
+  title: {
+    fontSize: 34,
+    fontWeight: "bold",
+    color: "black",
+  },
+  titleContainer: {
+    position: "absolute",  // Esto hace que el título esté posicionado de manera independiente
+    top: "12%",            // Ajusta este valor para mover el título hacia arriba o abajo
+    alignItems: "center",
+    marginBottom: "10%",
   },
 });

@@ -9,17 +9,14 @@ import {
   Linking,
   useWindowDimensions,
   Animated,
+  Modal,  // Importar Modal
+  ActivityIndicator,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { añadirHoras } from "../Modulos/Base de Datos Sqlite/Horas";
 import { ObtenerDatosUsuario, ActualizarInicio, ActualizarLatLong } from "../Modulos/InfoUsuario";
 import { Cronometro } from "../Modulos/Cronometro";
-import {
-  functionGetLocation,
-  validation,
-  startBackgroundLocation,
-  stopBackgroundLocation,
-} from "../Modulos/gps";
+import { functionGetLocation, validation, startBackgroundLocation, stopBackgroundLocation } from "../Modulos/gps";
 import { Ionicons } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { obtenerHorasAcumuladas } from "../Modulos/Base de Datos Sqlite/Horas";
@@ -36,6 +33,8 @@ export default function PaginaIngreso() {
   const [actualFill, setActualFill] = useState(0);
   const [localizaciones, setLocalizaciones] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [isLoading, setIsLoading] = useState(false); // Estado para el modal de carga
+  const [isPressed, setIsPressed] = useState(false); // Estado para detectar si el botón está presionado
 
   useEffect(() => {
     obtenerUsuario();
@@ -75,8 +74,6 @@ export default function PaginaIngreso() {
       }
       if (data.Localizaciones) {
         setLocalizaciones(data.Localizaciones);
-        
-        // Buscar ubicación que coincide con coordenadas almacenadas
         const defaultLocation = data.Localizaciones.find(loc => 
           loc.latitud.toString() === data.LatDepartamento &&
           loc.longitud.toString() === data.LonDepartamento
@@ -111,9 +108,15 @@ export default function PaginaIngreso() {
   };
 
   const iniciarTiempo = async () => {
+    setIsLoading(true); // Mostrar el modal de carga
+
     const permiso = await solicitarUbicacion();
-    if (!permiso || !ubicacion) return;
-    
+    if (!permiso || !ubicacion) {
+      Alert.alert("Ubicación obtenida, presiona de nuevo el boton");
+      setIsLoading(false); // Ocultar el modal de carga si no se obtuvo ubicación
+      return;
+    }
+
     const data = await ObtenerDatosUsuario();
     if (await validation(ubicacion, data.LatDepartamento, data.LonDepartamento)) {
       const now = new Date();
@@ -127,7 +130,9 @@ export default function PaginaIngreso() {
         duration: 500,
         useNativeDriver: true,
       }).start();
+      setIsLoading(false); // Ocultar el modal de carga después de iniciar
     } else {
+      setIsLoading(false); // Ocultar el modal de carga si la validación falla
       Alert.alert("Ubicación incorrecta", "No estás dentro del área seleccionada.");
     }
   };
@@ -168,8 +173,16 @@ export default function PaginaIngreso() {
               <Pressable
                 style={[
                   styles.btnChrono,
-                  { backgroundColor: mostrarCrono ? "#B22222" : "#2272A7" }
+                  { backgroundColor: mostrarCrono ? "#B22222" : "#2272A7",
+                    transform: [
+                      {
+                        scale: isPressed ? 1.1 : 1, // Cambiar el tamaño cuando se presiona
+                      },
+                    ],
+                  },
                 ]}
+                onPressIn={() => setIsPressed(true)} // Cuando se presiona
+                onPressOut={() => setIsPressed(false)} // Cuando se suelta
                 onPress={mostrarCrono ? detenerTiempo : iniciarTiempo}
               >
                 <Animated.View
@@ -197,6 +210,16 @@ export default function PaginaIngreso() {
           <Text style={styles.loadingText}>Cargando...</Text>
         )}
       </View>
+
+      {/* Modal de carga */}
+      <Modal transparent={true} animationType="fade" visible={isLoading}>
+        <View style={styles.modalBackground}>
+          <View style={styles.activityIndicatorWrapper}>
+            <ActivityIndicator size="large" color="#0000ff" />
+            <Text style={{ marginTop: 10 }}>Cargando...</Text>
+          </View>
+        </View>
+      </Modal>
 
       {/* Contenedor inferior */}
       <View style={styles.bottomContainer}>
@@ -334,5 +357,20 @@ const styles = StyleSheet.create({
   progressText: {
     fontSize: 18,
     color: "black",
+  },
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: "#FFFFFF",
+    height: 120,
+    width: 120,
+    borderRadius: 10,
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });
