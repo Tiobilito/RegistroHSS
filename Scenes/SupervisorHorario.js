@@ -100,11 +100,13 @@ const PaginaSupervisorHorario = () => {
       style={styles.activeUsersButton}
       onPress={() => setActiveUsersModalVisible(true)}
     >
-      <Ionicons
-      name="person-circle-outline"
-      size={24}
-      color="#2272A7"
-    />
+      {activeUsers.length === 0 && (
+        <Ionicons
+          name="person-circle-outline"
+          size={24}
+          color="#2272A7"
+        />
+      )}
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -122,7 +124,7 @@ const PaginaSupervisorHorario = () => {
         ))}
       </ScrollView>
     </TouchableOpacity>
-  );
+  );  
 
   if (!scheduleData) {
     return <Text style={styles.loadingText}>Cargando datos...</Text>;
