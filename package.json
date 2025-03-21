@@ -52,5 +52,16 @@
     "@babel/core": "^7.20.0",
     "@types/react-native": "^0.73.0"
   },
-  "private": true
+  "private": true,
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-tcp",
+          "react-native-flip-card",
+          "react-native-progress-circle"
+        ]
+      }
+    }
+  }
 }
