@@ -218,7 +218,7 @@ const PaginaSupervisorHorario = () => {
           persons={selectedCellData.persons}
           onClose={() => setModalVisible(false)}
         />
-       <ModalUsuariosActivo
+       <ModalUsuariosActivos
           visible={activeUsersModalVisible}
           users={activeUsers}
           onClose={() => setActiveUsersModalVisible(false)}
