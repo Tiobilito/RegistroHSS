@@ -44,13 +44,28 @@
     "react-native-safe-area-context": "4.12.0",
     "react-native-screens": "~4.4.0",
     "react-native-svg": "^15.8.0",
-    "react-native-tcp": "^4.0.0",
     "react-native-web": "^0.19.13",
     "typescript": "~5.3.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.0",
-    "@types/react-native": "^0.73.0"
+    "@babel/core": "^7.20.0"
+  },
+  "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "exclude": [
+          "react-native-flip-card",
+          "@google/generative-ai",
+          "@sendgrid/mail",
+          "expo-checkbox",
+          "install",
+          "nodemailer",
+          "react-native-progress-circle",
+          "typescript"
+        ],
+        "listUnknownPackages": false
+      }
+    }
   },
   "private": true
 }
