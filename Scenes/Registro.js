@@ -15,6 +15,21 @@ import { Picker } from "@react-native-picker/picker";
 import { AñadeUsuario } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 import { obtenerCentros, obtenerDepartamentos } from "../Modulos/Operaciones Supabase/Departamentos";
 import { CommonActions } from "@react-navigation/native";
+import * as Crypto from 'expo-crypto';
+
+// Función para hashear la contraseña
+const hashPassword = async (password) => {
+  try {
+    const hashedPassword = await Crypto.digestStringAsync(
+      Crypto.CryptoDigestAlgorithm.SHA256,
+      password
+    );
+    return hashedPassword;
+  } catch (error) {
+    console.error("Error al hashear la contraseña: ", error);
+    return null;
+  }
+};
 
 const Scale = Dimensions.get("window").width;
 
@@ -205,7 +220,7 @@ export default function PaginaRegistro({ navigation }) {
                 alignSelf: "center" // Centra el botón horizontalmente
               },
             ]}
-            onPress={() => {
+            onPress={async () => {
               if (
                 Nombre !== "" &&
                 tipoUsuario !== "" &&
@@ -220,11 +235,13 @@ export default function PaginaRegistro({ navigation }) {
                   return;
                 }
                 if (codigo.length === 9) {
+                  // Hasheando la contraseña
+                  const hashedPassword = await hashPassword(Contraseña);
                   AñadeUsuario(
                     Nombre.toUpperCase(),
                     tipoUsuario,
                     parseInt(codigo, 10),
-                    Contraseña,
+                    hashedPassword, // Usamos la contraseña hasheada
                     parseInt(selectedDepartamento, 10),
                     Correo.toLowerCase() // Asegurar que el correo sea en minúsculas
                   );

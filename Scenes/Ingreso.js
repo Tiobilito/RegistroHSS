@@ -19,6 +19,7 @@ import {
 } from "../Modulos/InfoUsuario";
 import * as LocalAuthentication from "expo-local-authentication";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import * as Crypto from "expo-crypto";
 
 const Scale = Dimensions.get("window").width;
 
@@ -68,7 +69,15 @@ export default function PaginaIngreso({ navigation }) {
   const IngresoUsuario = async () => {
     setIsLoading(true);
     try {
-      const result = await EncontrarUsuario(Codigo, Contraseña);
+      const data = await ObtenerDatosUsuario();
+      // Hash de la contraseña ingresada por el usuario
+      const hashedPassword = await Crypto.digestStringAsync(
+        Crypto.CryptoDigestAlgorithm.SHA256,
+        Contraseña
+      );
+      // Compara los hashes
+      const result = await EncontrarUsuario(Codigo, hashedPassword);
+      
       if (result === true) {
         const data = await ObtenerDatosUsuario();
         if (data.Contraseña !== Contraseña) {
