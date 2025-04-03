@@ -11,6 +11,7 @@ import {
   Animated,
   Modal,  // Importar Modal
   ActivityIndicator,
+  Image,
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';  // Importar AsyncStorage
 import { Picker } from "@react-native-picker/picker";
@@ -190,6 +191,10 @@ export default function PaginaIngreso() {
     >
       <View style={styles.overlay}>
         <View style={styles.header}>
+          <Image
+            source={require("../assets/icon.png")}
+            style={styles.icon}  // Usamos el estilo para posicionarlo
+          />
           <Text style={styles.title}>Bienvenido</Text>
           <Text style={styles.subtitle}>Registro de horas</Text>
         </View>
@@ -402,5 +407,12 @@ const styles = StyleSheet.create({
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
+  },
+  icon: {
+    position: "absolute",
+    top: 0,  // Ajusta según lo necesites
+    left: -90, // Ajusta según lo necesites
+    width: 70,  // Ajusta el tamaño de la imagen
+    height: 70, // Ajusta el tamaño de la imagen
   },
 });

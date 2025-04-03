@@ -142,6 +142,25 @@ export default function PaginaIngreso({ navigation }) {
   const image = require("../assets/Back.png");
   const icon = require("../assets/icon.png");
 
+  const levitationAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(levitationAnim, {
+          toValue: -5, // Sube el icono
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(levitationAnim, {
+          toValue: 0, // Regresa a la posición original
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
+
   return (
     <Animated.View style={{ flex: 1 }}>
     {/* Fondo blanco detrás del ImageBackground */}
@@ -164,7 +183,10 @@ export default function PaginaIngreso({ navigation }) {
       >
         <View style={styles.titleContainer}>
           {/* Icono encima del título */}
-          <Image source={icon} style={styles.iconImage} />
+          <Animated.Image 
+            source={icon} 
+            style={[styles.iconImage, { transform: [{ translateY: levitationAnim }] }]} 
+          />
           <Text style={[styles.title]}>
             Ingresa
           </Text>
