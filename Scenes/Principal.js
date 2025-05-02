@@ -12,7 +12,6 @@ import {
   Modal,  // Importar Modal
   ActivityIndicator,
 } from "react-native";
-import AsyncStorage from '@react-native-async-storage/async-storage';  // Importar AsyncStorage
 import { Picker } from "@react-native-picker/picker";
 import { añadirHoras } from "../Modulos/Base de Datos Sqlite/Horas";
 import { ObtenerDatosUsuario, ActualizarInicio, ActualizarLatLong } from "../Modulos/InfoUsuario";
@@ -21,7 +20,6 @@ import { functionGetLocation, validation, startBackgroundLocation, stopBackgroun
 import { Ionicons } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { obtenerHorasAcumuladas } from "../Modulos/Base de Datos Sqlite/Horas";
-import PrivacyModal from '../Modulos/Modales/PrivacyModal'; // Ruta relativa
 
 export default function PaginaIngreso() {
   const { width } = useWindowDimensions();
@@ -35,15 +33,13 @@ export default function PaginaIngreso() {
   const [actualFill, setActualFill] = useState(0);
   const [localizaciones, setLocalizaciones] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPressed, setIsPressed] = useState(false);
-  const [privacyModalVisible, setPrivacyModalVisible] = useState(false);  // Estado para el modal de privacidad
+  const [isLoading, setIsLoading] = useState(false); // Estado para el modal de carga
+  const [isPressed, setIsPressed] = useState(false); // Estado para detectar si el botón está presionado
 
   useEffect(() => {
-    setTimeout(() => {
-      verificarAceptacionPrivacidad();
-    }, 500);  //  Esperar 500ms antes de verificar AsyncStorage
-  }, []);  
+    obtenerUsuario();
+    obtenerTotalHoras();
+  }, []);
 
   const obtenerTotalHoras = async () => {
     const Total = await obtenerHorasAcumuladas();
@@ -69,18 +65,6 @@ export default function PaginaIngreso() {
     return () => progress.removeAllListeners();
   }, []);
 
-  useEffect(() => {
-    // Mostrar el modal de carga al inicio
-    setIsLoading(true);
-    
-    obtenerUsuario();
-    obtenerTotalHoras();
-    verificarAceptacionPrivacidad();  // Verificar si el usuario ya aceptó la privacidad
-  
-    // Una vez que todo haya cargado, oculta el modal
-    setIsLoading(false);
-  }, []);  
-
   const obtenerUsuario = async () => {
     let data = await ObtenerDatosUsuario();
     if (data) {
@@ -100,22 +84,6 @@ export default function PaginaIngreso() {
       }
     }
     setShowAll(true);
-  };
-
-  const verificarAceptacionPrivacidad = async () => {
-    //await AsyncStorage.removeItem('privacyAccepted');  // Eliminar el valor guardado (solo para pruebas)
-    const hasAccepted = await AsyncStorage.getItem('privacyAccepted');
-    console.log('Valor en AsyncStorage:', hasAccepted);
-  
-    if (hasAccepted === null || hasAccepted !== 'true') {  // Asegurar validación estricta
-      console.log('No se ha aceptado la privacidad, mostrando el modal.');
-     setPrivacyModalVisible(true);
-    }
-  };    
-
-  const handleAcceptPrivacy = async () => {
-    await AsyncStorage.setItem('privacyAccepted', 'true');  // Guardar que el usuario aceptó
-    setPrivacyModalVisible(false);  // Cerrar el modal de privacidad
   };
 
   const handleLocationChange = (itemValue) => {
@@ -140,13 +108,12 @@ export default function PaginaIngreso() {
   };
 
   const iniciarTiempo = async () => {
-    setIsLoading(true);
-    console.log("isLoading should be true now");
+    setIsLoading(true); // Mostrar el modal de carga
 
     const permiso = await solicitarUbicacion();
     if (!permiso || !ubicacion) {
       Alert.alert("Ubicación obtenida, presiona de nuevo el boton");
-      setIsLoading(false);
+      setIsLoading(false); // Ocultar el modal de carga si no se obtuvo ubicación
       return;
     }
 
@@ -163,9 +130,9 @@ export default function PaginaIngreso() {
         duration: 500,
         useNativeDriver: true,
       }).start();
-      setIsLoading(false);
+      setIsLoading(false); // Ocultar el modal de carga después de iniciar
     } else {
-      setIsLoading(false);
+      setIsLoading(false); // Ocultar el modal de carga si la validación falla
       Alert.alert("Ubicación incorrecta", "No estás dentro del área seleccionada.");
     }
   };
@@ -204,9 +171,18 @@ export default function PaginaIngreso() {
               )}
 
               <Pressable
-                style={[styles.btnChrono, { backgroundColor: mostrarCrono ? "#B22222" : "#2272A7" }]}
-                onPressIn={() => setIsPressed(true)}
-                onPressOut={() => setIsPressed(false)}
+                style={[
+                  styles.btnChrono,
+                  { backgroundColor: mostrarCrono ? "#B22222" : "#2272A7",
+                    transform: [
+                      {
+                        scale: isPressed ? 1.1 : 1, // Cambiar el tamaño cuando se presiona
+                      },
+                    ],
+                  },
+                ]}
+                onPressIn={() => setIsPressed(true)} // Cuando se presiona
+                onPressOut={() => setIsPressed(false)} // Cuando se suelta
                 onPress={mostrarCrono ? detenerTiempo : iniciarTiempo}
               >
                 <Animated.View
@@ -234,12 +210,6 @@ export default function PaginaIngreso() {
           <Text style={styles.loadingText}>Cargando...</Text>
         )}
       </View>
-
-      {/* Usar PrivacyModal en lugar del modal manual */}
-      <PrivacyModal
-        visible={privacyModalVisible}
-        onAccept={handleAcceptPrivacy}  // Aceptar privacidad
-      />
 
       {/* Modal de carga */}
       <Modal transparent={true} animationType="fade" visible={isLoading}>
