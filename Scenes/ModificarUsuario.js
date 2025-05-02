@@ -13,7 +13,8 @@ import {
 import { Picker } from "@react-native-picker/picker";
 import { ModificaUsuario, ObtenerDatosUsuarioSupa } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 import { obtenerDepartamentos, obtenerCentros } from "../Modulos/Operaciones Supabase/Departamentos";
-import * as Crypto from "expo-crypto"; // Importar hashing
+
+
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
 
 export default function PaginaModUsuario({ navigation }) {
@@ -30,8 +31,6 @@ export default function PaginaModUsuario({ navigation }) {
   const [selectedCentro, setSelectedCentro] = useState(null);
   const [selectedDepartamento, setSelectedDepartamento] = useState(null);
   const [correo, setCorreo] = useState("");
-  // Nuevo estado para almacenar la contraseña original
-  const [originalPassword, setOriginalPassword] = useState("");
 
   const DefDatosUsuario = async () => {
     const dataL = await ObtenerDatosUsuario();
@@ -41,9 +40,7 @@ export default function PaginaModUsuario({ navigation }) {
       DefCodigo(data.Codigo.toString());
       DeftipoUsuario(data.TipoServidor);
       DefContraseña(data.Contraseña);
-      setOriginalPassword(data.Contraseña); // Guardar la original
-      setCorreo(data.Correo);
-      DefContraseña(""); // No mostrar la contraseña hasheada
+      setCorreo(data.Correo);  // Agregar el correo
     }
   };
 
@@ -215,7 +212,7 @@ export default function PaginaModUsuario({ navigation }) {
 
         <Pressable
           style={[styles.btnRegistro, { marginBottom: height * 0.24 }]}
-          onPress={async () => {
+          onPress={() => {
             if (
               Nombre !== "" &&
               tipoUsuario !== "" &&
@@ -224,20 +221,11 @@ export default function PaginaModUsuario({ navigation }) {
               selectedDepartamento !== null
             ) {
               if (codigo.length === 9) {
-                let passwordToSend = Contraseña;
-
-                // Si la contraseña fue modificada, aplicar SHA-256
-                if (Contraseña !== originalPassword) {
-                  passwordToSend = await Crypto.digestStringAsync(
-                    Crypto.CryptoDigestAlgorithm.SHA256,
-                    Contraseña
-                  );
-                }
-                await ModificaUsuario(
+                ModificaUsuario(
                   Nombre.toUpperCase(),
                   tipoUsuario,
                   parseInt(codigo, 10),
-                  passwordToSend,
+                  Contraseña,
                   parseInt(selectedDepartamento, 10),
                   correo // Se agrega el correo aquí
                 );
