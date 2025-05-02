@@ -16,7 +16,6 @@ import {
   Platform, // Para manejar el comportamiento específico según el sistema operativo
 } from "react-native";
 import { changePassword } from "../Modulos/Operaciones Supabase/UsuariosSupa";
-import * as Crypto from "expo-crypto"; // Importar expo-crypto
 
 const image = require("../assets/Back.png");
 const API_BASE_URL = "https://checkactives-api-registrohss.onrender.com";
@@ -105,24 +104,15 @@ export default function ChangePassword({ navigation }) {
     setIsLoading(true);  // Mostrar el modal de carga
   
     try {
-      // Hashear la nueva contraseña con SHA-256
-      const hashedPassword = await Crypto.digestStringAsync(
-        Crypto.CryptoDigestAlgorithm.SHA256,
-        password
-      );
-      // Llamar a la función para cambiar la contraseña con la versión hasheada
-      await changePassword(hashedPassword, userId);
-
-      // Eliminar el token después del cambio exitoso
+      await changePassword(password, userId);
       await fetch(`${API_BASE_URL}/remove-token/${token}`, { method: "POST" });
-
       Alert.alert("Éxito", "Contraseña cambiada exitosamente");
       navigation.navigate("Ingreso");
     } catch (error) {
       console.error("Error al cambiar la contraseña:", error);
       Alert.alert("Error", "Error al cambiar la contraseña");
     } finally {
-      setIsLoading(false); // Ocultar el modal de carga
+      setIsLoading(false);  // Ocultar el modal de carga
     }
   }
 
