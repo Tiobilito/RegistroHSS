@@ -23,6 +23,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { AnimatedCircularProgress } from "react-native-circular-progress";
 import { obtenerHorasAcumuladas } from "../Modulos/Base de Datos Sqlite/Horas";
 import PrivacyModal from '../Modulos/Modales/PrivacyModal'; // Ruta relativa
+import robotGif from '../assets/Robot-O-unscreen.gif';
+import { ScrollView } from "react-native";
 
 export default function PaginaIngreso() {
   const { width } = useWindowDimensions();
@@ -39,6 +41,7 @@ export default function PaginaIngreso() {
   const [isLoading, setIsLoading] = useState(false);
   const [isPressed, setIsPressed] = useState(false);
   const [privacyModalVisible, setPrivacyModalVisible] = useState(false);  // Estado para el modal de privacidad
+  const [bubbleModalVisible, setBubbleModalVisible] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -191,14 +194,15 @@ export default function PaginaIngreso() {
     >
       <View style={styles.overlay}>
         <View style={styles.header}>
-          <Image
-            source={require("../assets/icon.png")}
-            style={styles.icon}  // Usamos el estilo para posicionarlo
-          />
+        <Pressable
+          onPress={() => setBubbleModalVisible(true)}
+          style={styles.iconButton}
+        >
+          <Image source={require("../assets/icon.png")} style={styles.icon} />
+        </Pressable>
           <Text style={styles.title}>Bienvenido</Text>
           <Text style={styles.subtitle}>Registro de horas</Text>
         </View>
-
         {showAll ? (
           <View style={styles.timerContainer}>
             <View style={styles.timerContent}>
@@ -252,6 +256,45 @@ export default function PaginaIngreso() {
           <View style={styles.activityIndicatorWrapper}>
             <ActivityIndicator size="large" color="#0000ff" />
             <Text style={{ marginTop: 10 }}>Cargando...</Text>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal transparent={true} visible={bubbleModalVisible} animationType="fade">
+        <View style={styles.bubbleModalOverlay}>
+          <View style={styles.bubbleContainer}>
+            <ScrollView style={styles.scrollArea} contentContainerStyle={{ alignItems: 'center' }}>
+              <Image
+                source={robotGif}
+                style={[
+                  styles.bubbleGif,
+                  {
+                    width: width * 0.25,
+                    height: width * 0.25,
+                  },
+                ]}
+                resizeMode="contain"
+              />
+
+              <Text style={styles.bubbleText}>
+                Bienvenido al sistema de registro de horas de servicio social.{"\n\n"}
+                ¿Cómo funciona el cronómetro?{"\n"}
+                Este cronómetro te permite llevar un control preciso del tiempo que dedicas a tu servicio social. Cada vez que inicies el cronómetro, se registrará tu tiempo acumulado.{"\n\n"}
+                Permiso de ubicación{"\n"}
+                Antes de comenzar, se te pedirá permiso para acceder a tu ubicación. Este paso es obligatorio para asegurar que te encuentres en el lugar correcto durante tus prácticas.{"\n"}
+                ➤ Una vez otorgado el permiso, deberás presionar nuevamente el botón para iniciar el cronómetro.{"\n\n"}
+                Control del tiempo{"\n"}
+                Puedes detener el cronómetro en cualquier momento. Todo el tiempo registrado será sumado a tu progreso total.{"\n\n"}
+                Gráfica de progreso{"\n"}
+                La gráfica circular a la izquierda se actualiza automáticamente con cada sesión que inicies, mostrando el porcentaje de horas acumuladas respecto al total de 480 horas requeridas.{"\n\n"}
+                Selecciona tu ubicación{"\n"}
+                En el picker de la derecha, puedes elegir el edificio o espacio en el que estás realizando tu servicio social o prácticas. Esto ayuda a mantener un registro más detallado.
+              </Text>
+            </ScrollView>
+
+            <Pressable style={styles.bubbleCloseButton} onPress={() => setBubbleModalVisible(false)}>
+              <Text style={{ color: "#fff", fontWeight: "bold" }}>Cerrar</Text>
+            </Pressable>
           </View>
         </View>
       </Modal>
@@ -409,10 +452,57 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   icon: {
+    width: 70,
+    height: 70,
+    resizeMode: "contain", // opcional
+  },  
+  bubbleModalOverlay: {
+  flex: 1,
+  justifyContent: "center",
+  alignItems: "center",
+  backgroundColor: "rgba(0,0,0,0.3)",
+  },
+  bubbleContainer: {
+    backgroundColor: "#fff",
+    borderRadius: 25,
+    padding: 20,
+    maxWidth: "80%",
+    borderWidth: 2,
+    borderColor: "#2272A7",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    alignItems: "center",
+    overflow: 'hidden',  // Asegura que el WebView no sobresalga
+  },
+  bubbleText: {
+    fontSize: 16,
+    color: "#333",
+    marginBottom: 15,
+    textAlign: "center",
+  },
+  bubbleCloseButton: {
+    backgroundColor: "#2272A7",
+    borderRadius: 15,
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+  },
+  iconButton: {
     position: "absolute",
-    top: 0,  // Ajusta según lo necesites
-    left: -90, // Ajusta según lo necesites
-    width: 70,  // Ajusta el tamaño de la imagen
-    height: 70, // Ajusta el tamaño de la imagen
+    top: 10,  // Puedes ajustar según el notch del dispositivo
+    left: -80,
+    zIndex: 10,
+  },
+  bubbleGif: {
+    width: 120, // Ajusta el tamaño según lo que necesites
+    height: 120,
+    marginBottom: 15,       // Añadir espacio entre el GIF y el texto
+  },
+  scrollArea: {
+    maxHeight: 500,  // Ajusta según tu preferencia
+    width: '100%',
+    marginBottom: 20
   },
 });

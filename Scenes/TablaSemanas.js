@@ -7,6 +7,7 @@ import {
   ImageBackground,
   Pressable,
   useWindowDimensions,
+  Image,
 } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import Checkbox from "expo-checkbox";
@@ -210,6 +211,10 @@ export default function PaginaTablaSemanas({ navigation }) {
     );
     return sumarTiempos(horasSeleccionadas.map((item) => item.Total));
   };
+
+  const [modalInfoVisible, setModalInfoVisible] = useState(false);
+
+  const robotGif = require("../assets/Robot-O-unscreen.gif");
 
   const image = require("../assets/fondo.webp");
 
@@ -417,6 +422,66 @@ export default function PaginaTablaSemanas({ navigation }) {
         visible={modalReporteUsuarioVisible}
         closeModal={() => setModalReporteUsuarioVisible(false)}
       />
+      {/* Ícono burbuja de ayuda */}
+      <Pressable
+        onPress={() => setModalInfoVisible(true)}
+        style={{
+          position: "absolute",
+          top: height * 0.05, // Ajusta la distancia desde la parte superior
+          right: width * 0.05, // Ajusta la distancia desde la parte derecha
+          // Elimina la propiedad elevation
+        }}
+      >
+        <Image
+          source={require("../assets/icon.png")}
+          style={{
+            width: 70 * scaleFactor,
+            height: 70 * scaleFactor,
+            // Asegúrate de no aplicar ningún borde o sombra aquí
+          }}
+        />
+      </Pressable>
+
+      {/* Modal de ayuda */}
+      {modalInfoVisible && (
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Image
+              source={robotGif}
+                style={[
+                  styles.bubbleGif,
+                    {
+                      width: width * 0.25,
+                      height: width * 0.25,
+                    },
+                ]}
+                resizeMode="contain"
+            />
+            <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+              ¿Cómo funciona esta pantalla?
+            </Text>
+            <Text style={{ textAlign: "center", marginBottom: 10 }}>
+              Aquí puedes visualizar, registrar y reportar tus horas por semana.
+              Marca las semanas que quieres reportar y genera el informe con el ícono 📄.
+            </Text>
+            <Text style={{ textAlign: "center", marginBottom: 10 }}>
+              Usa el ícono ➕ para registrar nuevas horas, y el 📖 para revisar tu historial.
+            </Text>
+            <Pressable
+              onPress={() => setModalInfoVisible(false)}
+              style={{
+                backgroundColor: "#2272A7",
+                paddingVertical: 8,
+                paddingHorizontal: 20,
+                borderRadius: 20,
+                marginTop: 10,
+              }}
+            >
+              <Text style={{ color: "white", fontWeight: "bold" }}>Cerrar</Text>
+            </Pressable>
+          </View>
+        </View>
+      )}
     </ImageBackground>
   );
 }
