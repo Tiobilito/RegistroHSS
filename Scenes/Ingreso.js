@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Text,
@@ -10,8 +10,6 @@ import {
   Modal,
   ActivityIndicator,
   useWindowDimensions,
-  Animated,
-  Image,
 } from "react-native";
 import { CommonActions } from "@react-navigation/native";
 import { EncontrarUsuario } from "../Modulos/VerificacionUsuario";
@@ -34,10 +32,6 @@ export default function PaginaIngreso({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
   const [errorModalVisible, setErrorModalVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  // Estado de animación para el fondo
-  const slideAnim = useRef(new Animated.Value(-height)).current; // Empieza fuera de la pantalla (arriba)
-  const backgroundAnim = useRef(new Animated.Value(-height)).current; // Fondo inicia fuera de pantalla
 
   const checkBiometricSupport = async () => {
     const hasHardware = await LocalAuthentication.hasHardwareAsync();
@@ -70,14 +64,6 @@ export default function PaginaIngreso({ navigation }) {
   useEffect(() => {
     checarUsuario();
     checkBiometricSupport();
-  }, []);
-
-  useEffect(() => {
-    Animated.timing(backgroundAnim, {
-      toValue: 0, // Se desliza a su posición normal
-      duration: 800,
-      useNativeDriver: true,
-    }).start();
   }, []);
 
   const IngresoUsuario = async () => {
@@ -140,20 +126,8 @@ export default function PaginaIngreso({ navigation }) {
   };
 
   const image = require("../assets/Back.png");
-  const icon = require("../assets/icon.png");
 
   return (
-    <Animated.View style={{ flex: 1 }}>
-    {/* Fondo blanco detrás del ImageBackground */}
-    <View style={styles.whiteBackground} />
-
-    {/* Fondo animado del ImageBackground */}
-    <Animated.View
-      style={{
-        flex: 1,
-        transform: [{ translateY: backgroundAnim }],
-      }}
-    >
     <ImageBackground source={image} style={styles.imgBackground}>
       <View style={{ height: height * 0.05 }} />
       <View
@@ -163,8 +137,6 @@ export default function PaginaIngreso({ navigation }) {
         ]}
       >
         <View style={styles.titleContainer}>
-          {/* Icono encima del título */}
-          <Image source={icon} style={styles.iconImage} />
           <Text style={[styles.title]}>
             Ingresa
           </Text>
@@ -295,8 +267,6 @@ export default function PaginaIngreso({ navigation }) {
           </View>
         </View>
       </View>
-      </ImageBackground>
-    </Animated.View>
 
       {/* Modal de carga */}
       <Modal transparent={true} animationType="fade" visible={isLoading}>
@@ -326,7 +296,7 @@ export default function PaginaIngreso({ navigation }) {
           </View>
         </View>
       </Modal>
-    </Animated.View>
+    </ImageBackground>
   );
 }
 
@@ -346,9 +316,6 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16, 
-  },
-  animatedContainer: {
-    flex: 1,
   },
   imgBackground: {
     flex: 1,
@@ -486,20 +453,5 @@ const styles = StyleSheet.create({
   errorButtonText: {
     color: "white",
     fontWeight: "bold",
-  },
-  whiteBackground: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "white", // Fondo blanco
-    zIndex: -1, // Para asegurarse de que esté detrás de todo
-  },
-  iconImage: {
-    width: 100, // Ajusta el tamaño del icono
-    height: 100, // Ajusta el tamaño del icono
-    marginBottom: 10, // Espaciado debajo del icono
-    marginTop: -50, // Ajusta el icono hacia arriba
   },
 });
