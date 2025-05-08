@@ -1,7 +1,7 @@
 import { Alert } from "react-native";
 import * as Location from "expo-location";
 import * as TaskManager from "expo-task-manager";
-import { ObtenerDatosUsuario } from "./InfoUsuario";
+import { ObtenerDatosUrls, ObtenerDatosUsuario } from "./InfoUsuario";
 import NetInfo from "@react-native-community/netinfo";
 
 const LOCATION_TASK_NAME = "background-location-task";
@@ -98,11 +98,12 @@ export const stopBackgroundLocation = async () => {
 
 export const activateActivity = async () => {
   const data = await ObtenerDatosUsuario();
+  const Urls = await ObtenerDatosUrls();
   const { isConnected } = await NetInfo.fetch();
   if (isConnected) {
     console.log("Activando Status...");
     try {
-      await fetch(`https://checkactives-api-registrohss.onrender.com/activity/${data.Codigo}`, {
+      await fetch(Urls.Api + `/activity/${data.Codigo}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
@@ -114,11 +115,12 @@ export const activateActivity = async () => {
 
 export const deactivateActivity = async () => {
   const data = await ObtenerDatosUsuario();
+  const Urls = await ObtenerDatosUrls();
   const { isConnected } = await NetInfo.fetch();
   if (isConnected) {
     console.log("Desactivando Status...");
     try {
-      await fetch(`https://checkactives-api-registrohss.onrender.com/deactivate/${data.Codigo}`, {
+      await fetch(Urls.Api + `/activity/${data.Codigo}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });

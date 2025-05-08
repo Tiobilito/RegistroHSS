@@ -19,6 +19,7 @@ import PaginaSupervisorHorario from "./Scenes/SupervisorHorario";
 import PaginaSupervisorReportes from "./Scenes/Reportes";
 import PaginaSupervisorAjustes from "./Scenes/SupervisorAjustes";
 import PaginaSupervisorHoras from "./Scenes/SupervisorHoras";
+import { getUrls } from "./Modulos/Operaciones Supabase/Generales";
 
 const Tab = createBottomTabNavigator();
 const TabSupervisor = createBottomTabNavigator();
@@ -141,6 +142,7 @@ const SupervisorNavigation = () => {
 export default function App() {
   useEffect(() => {
     initializeDatabase();
+    getUrls();
   }, []);
 
   return (
