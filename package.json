@@ -57,7 +57,9 @@
           "expo-checkbox",
           "install",
           "react-native-progress-circle",
-          "typescript"
+          "typescript",
+          "@rneui/base", 
+          "@rneui/themed"
         ],
         "listUnknownPackages": false
       }
