@@ -118,93 +118,100 @@ export default function Reportes({ navigation }) {
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    justifyContent: "center", 
-    alignItems: "center",
     width: "100%",
   },
   container: {
     flex: 1,
-    padding: 30,
-    width: "95%",
-    borderRadius: 10,
-    margin: 20,
+    paddingHorizontal: 20,
+    paddingTop: 60,
   },
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
     textAlign: "center",
+    marginBottom: 20,
+    color: "black",
     marginTop: 80,
   },
   reportListContainer: {
     flex: 1,
-    maxHeight: "50%", // Limitar la altura máxima del contenedor de la lista
-    width: "100%",
+    marginTop: 10,
   },
   reportInfoContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start",
     alignItems: "center",
-    marginBottom: 10,
-    backgroundColor: "#fcfcfc",
-    borderRadius: 10,
-    borderColor: "grey",
-    borderWidth: 0.8,
-    padding: 10,
+    backgroundColor: "#ffffff",
+    borderRadius: 16,
+    padding: 16,
+    marginVertical: 8,
+    borderWidth: 1,
+    borderColor: "black",
   },
   userIcon: {
-    marginRight: 10, // Espacio entre el icono y el texto
+    marginRight: 12,
+    color: "#2272A7",
   },
   text: {
     fontSize: 16,
     fontWeight: "bold",
-    textAlign: "center", // Centrar el texto
-  },
-  reportDetailsContainer: {
-    marginLeft: 10,
-    backgroundColor: "#f1f1f1",
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 10,
-  },
-  reportText: {
-    fontSize: 14,
     color: "#333",
+  },
+  subText: {
+    fontSize: 14,
+    fontWeight: "normal",
+    color: "#666",
   },
   modalOverlay: {
     flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
   },
   modalContainer: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     padding: 20,
-    borderRadius: 10,
-    width: "80%",
-    minHeight: "40%", // Nueva altura mínima
-    maxHeight: "60%", // Reducida para no ocupar toda la pantalla
-    alignSelf: "center", // Asegura que el modal esté centrado
+    borderRadius: 20,
+    width: "85%",
+    maxHeight: "80%",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
   },
   modalContent: {
-    maxHeight: "85%", // Limitar el área de contenido dentro del modal
-    overflow: "scroll", // Permite el desplazamiento del contenido
+    maxHeight: "75%",
   },
   modalTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 15,
+    color: "black",
     textAlign: "center",
+    marginBottom: 15,
+  },
+  reportDetailsContainer: {
+    backgroundColor: "#F5F9FF",
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: "#2272A7",
+  },
+  reportText: {
+    fontSize: 14,
+    color: "#444",
+    marginBottom: 4,
   },
   closeButton: {
-    marginTop: 20,
-    padding: 10,
+    marginTop: 16,
+    paddingVertical: 12,
     backgroundColor: "#2272A7",
-    borderRadius: 5,
+    borderRadius: 10,
   },
   closeButtonText: {
-    color: "white",
+    color: "#fff",
     textAlign: "center",
     fontSize: 16,
+    fontWeight: "bold",
   },
 });
