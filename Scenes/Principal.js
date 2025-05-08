@@ -107,19 +107,28 @@ export default function PaginaIngreso() {
   };
 
   const verificarAceptacionPrivacidad = async () => {
-    //await AsyncStorage.removeItem('privacyAccepted');  // Eliminar el valor guardado (solo para pruebas)
-    const hasAccepted = await AsyncStorage.getItem('privacyAccepted');
+    const data = await ObtenerDatosUsuario();
+    if (!data || !data.Codigo) return;
+
+    const claveUsuario = `privacyAccepted_${data.Codigo}`;
+    const hasAccepted = await AsyncStorage.getItem(claveUsuario);
     console.log('Valor en AsyncStorage:', hasAccepted);
-  
-    if (hasAccepted === null || hasAccepted !== 'true') {  // Asegurar validación estricta
-      console.log('No se ha aceptado la privacidad, mostrando el modal.');
-     setPrivacyModalVisible(true);
+    console.log(`Usuario con código ${data.Codigo} - ¿Aceptó privacidad?`, hasAccepted === 'true');
+
+    if (hasAccepted !== 'true') {
+      console.log('No se ha aceptado la privacidad para este usuario, mostrando el modal.');
+      setPrivacyModalVisible(true);
     }
-  };    
+  };
 
   const handleAcceptPrivacy = async () => {
-    await AsyncStorage.setItem('privacyAccepted', 'true');  // Guardar que el usuario aceptó
-    setPrivacyModalVisible(false);  // Cerrar el modal de privacidad
+    const data = await ObtenerDatosUsuario();
+    if (!data || !data.Codigo) return;
+
+    const claveUsuario = `privacyAccepted_${data.Codigo}`;
+    await AsyncStorage.setItem(claveUsuario, 'true');
+    console.log(`Usuario con código ${data.Codigo} - ¿Aceptó privacidad?`, hasAccepted === 'true');
+    setPrivacyModalVisible(false);
   };
 
   const handleLocationChange = (itemValue) => {
