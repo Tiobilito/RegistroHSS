@@ -13,39 +13,8 @@ import {
   Platform,
   SafeAreaView,
   Alert,
-  Image,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import robotGif from '../assets/Robot-O-unscreen.gif';
-
-// Función que envía la petición al endpoint /api/chat
-const sendChatRequest = async (messages, apiUrl) => {
-  const payload = {
-    model: "RegistroChat",
-    messages: messages,
-    stream: false,
-  };
-
-  try {
-    const response = await fetch(apiUrl + "/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.response || (data.message && data.message.content) || "";
-  } catch (error) {
-    console.error("Error en la solicitud:", error);
-    throw error;
-  }
-};
 import { ObtenerDatosUrls } from "../Modulos/InfoUsuario";
 
 export default function PaginaAyuda() {
@@ -57,10 +26,6 @@ export default function PaginaAyuda() {
   const scrollViewRef = useRef();
   const [url, setUrl] = useState("");
 
-  // Estados para el modal de configuración de URL
-  const [modalVisible, setModalVisible] = useState(false);
-  const [tempUrl, setTempUrl] = useState(url);
-  const [modalInfoVisible, setModalInfoVisible] = useState(false);
   // Función que envía la petición al endpoint /api/chat
   const sendChatRequest = async (messages) => {
     const payload = {
@@ -102,7 +67,6 @@ export default function PaginaAyuda() {
   // Contexto que se enviará únicamente en el primer mensaje
   const PROMPT_PREFIXES_Ilab =
     "Plaza IlabTDI (departamento de servicio social al que el prestador se inscribió): IlabTDI es un departamento orientado a desarrollar proyectos prácticos, además de orientar a nuestros prestadores a experimentar el ámbito laboral mediante nuestras metodologías de desarrollo, así como fomentar las soft skills para formar equipos. ";
-
 
   const sendMessage = async () => {
     if (!chatMessage.trim() || isLoading) return;
@@ -159,69 +123,6 @@ export default function PaginaAyuda() {
           style={styles.flexContainer}
           keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         >
-          {/* Botón tipo burbuja de ayuda */}
-          <Pressable
-            style={{
-              position: "absolute",
-              top: 40,
-              left: 20,
-              zIndex: 10, // Para asegurarte que esté encima del contenido
-            }}
-            onPress={() => setModalInfoVisible(true)}
-          >
-            <Image source={require("../assets/icon.png")} style={styles.icon} />
-          </Pressable>
-          {/* Modal de información tipo burbuja */}
-          <Modal
-            animationType="fade"
-            transparent={true}
-            visible={modalInfoVisible}
-            onRequestClose={() => setModalInfoVisible(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View
-                style={{
-                  backgroundColor: "#fff",
-                  borderRadius: 15,
-                  padding: 20,
-                  alignItems: "center",
-                  width: "85%",
-                }}
-              >
-                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
-                  Asistente Virtual
-                </Text>
-                <Text style={{ textAlign: "center", marginBottom: 10 }}>
-                  Puedes usar este chat para obtener orientación sobre tu servicio social, resolver dudas comunes y más. Asegúrate de tener configurada la URL del servidor.
-                </Text>
-                <Image
-                  source={robotGif}
-                  style={{ width: 150, height: 150, marginBottom: 10 }}
-                  resizeMode="contain"
-                />
-                <Pressable
-                  style={{
-                    backgroundColor: "#2196F3",
-                    paddingHorizontal: 20,
-                    paddingVertical: 8,
-                    borderRadius: 10,
-                  }}
-                  onPress={() => setModalInfoVisible(false)}
-                >
-                  <Text style={{ color: "#fff", fontWeight: "bold" }}>Cerrar</Text>
-                </Pressable>
-              </View>
-            </View>
-          </Modal>
-
-          {/* Botón para abrir el modal de configuración de URL */}
-          <View style={styles.configButtonContainer}>
-            <Pressable style={styles.configButton} onPress={() => setModalVisible(true)}>
-              <Ionicons name="settings" size={24 * scaleFactor} color="#FFF" />
-              <Text style={styles.configButtonText}>Configurar URL</Text>
-            </Pressable>
-          </View>
-
           {/* Contenedor del chat */}
           <View
             style={[
@@ -318,26 +219,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
   },
-  configButtonContainer: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    zIndex: 10,
-  },
-  configButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2272A7",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    marginTop: "10%",
-  },
-  configButtonText: {
-    color: "#FFF",
-    marginLeft: 6,
-    fontSize: 16,
-  },
   chatContainer: {
     backgroundColor: "#ffffff",
     borderRadius: 20,
@@ -390,53 +271,5 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#F0F0F0",
     borderBottomLeftRadius: 5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "80%",
-    backgroundColor: "#FFF",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  modalInput: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-  },
-  modalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  modalButton: {
-    flex: 1,
-    backgroundColor: "#2196F3",
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  modalButtonText: {
-    color: "#FFF",
-    fontWeight: "bold",
-  },
-  icon: {
-    width: 70,
-    height: 70,
-    resizeMode: "contain", // opcional
   },
 });
