@@ -285,17 +285,27 @@ export default function PaginaIngreso() {
               />
 
               <Text style={styles.bubbleText}>
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
                 Bienvenido al sistema de registro de horas de servicio social.{"\n\n"}
+                </Text>
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
                 ¿Cómo funciona el cronómetro?{"\n"}
+                </Text>
                 Este cronómetro te permite llevar un control preciso del tiempo que dedicas a tu servicio social. Cada vez que inicies el cronómetro, se registrará tu tiempo acumulado.{"\n\n"}
                 Permiso de ubicación{"\n"}
                 Antes de comenzar, se te pedirá permiso para acceder a tu ubicación. Este paso es obligatorio para asegurar que te encuentres en el lugar correcto durante tus prácticas.{"\n"}
-                ➤ Una vez otorgado el permiso, deberás presionar nuevamente el botón para iniciar el cronómetro.{"\n\n"}
+                Una vez otorgado el permiso, deberás presionar nuevamente el botón para iniciar el cronómetro.{"\n\n"}
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
                 Control del tiempo{"\n"}
+                </Text>
                 Puedes detener el cronómetro en cualquier momento. Todo el tiempo registrado será sumado a tu progreso total.{"\n\n"}
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
                 Gráfica de progreso{"\n"}
+                </Text>
                 La gráfica circular a la izquierda se actualiza automáticamente con cada sesión que inicies, mostrando el porcentaje de horas acumuladas respecto al total de 480 horas requeridas.{"\n\n"}
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
                 Selecciona tu ubicación{"\n"}
+                </Text>
                 En el picker de la derecha, puedes elegir el edificio o espacio en el que estás realizando tu servicio social o prácticas. Esto ayuda a mantener un registro más detallado.
               </Text>
             </ScrollView>

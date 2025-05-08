@@ -246,7 +246,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   headerCell: {
-    backgroundColor: "#3498db",
+    backgroundColor: "gray",
     borderRadius: 12,
   },
   hourCell: {
