@@ -11,14 +11,15 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
-  Modal,
   SafeAreaView,
   Alert,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { ObtenerDatosUrls } from "../Modulos/InfoUsuario";
 
 // Función que envía la petición al endpoint /api/chat
-const sendChatRequest = async (messages, apiUrl) => {
+const sendChatRequest = async (messages) => {
+  const apiUrl = ObtenerDatosUrls().Chatbot;
   const payload = {
     model: "RegistroChat",
     messages: messages,
@@ -53,20 +54,11 @@ export default function PaginaAyuda() {
   const [chatMessage, setChatMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef();
-  const [url, setUrl] = useState("");
   // Contexto que se enviará únicamente en el primer mensaje
   const PROMPT_PREFIXES_Ilab = "Plaza IlabTDI (departamento de servicio social al que el prestador se inscribió): IlabTDI es un departamento orientado a desarrollar proyectos prácticos, además de orientar a nuestros prestadores a experimentar el ámbito laboral mediante nuestras metodologías de desarrollo, así como fomentar las soft skills para formar equipos. ";
 
-  // Estados para el modal de configuración de URL
-  const [modalVisible, setModalVisible] = useState(false);
-  const [tempUrl, setTempUrl] = useState(url);
-
   const sendMessage = async () => {
     if (!chatMessage.trim() || isLoading) return;
-    if (!url.trim()) {
-      Alert.alert("Error", "La URL no está configurada. Por favor, configúrala.");
-      return;
-    }
 
     // Almacenar el mensaje original en el historial para mostrar
     const newUserMessage = { role: "user", content: chatMessage };
@@ -112,14 +104,6 @@ export default function PaginaAyuda() {
           style={styles.flexContainer}
           keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         >
-          {/* Botón para abrir el modal de configuración de URL */}
-          <View style={styles.configButtonContainer}>
-            <Pressable style={styles.configButton} onPress={() => setModalVisible(true)}>
-              <Ionicons name="settings" size={24 * scaleFactor} color="#FFF" />
-              <Text style={styles.configButtonText}>Configurar URL</Text>
-            </Pressable>
-          </View>
-
           {/* Contenedor del chat */}
           <View
             style={[
@@ -196,47 +180,6 @@ export default function PaginaAyuda() {
               )}
             </Pressable>
           </View>
-
-          {/* Modal para configurar la URL */}
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}
-          >
-            <View style={styles.modalOverlay}>
-              <View style={styles.modalContainer}>
-                <Text style={styles.modalTitle}>Configurar URL</Text>
-                <TextInput
-                  style={styles.modalInput}
-                  placeholder="Ingresa la URL"
-                  placeholderTextColor="#999"
-                  value={tempUrl}
-                  onChangeText={setTempUrl}
-                />
-                <View style={styles.modalButtonContainer}>
-                  <Pressable
-                    style={styles.modalButton}
-                    onPress={() => {
-                      setUrl(tempUrl);
-                      setModalVisible(false);
-                    }}
-                  >
-                    <Text style={styles.modalButtonText}>Guardar</Text>
-                  </Pressable>
-                  <Pressable
-                    style={styles.modalButton}
-                    onPress={() => {
-                      setTempUrl(url);
-                      setModalVisible(false);
-                    }}
-                  >
-                    <Text style={styles.modalButtonText}>Cancelar</Text>
-                  </Pressable>
-                </View>
-              </View>
-            </View>
-          </Modal>
         </KeyboardAvoidingView>
       </ImageBackground>
     </SafeAreaView>
@@ -250,26 +193,6 @@ const styles = StyleSheet.create({
   flexContainer: {
     flex: 1,
     alignItems: "center",
-  },
-  configButtonContainer: {
-    position: "absolute",
-    top: 10,
-    right: 20,
-    zIndex: 10,
-  },
-  configButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2196F3",
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    marginTop: "10%",
-  },
-  configButtonText: {
-    color: "#FFF",
-    marginLeft: 6,
-    fontSize: 16,
   },
   chatContainer: {
     backgroundColor: "#ffffff",
@@ -323,48 +246,5 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     backgroundColor: "#F0F0F0",
     borderBottomLeftRadius: 5,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContainer: {
-    width: "80%",
-    backgroundColor: "#FFF",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 15,
-  },
-  modalInput: {
-    width: "100%",
-    borderWidth: 1,
-    borderColor: "#DDD",
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 15,
-  },
-  modalButtonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
-  },
-  modalButton: {
-    flex: 1,
-    backgroundColor: "#2196F3",
-    paddingVertical: 10,
-    marginHorizontal: 5,
-    borderRadius: 5,
-    alignItems: "center",
-  },
-  modalButtonText: {
-    color: "#FFF",
-    fontWeight: "bold",
   },
 });
