@@ -1,3 +1,4 @@
+// HorarioSupa.js
 import { supabase } from "./supabase";
 import {
   ObtenerDatosUsuario,
