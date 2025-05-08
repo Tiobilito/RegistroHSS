@@ -44,7 +44,6 @@
     "react-native-svg": "^15.8.0",
     "react-native-video": "^6.11.0",
     "react-native-web": "^0.19.13",
-    "socket.io-client": "^4.8.1",
     "typescript": "~5.3.3"
   },
   "devDependencies": {
