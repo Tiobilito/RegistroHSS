@@ -169,11 +169,15 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   title: {
-    fontSize: 28, // Título más grande
+    fontSize: 28,
     fontWeight: "bold",
     marginBottom: 20,
     textAlign: "center",
-    marginTop: 80, // Baja el título
+    marginTop: 80,
+    // Sombras
+    textShadowColor: "#000",
+    textShadowOffset: { width: 0.70, height: 0.70 },
+    textShadowRadius: 0.1,
   },
   filterSubtitle: {
     fontSize: 18, // Subtítulo para los filtros
@@ -183,11 +187,17 @@ const styles = StyleSheet.create({
   },
   filtersContainer: {
     marginBottom: 20,
-    backgroundColor: "#fcfcfc", // Fondo gris claro para los filtros
-    borderRadius: 10, // Bordes redondeados para los filtros
-    padding: 15, // Espaciado interno
-    borderColor: "black", // Borde negro
-    borderWidth: 0.5, // Grosor del borde
+    backgroundColor: "#fcfcfc",
+    borderRadius: 10,
+    padding: 15,
+    borderColor: "black",
+    borderWidth: 0.5,
+    // Sombras
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4, // Para Android
   },
   filterRow: {
     flexDirection: "row",
@@ -209,14 +219,20 @@ const styles = StyleSheet.create({
   },
   studentInfoContainer: {
     flexDirection: "row",
-    justifyContent: "flex-start", // Alinear el texto y el picker a la izquierda
-    alignItems: "center", // Asegura que el texto y el picker estén centrados
+    justifyContent: "flex-start",
+    alignItems: "center",
     marginBottom: 10,
-    backgroundColor: "#fcfcfc", // Fondo gris claro para los filtros
+    backgroundColor: "#fcfcfc",
     borderRadius: 10,
-    borderColor: "black", // Borde negro
-    borderWidth: 0.5, // Grosor del borde
+    borderColor: "black",
+    borderWidth: 0.5,
     padding: 7,
+    // Sombras
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
   },
   text: {
     fontSize: 16, // Nombre más pequeño para que todo se acomode

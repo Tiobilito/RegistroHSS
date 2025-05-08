@@ -136,7 +136,9 @@ export default function ChangePassword({ navigation }) {
       >
       <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
         <ImageBackground source={image} style={styles.imgBackground}>
+        <View style={styles.titleContainer}>
         <Text style={styles.title}>Recuperar contraseña</Text>
+        </View>
           <View style={styles.formContainer}>
             {!userId && (
               <>
@@ -262,17 +264,23 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   section: {
-    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    backgroundColor: "rgb(250, 250, 250)",
     borderRadius: 10,
     padding: 20,
     marginBottom: 20,
     width: "100%",
     alignItems: "center",
-  },
+    // Sombra para iOS
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    // Sombra para Android
+    elevation: 8,
+  },  
   title: {
     fontWeight: "bold",
     color: "black",
-    marginBottom: 10,
   },
   subtitleContainer: {
     alignSelf: "stretch",
@@ -343,8 +351,15 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: "bold",
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: "center",
-    marginTop: 40,
+    marginTop: 10,
   },
+  titleContainer: {
+    backgroundColor: "rgba(250, 250, 250, 0.84)",
+    paddingVertical: 0,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: "center",
+  },  
 });

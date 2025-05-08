@@ -16,6 +16,7 @@ import { AñadeUsuario } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 import { obtenerCentros, obtenerDepartamentos } from "../Modulos/Operaciones Supabase/Departamentos";
 import { CommonActions } from "@react-navigation/native";
 import * as Crypto from 'expo-crypto';
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 // Función para hashear la contraseña
 const hashPassword = async (password) => {
@@ -105,7 +106,10 @@ export default function PaginaRegistro({ navigation }) {
             }
           ]}
         >
-          <Text style={styles.subtitle}>Nombre</Text>
+          <View style={styles.section}>
+            <Icon name="user" size={20} color="#2272A7" style={styles.icon} />
+              <Text style={styles.subtitle}>Nombre</Text>
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={(text) => {
@@ -114,7 +118,10 @@ export default function PaginaRegistro({ navigation }) {
             value={Nombre}
             placeholder="Nombre"
           />
-          <Text style={styles.subtitle}>Código</Text>
+          <View style={styles.section}>
+            <Icon name="id-badge" size={20} color="#2272A7" style={styles.icon} />
+              <Text style={styles.subtitle}>Código</Text>
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={(text) => {
@@ -124,7 +131,10 @@ export default function PaginaRegistro({ navigation }) {
             value={codigo}
             placeholder="Codigo"
           />
-          <Text style={styles.subtitle}>Correo Electrónico</Text>
+          <View style={styles.section}>
+            <Icon name="envelope" size={20} color="#2272A7" style={styles.icon} />
+              <Text style={styles.subtitle}>Correo Electrónico</Text>
+          </View>
           <TextInput
             style={styles.input}
             onChangeText={(text) => DefCorreo(text)}
@@ -132,7 +142,10 @@ export default function PaginaRegistro({ navigation }) {
             placeholder="Correo Electrónico"
             keyboardType="email-address"
           />
-          <Text style={styles.subtitle}>Rol </Text>
+          <View style={styles.section}>
+            <Icon name="shield" size={20} color="#2272A7" style={styles.icon} />
+              <Text style={styles.subtitle}>Rol </Text>
+          </View>
           <View
             style={[
               { width: 240, height: 150 },
@@ -149,7 +162,10 @@ export default function PaginaRegistro({ navigation }) {
               <Picker.Item label="Practicante" value="Practicante" />
             </Picker>
           </View>
-          <Text style={styles.subtitle}>Centro Universitario</Text>
+          <View style={[styles.section, { alignItems: "center" }]}>
+            <Icon name="building" size={20} color="#2272A7" style={styles.icon} />
+              <Text style={styles.subtitle}>Centro Universitario</Text>
+          </View>
           <View
             style={[
               { width: 240, height: 150 },
@@ -174,7 +190,10 @@ export default function PaginaRegistro({ navigation }) {
             selectedCentro !== "Selecciona una opción" &&
             departamentos.length > 0 && (
               <>
-                <Text style={styles.subtitle}>Selecciona un Departamento</Text>
+              <View style={[styles.section, { alignItems: "center" }]}>
+                <Icon name="sitemap" size={20} color="#2272A7" style={styles.icon} />
+                  <Text style={styles.subtitle}>Selecciona un Departamento</Text>
+              </View>
                 <View
                   style={[
                     { width: 240, height: 150 },
@@ -200,7 +219,10 @@ export default function PaginaRegistro({ navigation }) {
                 </View>
               </>
             )}
-          <Text style={styles.subtitle}>Contraseña </Text>
+          <View style={styles.section}>
+            <Icon name="key" size={20} color="#2272A7" style={styles.icon} />
+              <Text style={styles.subtitle}>Contraseña </Text>
+          </View>
           <TextInput
             style={styles.input}
             secureTextEntry={true}
@@ -275,23 +297,32 @@ const styles = StyleSheet.create({
     marginTop: -40,
   },
   subtitle: {
-    fontSize: Scale > 400 ? 18 : 14,
+    fontSize: 16,
     marginLeft: "4%",
+    marginTop: 5,
+    marginBottom: 5,
     color: "black",
+    fontWeight: "600",
+  },
+  icon: {
+    marginRight: 10,
+    marginTop: 3,
   },
   txtBtn: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   background: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    // Se eliminó resizeMode aquí ya que se especifica en la prop resizeMode del ImageBackground
   },
   formContainer: {
-    height: "65%",
-    width: "84%",
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    borderRadius: 20,
+    padding: 20,
+    alignSelf: "center",
   },
   titleContainer: {
     alignItems: "center",
@@ -299,19 +330,17 @@ const styles = StyleSheet.create({
     marginTop: "55%",
   },
   input: {
-    height: 40,
-    margin: 12,
-    padding: 10,
+    height: 50,
+    paddingHorizontal: 15,
+    marginVertical: 8,
     backgroundColor: "#C5E0F2",
-    borderRadius: 50,
-    elevation: 15,
-    shadowColor: "#333333",
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    borderRadius: 12,
+    fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 5,
   },
   btnContainer: {
     alignItems: "center",
@@ -365,5 +394,10 @@ const styles = StyleSheet.create({
     height: 1,
     width: 120,
     backgroundColor: "black",
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
   },
 });
