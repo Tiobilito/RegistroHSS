@@ -127,7 +127,6 @@ export default function PaginaIngreso() {
 
     const claveUsuario = `privacyAccepted_${data.Codigo}`;
     await AsyncStorage.setItem(claveUsuario, 'true');
-    console.log(`Usuario con código ${data.Codigo} - ¿Aceptó privacidad?`, hasAccepted === 'true');
     setPrivacyModalVisible(false);
   };
 
