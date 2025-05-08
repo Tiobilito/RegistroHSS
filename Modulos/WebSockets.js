@@ -1,8 +1,6 @@
 import { io } from "socket.io-client";
 import { ObtenerDatosUrls } from "./InfoUsuario";
 
-// URL del servidor WebSocket
-let SERVER_URL;
 let socket;
 
 // Función para registrar un usuario activo
@@ -54,7 +52,7 @@ function handleConnection() {
 export async function initializeWebSocketClient() {
   const Urls = await ObtenerDatosUrls();
   if (Urls) {
-    SERVER_URL = Urls.Api;
+    const SERVER_URL = Urls.Api;
     socket = io(SERVER_URL);
   }
   handleConnection();

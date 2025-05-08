@@ -32,7 +32,7 @@ export const GuardarDatosUsuario = async (
       LonDepartamento: localizaciones[0]?.longitud?.toString() || "",
       Localizaciones: localizaciones,
       idDepartamento: iddepartamento,
-      Correo: Correo
+      Correo: Correo,
     };
 
     const jsonData = JSON.stringify(data);
@@ -151,7 +151,7 @@ export const GuardarDatosUrls = async (api, chatbot) => {
   } catch (error) {
     console.error("Error al guardar los datos de URLs: ", error);
   }
-}
+};
 
 export const ObtenerDatosUrls = async () => {
   try {
@@ -165,4 +165,4 @@ export const ObtenerDatosUrls = async () => {
     console.error("Error al obtener los datos de URLs: ", error);
     return null;
   }
-}
+};
