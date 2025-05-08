@@ -35,8 +35,10 @@ export default function ChangePassword({ navigation }) {
 
   async function handleRequestToken() {
     const url = await ObtenerDatosUrls();
-    const API_BASE_URL = url.Chatbot;
-    if (isLoading) return; // Aseguramos que no se ejecute si ya está en carga
+    const API_BASE_URL = url.Api;
+    console.log("URL del API:", API_BASE_URL);
+    console.log("Email:", email);
+    if (isLoading) return;
   
     if (!email) {
       Alert.alert("Error", "Por favor ingresa un correo válido.");
