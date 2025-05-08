@@ -15,10 +15,10 @@ import { ModificaUsuario, ObtenerDatosUsuarioSupa } from "../Modulos/Operaciones
 import { obtenerDepartamentos, obtenerCentros } from "../Modulos/Operaciones Supabase/Departamentos";
 import * as Crypto from "expo-crypto"; // Importar hashing
 import { ObtenerDatosUsuario } from "../Modulos/InfoUsuario";
+import Icon from 'react-native-vector-icons/FontAwesome'; // Importar los íconos
 
 export default function PaginaModUsuario({ navigation }) {
   const { width, height } = useWindowDimensions();
-  // Factor de escala basado en un ancho base de 375
   const scaleFactor = width / 375;
 
   const [Nombre, DefNombre] = useState("");
@@ -30,8 +30,9 @@ export default function PaginaModUsuario({ navigation }) {
   const [selectedCentro, setSelectedCentro] = useState(null);
   const [selectedDepartamento, setSelectedDepartamento] = useState(null);
   const [correo, setCorreo] = useState("");
-  // Nuevo estado para almacenar la contraseña original
   const [originalPassword, setOriginalPassword] = useState("");
+  const [buttonYPosition, setButtonYPosition] = useState(0); // Para calcular la posición del botón
+  const [scrollHeight, setScrollHeight] = useState(0); // Para controlar la altura del ScrollView
 
   const DefDatosUsuario = async () => {
     const dataL = await ObtenerDatosUsuario();
@@ -41,7 +42,7 @@ export default function PaginaModUsuario({ navigation }) {
       DefCodigo(data.Codigo.toString());
       DeftipoUsuario(data.TipoServidor);
       DefContraseña(data.Contraseña);
-      setOriginalPassword(data.Contraseña); // Guardar la original
+      setOriginalPassword(data.Contraseña);
       setCorreo(data.Correo);
       DefContraseña(""); // No mostrar la contraseña hasheada
     }
@@ -69,6 +70,16 @@ export default function PaginaModUsuario({ navigation }) {
     }
   }, [selectedCentro]);
 
+  const handleButtonLayout = (event) => {
+    const { y } = event.nativeEvent.layout;
+    setButtonYPosition(y);
+  };
+
+  const handleContentLayout = (event) => {
+    const { height } = event.nativeEvent.layout;
+    setScrollHeight(height);
+  };
+
   const image = require("../assets/Back.png");
 
   return (
@@ -77,24 +88,29 @@ export default function PaginaModUsuario({ navigation }) {
       style={[styles.background, { width, height }]}
       resizeMode="cover"
     >
-      {/* Contenedor del título */}
-      <View
-        style={[
-          styles.titleContainer,
-          { marginTop: height * 0.25, marginBottom: height * 0.05 },
-        ]}
-      >
+      <View style={[styles.titleContainer, { marginTop: height * 0.18, marginBottom: height * 0.03 }]}>
         <Text style={[styles.title, { fontSize: scaleFactor > 1 ? 30 : 28 }]}>
           Editar usuario
         </Text>
       </View>
-
+      <View style={{ height: 500, width: width * 0.84 }}>
       <ScrollView
-        style={[styles.formContainer, { width: width * 0.84, height: height * 0.55 }]}
+        contentContainerStyle={[
+          styles.formContainer,
+          { 
+            width: width * 0.84,
+            flexGrow: 1 // <- esto es CLAVE para limitar el scroll al contenido real
+          }
+        ]}
+        onLayout={handleContentLayout}
+        showsVerticalScrollIndicator={false}
+        bounces={false}
+        overScrollMode="never"
       >
-        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>
-          Nombre
-        </Text>
+        <View style={styles.section}>
+          <Icon name="user" size={20} color="#2272A7" style={styles.icon} />
+          <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>Nombre</Text>
+        </View>
         <TextInput
           style={[styles.input, { fontSize: 16 * scaleFactor }]}
           onChangeText={(text) => DefNombre(text)}
@@ -102,22 +118,18 @@ export default function PaginaModUsuario({ navigation }) {
           placeholder="Nombre"
         />
 
-        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>
-          Código
-        </Text>
-        <Text
-          style={{
-            fontSize: 24 * scaleFactor,
-            marginLeft: "4%",
-            color: "black",
-          }}
-        >
+        <View style={styles.section}>
+          <Icon name="id-badge" size={20} color="#2272A7" style={styles.icon} />
+          <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>Código</Text>
+        </View>
+        <Text style={{ fontSize: 24 * scaleFactor, marginLeft: "4%", color: "black" }}>
           {codigo}
         </Text>
 
-        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>
-          Correo
-        </Text>
+        <View style={styles.section}>
+          <Icon name="envelope" size={20} color="#2272A7" style={styles.icon} />
+          <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14 }]}>Correo</Text>
+        </View>
         <TextInput
           style={[styles.input, { fontSize: 16 * scaleFactor }]}
           onChangeText={(text) => setCorreo(text)}
@@ -125,16 +137,13 @@ export default function PaginaModUsuario({ navigation }) {
           placeholder="Correo electrónico"
         />
 
-        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginBottom: 5 }]}>
-          Rol
-        </Text>
-        {/* Se reduce la altura del contenedor del Picker para Rol */}
-        <View
-          style={{
-            width: 240 * (width / 375),
-            height: 80 * (height / 667), // Reducido de 100 a 80
-          }}
-        >
+        <View style={styles.section}>
+          <Icon name="shield" size={20} color="#2272A7" style={styles.icon} />
+          <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginBottom: 5 }]}>
+            Rol
+          </Text>
+        </View>
+        <View style={{ width: 240 * (width / 375), height: 80 * (height / 667) }}>
           <Picker
             selectedValue={tipoUsuario}
             itemStyle={[styles.text, { fontSize: 16 * scaleFactor }]}
@@ -146,16 +155,13 @@ export default function PaginaModUsuario({ navigation }) {
           </Picker>
         </View>
 
-        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -40 }]}>
-          Centro Universitario
-        </Text>
-        {/* Reducir también la altura del contenedor del Picker para Centro Universitario */}
-        <View
-          style={{
-            width: 240 * (width / 375),
-            height: 80 * (height / 667), // Reducido de 100 a 80
-          }}
-        >
+        <View style={[styles.section, { alignItems: "center" }]}>
+          <Icon name="building" size={20} color="#2272A7" style={styles.icon} />
+          <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -30 }]}>
+            Centro Universitario
+          </Text>
+        </View>
+        <View style={{ width: 240 * (width / 375), height: 80 * (height / 667) }}>
           <Picker
             selectedValue={selectedCentro}
             itemStyle={[styles.text, { fontSize: 16 * scaleFactor }]}
@@ -175,15 +181,13 @@ export default function PaginaModUsuario({ navigation }) {
           selectedCentro !== "Selecciona una opción" &&
           departamentos.length > 0 && (
             <>
-              <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -40 }]}>
-                Selecciona un Departamento
-              </Text>
-              <View
-                style={{
-                  width: 240 * (width / 375),
-                  height: 80 * (height / 667), // Reducido de 100 a 80
-                }}
-              >
+              <View style={[styles.section, { alignItems: "center" }]}>
+                <Icon name="sitemap" size={20} color="#2272A7" style={styles.icon} />
+                <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -30 }]}>
+                  Selecciona un Departamento
+                </Text>
+              </View>
+              <View style={{ width: 240 * (width / 375), height: 80 * (height / 667) }}>
                 <Picker
                   selectedValue={selectedDepartamento}
                   itemStyle={[styles.text, { fontSize: 16 * scaleFactor }]}
@@ -202,9 +206,12 @@ export default function PaginaModUsuario({ navigation }) {
             </>
           )}
 
-        <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -40 }]}>
-          Contraseña
-        </Text>
+        <View style={styles.section}>
+          <Icon name="key" size={20} color="#2272A7" style={styles.icon} />
+          <Text style={[styles.subtitle, { fontSize: scaleFactor > 1 ? 18 : 14, marginTop: -30 }]}>
+            Contraseña
+          </Text>
+        </View>
         <TextInput
           style={[styles.input, { fontSize: 16 * scaleFactor }]}
           secureTextEntry={true}
@@ -214,7 +221,7 @@ export default function PaginaModUsuario({ navigation }) {
         />
 
         <Pressable
-          style={[styles.btnRegistro, { marginBottom: height * 0.24 }]}
+          style={[styles.btnRegistro, { marginBottom: 20 }]}
           onPress={async () => {
             if (
               Nombre !== "" &&
@@ -226,7 +233,6 @@ export default function PaginaModUsuario({ navigation }) {
               if (codigo.length === 9) {
                 let passwordToSend = Contraseña;
 
-                // Si la contraseña fue modificada, aplicar SHA-256
                 if (Contraseña !== originalPassword) {
                   passwordToSend = await Crypto.digestStringAsync(
                     Crypto.CryptoDigestAlgorithm.SHA256,
@@ -239,7 +245,7 @@ export default function PaginaModUsuario({ navigation }) {
                   parseInt(codigo, 10),
                   passwordToSend,
                   parseInt(selectedDepartamento, 10),
-                  correo // Se agrega el correo aquí
+                  correo
                 );
                 navigation.goBack();
               } else {
@@ -249,69 +255,96 @@ export default function PaginaModUsuario({ navigation }) {
               Alert.alert("Por favor rellene todos los datos, o cancele");
             }
           }}
+          onLayout={handleButtonLayout}
         >
-          <Text style={[styles.txtBtn, { fontSize: 16 * scaleFactor }]}>
-            Modificar
-          </Text>
+          <Text style={[styles.txtBtn, { fontSize: 16 * scaleFactor }]}>Modificar</Text>
         </Pressable>
       </ScrollView>
+      </View>
     </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: "bold",
     color: "black",
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 16,
     marginLeft: "4%",
+    marginTop: 5,
+    marginBottom: 5,
     color: "black",
+    fontWeight: "600",
+  },
+  icon: {
+    marginRight: 10,
+    marginTop: 3,
   },
   txtBtn: {
     color: "white",
     fontWeight: "bold",
+    fontSize: 16,
   },
   background: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    resizeMode: "cover",
   },
   formContainer: {
-    width: "84%",
+    backgroundColor: "rgba(255, 255, 255, 0.85)",
+    borderRadius: 20,
+    padding: 20,
+    alignSelf: "center",
   },
   titleContainer: {
     alignItems: "center",
     marginBottom: "10%",
   },
   input: {
-    height: 40,
-    margin: 12,
-    padding: 10,
+    height: 50,
+    paddingHorizontal: 15,
+    marginVertical: 8,
     backgroundColor: "#C5E0F2",
-    borderRadius: 50,
-    elevation: 15,
-    shadowColor: "#333333",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    borderRadius: 12,
+    fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 5,
+  },
+  pickerContainer: {
+    backgroundColor: "#C5E0F2",
+    borderRadius: 12,
+    marginVertical: 8,
+    marginLeft: "4%",
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 5,
   },
   btnRegistro: {
     backgroundColor: "#2272A7",
-    height: "8%",
-    width: "40%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginBottom: "24%",
-    borderRadius: 10,
-    elevation: 15,
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 30,
+    elevation: 6,
     shadowColor: "#333333",
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3,
     alignSelf: "center",
+    marginTop: 20,
+  },
+  section: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 6,
   },
 });

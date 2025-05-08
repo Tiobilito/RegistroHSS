@@ -26,6 +26,7 @@ export default function PaginaAjustes({ navigation }) {
   const [usuario, setUsuario] = useState(null);
   const rotateY = useSharedValue(0);
   const [flipped, setFlipped] = useState(false);
+  const [modalInfoVisible, setModalInfoVisible] = useState(false); // Estado del modal
 
   useEffect(() => {
     const cargarDatosUsuario = async () => {
@@ -160,7 +161,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 10,
+    borderRadius: 20,
   },
   cardFront: {
     backgroundColor: "#2272A7",
@@ -204,9 +205,12 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   title: {
-    fontSize: 34,
+    fontSize: 36,
     fontWeight: "bold",
     color: "black",
+    textShadowColor: "rgba(0,0,0,0.2)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   titleContainer: {
     position: "absolute",
@@ -217,5 +221,5 @@ const styles = StyleSheet.create({
     width: "80%",
     height: "30%",
     position: "relative",
-  },
+  }, 
 });

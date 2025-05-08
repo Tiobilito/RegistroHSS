@@ -14,8 +14,10 @@ import {
   Modal,
   SafeAreaView,
   Alert,
+  Image,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import robotGif from '../assets/Robot-O-unscreen.gif';
 
 // Función que envía la petición al endpoint /api/chat
 const sendChatRequest = async (messages, apiUrl) => {
@@ -60,6 +62,7 @@ export default function PaginaAyuda() {
   // Estados para el modal de configuración de URL
   const [modalVisible, setModalVisible] = useState(false);
   const [tempUrl, setTempUrl] = useState(url);
+  const [modalInfoVisible, setModalInfoVisible] = useState(false);
 
   const sendMessage = async () => {
     if (!chatMessage.trim() || isLoading) return;
@@ -112,6 +115,61 @@ export default function PaginaAyuda() {
           style={styles.flexContainer}
           keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         >
+          {/* Botón tipo burbuja de ayuda */}
+          <Pressable
+            style={{
+              position: "absolute",
+              top: 40,
+              left: 20,
+              zIndex: 10, // Para asegurarte que esté encima del contenido
+            }}
+            onPress={() => setModalInfoVisible(true)}
+          >
+            <Image source={require("../assets/icon.png")} style={styles.icon} />
+          </Pressable>
+          {/* Modal de información tipo burbuja */}
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={modalInfoVisible}
+            onRequestClose={() => setModalInfoVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View
+                style={{
+                  backgroundColor: "#fff",
+                  borderRadius: 15,
+                  padding: 20,
+                  alignItems: "center",
+                  width: "85%",
+                }}
+              >
+                <Text style={{ fontSize: 18, fontWeight: "bold", marginBottom: 10 }}>
+                  Asistente Virtual
+                </Text>
+                <Text style={{ textAlign: "center", marginBottom: 10 }}>
+                  Puedes usar este chat para obtener orientación sobre tu servicio social, resolver dudas comunes y más. Asegúrate de tener configurada la URL del servidor.
+                </Text>
+                <Image
+                  source={robotGif}
+                  style={{ width: 150, height: 150, marginBottom: 10 }}
+                  resizeMode="contain"
+                />
+                <Pressable
+                  style={{
+                    backgroundColor: "#2196F3",
+                    paddingHorizontal: 20,
+                    paddingVertical: 8,
+                    borderRadius: 10,
+                  }}
+                  onPress={() => setModalInfoVisible(false)}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "bold" }}>Cerrar</Text>
+                </Pressable>
+              </View>
+            </View>
+          </Modal>
+
           {/* Botón para abrir el modal de configuración de URL */}
           <View style={styles.configButtonContainer}>
             <Pressable style={styles.configButton} onPress={() => setModalVisible(true)}>
@@ -126,7 +184,7 @@ export default function PaginaAyuda() {
               styles.chatContainer,
               {
                 width: width * 0.9,
-                marginTop: height * 0.10,
+                marginTop: height * 0.15,
                 flex: 1,
               },
             ]}
@@ -253,14 +311,14 @@ const styles = StyleSheet.create({
   },
   configButtonContainer: {
     position: "absolute",
-    top: 10,
+    top: 50,
     right: 20,
     zIndex: 10,
   },
   configButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#2196F3",
+    backgroundColor: "#2272A7",
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 20,
@@ -366,5 +424,10 @@ const styles = StyleSheet.create({
   modalButtonText: {
     color: "#FFF",
     fontWeight: "bold",
+  },
+  icon: {
+    width: 70,
+    height: 70,
+    resizeMode: "contain", // opcional
   },
 });

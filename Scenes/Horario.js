@@ -179,7 +179,9 @@ const PaginaHorario = () => {
           </View>
         </ScrollView>
       </View>
-      <Button title="Guardar Horario" onPress={guardarHorario} />
+      <TouchableOpacity style={styles.saveButton} onPress={guardarHorario}>
+        <Text style={styles.saveButtonText}>Guardar Horario</Text>
+      </TouchableOpacity>
     </ImageBackground>
   );
 };
@@ -191,14 +193,26 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
   Header: {
-    fontSize: 20,
+    fontSize: 28,
     fontWeight: "bold",
     textAlign: "center",
+    color: "#2c3e50",
     marginBottom: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.1)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   scheduleContainer: {
     flex: 1,
     marginHorizontal: 10,
+    backgroundColor: "rgba(255,255,255,0.9)",
+    borderRadius: 16,
+    padding: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    elevation: 3,
   },
   headerRow: {
     flexDirection: "row",
@@ -207,8 +221,9 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderWidth: 1,
-    borderColor: "#ccc",
-    backgroundColor: "#f0f0f0",
+    borderColor: "#ddd",
+    backgroundColor: "#ecf0f1",
+    borderTopLeftRadius: 12,
   },
   bodyScrollView: {
     flex: 1,
@@ -225,31 +240,62 @@ const styles = StyleSheet.create({
   cell: {
     width: 70,
     height: 70,
-    borderWidth: 1,
-    borderColor: "#ccc",
     justifyContent: "center",
     alignItems: "center",
+    margin: 2,
+    borderRadius: 12,
   },
   headerCell: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#3498db",
+    borderRadius: 12,
   },
   hourCell: {
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#ecf0f1",
+    borderRadius: 12,
   },
   headerText: {
     fontWeight: "bold",
+    color: "#fff",
+    textAlign: "center",
   },
-  hourText: {},
+  hourText: {
+    fontWeight: "500",
+    color: "#2c3e50",
+  },
   attendedCell: {
-    backgroundColor: "#4caf50",
+    backgroundColor: "#27ae60",
   },
   emptyCell: {
     backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ddd",
   },
   attendedText: {
     color: "#fff",
     fontWeight: "bold",
   },
+  saveButton: {
+    marginTop: 10, // antes 20
+    marginBottom: 20,
+    marginHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: "#2577d9", // azul más fuerte
+    borderRadius: 30,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 6,
+  },  
+  saveButtonText: {
+    color: "#fff",
+    fontSize: 17,
+    fontWeight: "bold",
+    textShadowColor: "rgba(0, 0, 0, 0.2)",
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 1,
+  },  
 });
 
 export default PaginaHorario;
