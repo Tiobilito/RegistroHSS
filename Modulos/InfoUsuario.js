@@ -32,7 +32,7 @@ export const GuardarDatosUsuario = async (
       LonDepartamento: localizaciones[0]?.longitud?.toString() || "",
       Localizaciones: localizaciones,
       idDepartamento: iddepartamento,
-      Correo: Correo
+      Correo: Correo,
     };
 
     const jsonData = JSON.stringify(data);
@@ -136,5 +136,33 @@ export const BorrarHorarioUsuario = async () => {
     console.log("Horario borrado correctamente");
   } catch (error) {
     console.error("Error al borrar el horario: ", error);
+  }
+};
+
+export const GuardarDatosUrls = async (api, chatbot) => {
+  try {
+    const data = {
+      Api: api,
+      Chatbot: chatbot,
+    };
+    const jsonData = JSON.stringify(data);
+    await AsyncStorage.setItem("@Urls", jsonData);
+    console.log("Datos de URLs guardados correctamente: ", jsonData);
+  } catch (error) {
+    console.error("Error al guardar los datos de URLs: ", error);
+  }
+};
+
+export const ObtenerDatosUrls = async () => {
+  try {
+    const jsonData = await AsyncStorage.getItem("@Urls");
+    if (jsonData != null) {
+      return JSON.parse(jsonData);
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error("Error al obtener los datos de URLs: ", error);
+    return null;
   }
 };
