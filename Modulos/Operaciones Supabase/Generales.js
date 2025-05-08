@@ -3,7 +3,7 @@ import { GuardarDatosUrls } from "../InfoUsuario";
 
 export async function getUrls() {
   const { data, error } = await supabase
-    .from("Urls")
+    .from("URLs")
     .select("url")
     .in("id", [1, 2]);
 

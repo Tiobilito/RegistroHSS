@@ -17,36 +17,6 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { ObtenerDatosUrls } from "../Modulos/InfoUsuario";
 
-// Función que envía la petición al endpoint /api/chat
-const sendChatRequest = async (messages) => {
-  const apiUrl = ObtenerDatosUrls().Chatbot;
-  const payload = {
-    model: "RegistroChat",
-    messages: messages,
-    stream: false,
-  };
-
-  try {
-    const response = await fetch(apiUrl + "/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Error HTTP: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.response || (data.message && data.message.content) || "";
-  } catch (error) {
-    console.error("Error en la solicitud:", error);
-    throw error;
-  }
-};
-
 export default function PaginaAyuda() {
   const { width, height } = useWindowDimensions();
   const scaleFactor = width / 375;
@@ -54,8 +24,49 @@ export default function PaginaAyuda() {
   const [chatMessage, setChatMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef();
+  const [url, setUrl] = useState("");
+
+  // Función que envía la petición al endpoint /api/chat
+  const sendChatRequest = async (messages) => {
+    const payload = {
+      model: "RegistroChat",
+      messages: messages,
+      stream: false,
+    };
+
+    try {
+      const response = await fetch(url + "/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error HTTP: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.response || (data.message && data.message.content) || "";
+    } catch (error) {
+      console.error("Error en la solicitud:", error);
+      throw error;
+    }
+  };
+
+  useEffect(() => {
+    const fetchUrl = async () => {
+      const apiUrl = await ObtenerDatosUrls();
+      console.log("URL del API:", apiUrl.Chatbot);
+      setUrl(apiUrl.Chatbot);
+    };
+    fetchUrl();
+  }, []);
+
   // Contexto que se enviará únicamente en el primer mensaje
-  const PROMPT_PREFIXES_Ilab = "Plaza IlabTDI (departamento de servicio social al que el prestador se inscribió): IlabTDI es un departamento orientado a desarrollar proyectos prácticos, además de orientar a nuestros prestadores a experimentar el ámbito laboral mediante nuestras metodologías de desarrollo, así como fomentar las soft skills para formar equipos. ";
+  const PROMPT_PREFIXES_Ilab =
+    "Plaza IlabTDI (departamento de servicio social al que el prestador se inscribió): IlabTDI es un departamento orientado a desarrollar proyectos prácticos, además de orientar a nuestros prestadores a experimentar el ámbito laboral mediante nuestras metodologías de desarrollo, así como fomentar las soft skills para formar equipos. ";
 
   const sendMessage = async () => {
     if (!chatMessage.trim() || isLoading) return;
@@ -67,9 +78,14 @@ export default function PaginaAyuda() {
 
     // Armar el mensaje que se enviará al backend
     const messageForBackend =
-      chatHistory.length === 0 ? PROMPT_PREFIXES_Ilab + chatMessage : chatMessage;
+      chatHistory.length === 0
+        ? PROMPT_PREFIXES_Ilab + chatMessage
+        : chatMessage;
     // Crear el arreglo de mensajes a enviar, sin modificar lo que se muestra en el chat
-    const messagesToSend = [...chatHistory, { role: "user", content: messageForBackend }];
+    const messagesToSend = [
+      ...chatHistory,
+      { role: "user", content: messageForBackend },
+    ];
 
     setChatMessage("");
 
@@ -77,10 +93,13 @@ export default function PaginaAyuda() {
       setIsLoading(true);
       const botResponse = await sendChatRequest(messagesToSend, url);
       const botMessage = { role: "assistant", content: botResponse };
-      setChatHistory(prev => [...prev, botMessage]);
+      setChatHistory((prev) => [...prev, botMessage]);
     } catch (error) {
       // Mostrar alerta de error para que se configure la URL o se solucione el problema
-      Alert.alert("Error en la petición", "Hubo un problema al conectarse con el servidor. Por favor, verifica la URL y vuelve a intentarlo.");
+      Alert.alert(
+        "Error en la petición",
+        "Hubo un problema al conectarse con el servidor. Por favor, verifica la URL y vuelve a intentarlo."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -110,7 +129,7 @@ export default function PaginaAyuda() {
               styles.chatContainer,
               {
                 width: width * 0.9,
-                marginTop: height * 0.10,
+                marginTop: height * 0.1,
                 flex: 1,
               },
             ]}
@@ -120,17 +139,23 @@ export default function PaginaAyuda() {
               style={styles.scrollView}
               contentContainerStyle={{ paddingBottom: 100 }}
               keyboardDismissMode="interactive"
-              onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+              onContentSizeChange={() =>
+                scrollViewRef.current?.scrollToEnd({ animated: true })
+              }
             >
               {chatHistory.map((msg, index) => (
                 <View
                   key={index}
                   style={[
                     styles.messageContainer,
-                    msg.role === "user" ? styles.userMessage : styles.botMessage,
+                    msg.role === "user"
+                      ? styles.userMessage
+                      : styles.botMessage,
                   ]}
                 >
-                  <Text style={[styles.chatText, { fontSize: 16 * scaleFactor }]}>
+                  <Text
+                    style={[styles.chatText, { fontSize: 16 * scaleFactor }]}
+                  >
                     {msg.content}
                   </Text>
                 </View>
