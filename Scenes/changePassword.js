@@ -17,9 +17,9 @@ import {
 } from "react-native";
 import { changePassword } from "../Modulos/Operaciones Supabase/UsuariosSupa";
 import * as Crypto from "expo-crypto"; // Importar expo-crypto
+import { ObtenerDatosUrls } from "../Modulos/InfoUsuario";
 
 const image = require("../assets/Back.png");
-const API_BASE_URL = "https://checkactives-api-registrohss.onrender.com";
 
 export default function ChangePassword({ navigation }) {
   const { width } = useWindowDimensions();
@@ -34,6 +34,8 @@ export default function ChangePassword({ navigation }) {
   const [isLoading, setIsLoading] = useState(false);
 
   async function handleRequestToken() {
+    const url = await ObtenerDatosUrls();
+    const API_BASE_URL = url.Chatbot;
     if (isLoading) return; // Aseguramos que no se ejecute si ya está en carga
   
     if (!email) {
@@ -62,6 +64,8 @@ export default function ChangePassword({ navigation }) {
   }
 
   async function handleVerifyToken() {
+    const url = await ObtenerDatosUrls();
+    const API_BASE_URL = url.Chatbot;
     if (isLoading) return; // Aseguramos que no se ejecute si ya está en carga
   
     if (!token) {
@@ -91,6 +95,8 @@ export default function ChangePassword({ navigation }) {
   }  
 
   async function handleChangePassword() {
+    const url = await ObtenerDatosUrls();
+    const API_BASE_URL = url.Chatbot;
     if (isLoading) return; // Aseguramos que no se ejecute si ya está en carga
   
     if (!userId) {
